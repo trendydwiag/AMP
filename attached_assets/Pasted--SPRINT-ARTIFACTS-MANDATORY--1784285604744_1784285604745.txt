@@ -1,0 +1,188 @@
+====================================================
+SPRINT ARTIFACTS (MANDATORY)
+====================================================
+
+This sprint is not complete until ALL documentation below has been generated.
+
+Create (or update) the following documents.
+
+----------------------------------------------------
+1. CHANGELOG
+----------------------------------------------------
+
+Create or update
+
+docs/changelog/CHANGELOG.md
+
+Append a new section:
+
+## Sprint 3.4D
+
+Include:
+
+- Summary
+- Features completed
+- Bugs fixed
+- UI improvements
+- Backend fixes
+- Refactoring
+- Files modified
+- Breaking changes (if any)
+- Known Issues
+- Demo readiness
+
+Never overwrite previous sprint history.
+
+Always append.
+
+----------------------------------------------------
+2. DECISION LOG
+----------------------------------------------------
+
+Create or update
+
+docs/architecture/DECISION_LOG.md
+
+Document every architectural decision made during this sprint.
+
+Include:
+
+Decision
+
+Reason
+
+Alternatives considered
+
+Trade-offs
+
+Impact
+
+Future migration path
+
+This document will become the engineering history of AMP Studio.
+
+----------------------------------------------------
+3. UI CHANGELOG
+----------------------------------------------------
+
+Create or update
+
+docs/ui/UI_CHANGELOG.md
+
+Document every visual change.
+
+Include:
+
+Before
+
+After
+
+Reason
+
+Affected pages
+
+Screenshots (if available)
+
+----------------------------------------------------
+4. QA REPORT
+----------------------------------------------------
+
+Create
+
+docs/reports/QA_SPRINT_3_4D.md
+
+Include:
+
+Pages tested
+
+Errors found
+
+Errors fixed
+
+Remaining issues
+
+Browser compatibility
+
+Responsive validation
+
+Accessibility notes
+
+Performance observations
+
+----------------------------------------------------
+5. TECHNICAL DEBT
+----------------------------------------------------
+
+Create or update
+
+docs/architecture/TECH_DEBT.md
+
+Every unresolved issue discovered during this sprint must be recorded.
+
+Do not hide problems.
+
+Document them.
+
+Each item must include:
+
+Priority
+
+Description
+
+Impact
+
+Suggested solution
+
+Estimated effort
+
+----------------------------------------------------
+6. DEMO STATUS
+----------------------------------------------------
+
+Create or update
+
+docs/demo/DEMO_STATUS.md
+
+Include
+
+Current completion percentage
+
+Completed modules
+
+Modules still under construction
+
+Known demo risks
+
+Recommendation before presenting to Kabulhaden
+
+Overall Demo Score
+
+(0–100)
+
+----------------------------------------------------
+7. NEXT SPRINT
+----------------------------------------------------
+
+Create
+
+docs/sprints/NEXT_SPRINT.md
+
+Based on everything discovered during this sprint,
+
+recommend the next sprint priorities.
+
+Rank them by
+
+Business Value
+
+Technical Risk
+
+Demo Importance
+
+====================================================
+QUALITY RULE
+====================================================
+
+Documentation is part of the deliverable.
+
+A sprint without updated documentation is considered incomplete.
