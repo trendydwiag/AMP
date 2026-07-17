@@ -23,20 +23,31 @@ class IcecastAdapter(RadioProviderAdapter):
             return {}
 
     def _find_mount(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        mounts = data.get('icestats', {}).get('mount', [])
-        if isinstance(mounts, dict):
-            mounts = [mounts]
+        ice = data.get('icestats', {})
+
+        # Icecast uses 'source' key (not 'mount') for active stream sources.
+        # When one source is connected it's a dict; when multiple, a list.
+        # Some older/patched builds may use 'mount' — check both.
+        raw = ice.get('source') or ice.get('mount')
+        if raw is None:
+            return {}
+        mounts = [raw] if isinstance(raw, dict) else list(raw)
+
+        # Try to match by mount path extracted from stream_url
         stream_path = ''
         if self.stream_url:
             parts = self.stream_url.rstrip('/').split('/')
             stream_path = '/' + parts[-1] if parts else ''
+
         for mount in mounts:
+            # Icecast 'source' entries use 'listenurl' or 'mount' for identification
+            listen = mount.get('listenurl', '')
             mnt = mount.get('mount', '')
-            if stream_path and mnt == stream_path:
-                return mount
-        if mounts:
-            return mounts[0]
-        return {}
+            if stream_path:
+                if listen.endswith(stream_path) or mnt == stream_path:
+                    return mount
+        # No exact match — return first available source
+        return mounts[0] if mounts else {}
 
     def get_now_playing(self) -> NowPlayingData:
         data = self._get_status()

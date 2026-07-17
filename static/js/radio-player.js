@@ -27,8 +27,10 @@ document.addEventListener('alpine:init', () => {
 
         init() {
             this.audio = new Audio();
-            this.audio.preload = 'auto';
-            this.audio.crossOrigin = 'anonymous';
+            this.audio.preload = 'none';
+            // crossOrigin intentionally NOT set — Icecast does not send CORS headers
+            // by default, and setting crossOrigin='anonymous' causes the browser to
+            // block playback silently. Radio streaming does not require canvas access.
             this.audio.volume = this.volume / 100;
 
             this.audio.addEventListener('playing', () => {
