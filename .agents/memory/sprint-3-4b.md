@@ -28,7 +28,7 @@ description: Changes made in Sprint 3.4B design polish pass across all studio pa
 - Added `x-init="init()"` to header stream status widget (was missing, polling never started)
 
 ## ProfilingPanel Fix
-- PANELS list in DEBUG_TOOLBAR_CONFIG explicitly excludes ProfilingPanel
-- SHOW_TOOLBAR_CALLBACK approach was insufficient — only PANELS exclusion prevents the cProfile crash on concurrent requests
+- Use `DEBUG_TOOLBAR_PANELS` (top-level Django setting), NOT `DEBUG_TOOLBAR_CONFIG['PANELS']` — the latter key is silently ignored by debug_toolbar
+- Also omit `RedirectsPanel` — it sits between the toolbar chain and ProfilingPanel and can still trigger crashes when redirects arrive concurrently
 
-**Why:** ProfilingPanel uses cProfile which raises ValueError if two requests arrive simultaneously. Removing it from PANELS prevents it from being instantiated.
+**Why:** ProfilingPanel uses cProfile which raises ValueError if two requests arrive simultaneously. `get_panels()` in debug_toolbar reads exclusively from `settings.DEBUG_TOOLBAR_PANELS`, so `DEBUG_TOOLBAR_CONFIG['PANELS']` has zero effect — a silent no-op that wasted two fix attempts.
