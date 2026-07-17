@@ -4,402 +4,458 @@
 {% block title %}Beranda{% endblock %}
 
 {% block content %}
-<div class="space-y-8">
+<div class="space-y-6">
 
   {# ── Welcome Banner ── #}
-  <div class="flex items-start justify-between gap-4">
-    <div class="flex items-center gap-4">
-      {# Partner Logo #}
-      {% if SITE_LOGO %}
-      <div class="w-14 h-14 rounded-2xl overflow-hidden border border-[var(--amp-border-light)] shadow-sm flex-shrink-0">
-        <img src="{{ SITE_LOGO }}" alt="{{ SITE_NAME }}" class="w-full h-full object-contain p-1">
+  <div class="rounded-2xl overflow-hidden" style="background: linear-gradient(135deg, var(--amp-coffee-700) 0%, var(--amp-coffee-500) 60%, var(--amp-coffee-400) 100%);">
+    <div class="px-6 py-5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4 min-w-0">
+        {% if SITE_LOGO %}
+        <div class="w-12 h-12 rounded-xl overflow-hidden bg-white/10 border border-white/20 flex-shrink-0">
+          <img src="{{ SITE_LOGO }}" alt="{{ SITE_NAME }}" class="w-full h-full object-contain p-1.5">
+        </div>
+        {% else %}
+        <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><circle cx="12" cy="12" r="2"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+        </div>
+        {% endif %}
+        <div class="min-w-0">
+          <h1 class="text-white font-semibold text-lg leading-tight truncate">
+            {% now "H" as h %}{% if h < "11" %}Selamat pagi{% elif h < "15" %}Selamat siang{% elif h < "18" %}Selamat sore{% else %}Selamat malam{% endif %}, {{ user.get_full_name|default:user.username }}! 👋
+          </h1>
+          <p class="text-white/60 text-sm mt-0.5 truncate">{{ SITE_NAME }} · Ringkasan aktivitas hari ini</p>
+        </div>
       </div>
-      {% else %}
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--amp-coffee-400)] to-[var(--amp-coffee-600)] flex items-center justify-center flex-shrink-0 shadow-sm">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><circle cx="12" cy="12" r="2"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+      <div class="hidden md:flex items-center gap-2 flex-shrink-0">
+        {% if not setup_wizard_done %}
+        <a href="{% url 'studio:setup_wizard' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-colors">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Setup Wizard
+        </a>
+        {% endif %}
+        <a href="{% url 'news:cms_article_create' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-[var(--amp-coffee-700)] text-sm font-semibold hover:bg-white/90 transition-colors">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Artikel Baru
+        </a>
       </div>
-      {% endif %}
-      <div>
-        <h1 class="amp-page-title">
-          {% now "H" as h %}
-          {% if h < "11" %}Selamat pagi{% elif h < "15" %}Selamat siang{% elif h < "18" %}Selamat sore{% else %}Selamat malam{% endif %},
-          {{ user.get_full_name|default:user.username }}! 👋
-        </h1>
-        <p class="amp-page-subtitle">{{ SITE_NAME }} · Berikut ringkasan aktivitas hari ini.</p>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-2 flex-shrink-0">
-      {% if not setup_wizard_done %}
-      <a href="{% url 'studio:setup_wizard' %}" class="amp-btn amp-btn-secondary gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        Setup Wizard
-      </a>
-      {% endif %}
-      <a href="{% url 'news:cms_article_create' %}" class="amp-btn amp-btn-primary gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Artikel Baru
-      </a>
     </div>
   </div>
 
-  {# ── Sprint 3.5: Dashboard Action Cards (contextual suggestions) ── #}
+  {# ── Metric Cards ── #}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+    {# Live Listeners #}
+    <div class="amp-card p-5" x-data="streamStatus()" x-init="init()">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: var(--amp-danger-light);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amp-danger)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="amp-status-dot" :class="isLive ? 'live' : 'offline'"></span>
+          <span class="text-xs font-medium" :class="isLive ? 'text-[var(--amp-danger)]' : 'text-[var(--amp-text-tertiary)]'" x-text="isLive ? 'LIVE' : 'OFFLINE'">OFFLINE</span>
+        </div>
+      </div>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)] leading-none mb-1" x-text="listenerCount || '0'">0</p>
+      <p class="text-sm text-[var(--amp-text-tertiary)]">Pendengar Online</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-2 truncate" x-text="currentProgram || 'Tidak ada program'">—</p>
+    </div>
+
+    {# Articles #}
+    <div class="amp-card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: var(--amp-info-light);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        {% if stats.articles_pending %}
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style="background: var(--amp-warning-light); color: var(--amp-warning-dark);">{{ stats.articles_pending }} pending</span>
+        {% endif %}
+      </div>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)] leading-none mb-1">{{ stats.articles_today|default:"0" }}</p>
+      <p class="text-sm text-[var(--amp-text-tertiary)]">Artikel Diterbitkan</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-2">Hari ini</p>
+    </div>
+
+    {# Podcasts #}
+    <div class="amp-card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: var(--amp-success-light);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style="background: var(--amp-success-light); color: var(--amp-success-dark);">{{ stats.podcast_total|default:"0" }} total</span>
+      </div>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)] leading-none mb-1">{{ stats.podcast_episodes|default:"0" }}</p>
+      <p class="text-sm text-[var(--amp-text-tertiary)]">Episode Podcast</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-2">Baru bulan ini</p>
+    </div>
+
+    {# Programs #}
+    <div class="amp-card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: var(--amp-coffee-100);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+        </div>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style="background: var(--amp-coffee-100); color: var(--amp-coffee-700);">{{ stats.episodes_scheduled|default:"0" }} terjadwal</span>
+      </div>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)] leading-none mb-1">{{ stats.programs_active|default:"0" }}</p>
+      <p class="text-sm text-[var(--amp-text-tertiary)]">Program Aktif</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-2">Dari seluruh program</p>
+    </div>
+
+  </div>
+
+  {# ── Getting Started (only if incomplete) ── #}
   {% if not has_radio_station or not has_schedule or not has_sponsor or not has_podcast or not has_news %}
-  <div class="amp-card p-5 border border-[var(--amp-warning)] border-opacity-40 bg-[var(--amp-warning-light)] bg-opacity-40">
-    <div class="flex items-center gap-2 mb-3">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <p class="text-sm font-semibold text-[var(--amp-warning-dark)]">Langkah yang disarankan untuk memulai</p>
+  {% with total_steps=5 %}
+  {% with done_steps=has_radio_station|add:has_schedule|add:has_sponsor|add:has_podcast|add:has_news %}
+  <div class="amp-card overflow-hidden">
+    {# Header #}
+    <div class="px-6 py-4 border-b border-[var(--amp-border-light)] flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--amp-coffee-100);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <div>
+          <p class="font-semibold text-sm text-[var(--amp-text-primary)]">Mulai Siaran Anda</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)]">Selesaikan langkah berikut untuk mengaktifkan semua fitur</p>
+        </div>
+      </div>
+      <a href="{% url 'studio:setup_wizard' %}" class="amp-btn amp-btn-secondary amp-btn-sm hidden sm:inline-flex">Buka Wizard →</a>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    {# Steps grid #}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-[var(--amp-border-light)]">
 
-      {% if not has_radio_station %}
-      <a href="{% url 'studio:streaming_center' %}" class="flex items-start gap-3 p-4 rounded-xl bg-white border border-[var(--amp-border-light)] hover:border-[var(--amp-danger)] hover:shadow-sm transition-all group">
-        <div class="w-9 h-9 rounded-lg bg-[var(--amp-danger-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-danger)" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><circle cx="12" cy="12" r="2"/></svg>
+      {# Step: Radio Station #}
+      <a href="{% url 'studio:streaming_center' %}" class="group flex flex-col gap-3 p-4 bg-[var(--amp-surface-primary)] hover:bg-[var(--amp-coffee-50)] transition-colors relative">
+        <div class="flex items-center justify-between">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center {% if has_radio_station %}bg-[var(--amp-success-light)]{% else %}bg-[var(--amp-danger-light)]{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if has_radio_station %}var(--amp-success){% else %}var(--amp-danger){% endif %}" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+          </div>
+          {% if has_radio_station %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {% else %}
+          <svg class="opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          {% endif %}
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-[var(--amp-text-primary)]">Tambah Streaming</p>
-          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Belum ada stasiun radio aktif</p>
+        <div>
+          <p class="text-sm font-semibold text-[var(--amp-text-primary)] {% if has_radio_station %}line-through opacity-50{% endif %}">Tambah Streaming</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{% if has_radio_station %}Selesai ✓{% else %}Belum ada stasiun aktif{% endif %}</p>
         </div>
-        <svg class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      {% endif %}
 
-      {% if not has_schedule %}
-      <a href="{% url 'broadcast:schedule_list' %}" class="flex items-start gap-3 p-4 rounded-xl bg-white border border-[var(--amp-border-light)] hover:border-[var(--amp-warning)] hover:shadow-sm transition-all group">
-        <div class="w-9 h-9 rounded-lg bg-[var(--amp-warning-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      {# Step: Schedule #}
+      <a href="{% url 'broadcast:schedule_list' %}" class="group flex flex-col gap-3 p-4 bg-[var(--amp-surface-primary)] hover:bg-[var(--amp-coffee-50)] transition-colors relative">
+        <div class="flex items-center justify-between">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center {% if has_schedule %}bg-[var(--amp-success-light)]{% else %}bg-[var(--amp-warning-light)]{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if has_schedule %}var(--amp-success){% else %}var(--amp-warning){% endif %}" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          {% if has_schedule %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {% else %}
+          <svg class="opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          {% endif %}
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-[var(--amp-text-primary)]">Buat Jadwal</p>
-          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Belum ada jadwal siaran hari ini</p>
+        <div>
+          <p class="text-sm font-semibold text-[var(--amp-text-primary)] {% if has_schedule %}line-through opacity-50{% endif %}">Buat Jadwal</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{% if has_schedule %}Selesai ✓{% else %}Jadwal siaran belum ada{% endif %}</p>
         </div>
-        <svg class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      {% endif %}
 
-      {% if not has_sponsor %}
-      <a href="/admin/sponsor/" class="flex items-start gap-3 p-4 rounded-xl bg-white border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:shadow-sm transition-all group">
-        <div class="w-9 h-9 rounded-lg bg-[var(--amp-coffee-50)] flex items-center justify-center flex-shrink-0 mt-0.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      {# Step: Sponsor #}
+      <a href="/admin/sponsor/" class="group flex flex-col gap-3 p-4 bg-[var(--amp-surface-primary)] hover:bg-[var(--amp-coffee-50)] transition-colors relative">
+        <div class="flex items-center justify-between">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center {% if has_sponsor %}bg-[var(--amp-success-light)]{% else %}bg-[var(--amp-coffee-100)]{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if has_sponsor %}var(--amp-success){% else %}var(--amp-coffee-600){% endif %}" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          {% if has_sponsor %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {% else %}
+          <svg class="opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          {% endif %}
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-[var(--amp-text-primary)]">Tambah Sponsor</p>
-          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Belum ada sponsor aktif</p>
+        <div>
+          <p class="text-sm font-semibold text-[var(--amp-text-primary)] {% if has_sponsor %}line-through opacity-50{% endif %}">Tambah Sponsor</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{% if has_sponsor %}Selesai ✓{% else %}Belum ada sponsor aktif{% endif %}</p>
         </div>
-        <svg class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      {% endif %}
 
-      {% if not has_podcast %}
-      <a href="{% url 'podcast:cms_episode_create' %}" class="flex items-start gap-3 p-4 rounded-xl bg-white border border-[var(--amp-border-light)] hover:border-[var(--amp-info)] hover:shadow-sm transition-all group">
-        <div class="w-9 h-9 rounded-lg bg-[var(--amp-info-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+      {# Step: Podcast #}
+      <a href="{% url 'podcast:cms_episode_create' %}" class="group flex flex-col gap-3 p-4 bg-[var(--amp-surface-primary)] hover:bg-[var(--amp-coffee-50)] transition-colors relative">
+        <div class="flex items-center justify-between">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center {% if has_podcast %}bg-[var(--amp-success-light)]{% else %}bg-[var(--amp-info-light)]{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if has_podcast %}var(--amp-success){% else %}var(--amp-info){% endif %}" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+          </div>
+          {% if has_podcast %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {% else %}
+          <svg class="opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          {% endif %}
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-[var(--amp-text-primary)]">Upload Podcast</p>
-          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Belum ada episode podcast</p>
+        <div>
+          <p class="text-sm font-semibold text-[var(--amp-text-primary)] {% if has_podcast %}line-through opacity-50{% endif %}">Upload Podcast</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{% if has_podcast %}Selesai ✓{% else %}Belum ada episode{% endif %}</p>
         </div>
-        <svg class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      {% endif %}
 
-      {% if not has_news %}
-      <a href="{% url 'news:cms_article_create' %}" class="flex items-start gap-3 p-4 rounded-xl bg-white border border-[var(--amp-border-light)] hover:border-[var(--amp-success)] hover:shadow-sm transition-all group">
-        <div class="w-9 h-9 rounded-lg bg-[var(--amp-success-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      {# Step: News #}
+      <a href="{% url 'news:cms_article_create' %}" class="group flex flex-col gap-3 p-4 bg-[var(--amp-surface-primary)] hover:bg-[var(--amp-coffee-50)] transition-colors relative">
+        <div class="flex items-center justify-between">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center {% if has_news %}bg-[var(--amp-success-light)]{% else %}bg-[var(--amp-success-light)]{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          {% if has_news %}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {% else %}
+          <svg class="opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          {% endif %}
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-[var(--amp-text-primary)]">Tulis Berita</p>
-          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Belum ada artikel dipublikasikan</p>
+        <div>
+          <p class="text-sm font-semibold text-[var(--amp-text-primary)] {% if has_news %}line-through opacity-50{% endif %}">Tulis Berita</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{% if has_news %}Selesai ✓{% else %}Belum ada artikel{% endif %}</p>
         </div>
-        <svg class="mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
-      {% endif %}
 
     </div>
   </div>
+  {% endwith %}
+  {% endwith %}
   {% endif %}
 
-  {# ── Metric Cards Row ── #}
-  <div class="amp-grid amp-grid-4">
-    {# Live Listeners #}
-    <div class="amp-card amp-card-elevated p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="amp-badge amp-badge-success">
-          <span class="amp-status-dot live"></span>
-          LIVE
-        </span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-      </div>
-      <p class="amp-metric" x-data="streamStatus()" x-init="init()">
-        <span class="amp-metric-value" x-text="listenerCount || '—'">—</span>
-      </p>
-      <p class="amp-metric-label">Pendengar Online</p>
-      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1" x-data="streamStatus()" x-init="init()">
-        <span x-text="currentProgram || 'Tidak ada program'"></span>
-      </p>
-    </div>
+  {# ── Main 2-col grid ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-    {# Articles Today #}
-    <div class="amp-card amp-card-elevated p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="amp-badge amp-badge-secondary">Hari ini</span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      </div>
-      <p class="amp-metric-value">{{ stats.articles_today|default:"0" }}</p>
-      <p class="amp-metric-label">Artikel Diterbitkan</p>
-      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ stats.articles_pending|default:"0" }} menunggu review</p>
-    </div>
+    {# ── Left (2/3) ── #}
+    <div class="lg:col-span-2 space-y-5">
 
-    {# Podcast Episodes #}
-    <div class="amp-card amp-card-elevated p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="amp-badge amp-badge-secondary">Podcast</span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
-      </div>
-      <p class="amp-metric-value">{{ stats.podcast_episodes|default:"0" }}</p>
-      <p class="amp-metric-label">Episode Podcast</p>
-      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ stats.podcast_total|default:"0" }} total episode</p>
-    </div>
-
-    {# Active Programs #}
-    <div class="amp-card amp-card-elevated p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="amp-badge amp-badge-secondary">Program</span>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
-      </div>
-      <p class="amp-metric-value">{{ stats.programs_active|default:"0" }}</p>
-      <p class="amp-metric-label">Program Aktif</p>
-      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ stats.episodes_scheduled|default:"0" }} episode terjadwal</p>
-    </div>
-  </div>
-
-  {# ── Main Content Grid ── #}
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    {# ── Left Column (2/3) ── #}
-    <div class="lg:col-span-2 space-y-6">
-
-      {# Live Broadcast Status #}
-      <div class="amp-card amp-card-elevated p-6" x-data="streamStatus()" x-init="init()">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-[var(--amp-text-primary)]">Siaran Langsung</h2>
-          <span class="amp-status-dot" :class="isLive ? 'live' : 'offline'"></span>
+      {# Live Broadcast #}
+      <div class="amp-card overflow-hidden" x-data="streamStatus()" x-init="init()">
+        <div class="px-6 py-4 border-b border-[var(--amp-border-light)] flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Siaran Langsung</h2>
+            <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium" :class="isLive ? 'bg-[var(--amp-danger-light)] text-[var(--amp-danger-dark)]' : 'bg-[var(--amp-surface-tertiary)] text-[var(--amp-text-tertiary)]'">
+              <span class="amp-status-dot" :class="isLive ? 'live' : 'offline'"></span>
+              <span x-text="isLive ? 'ON AIR' : 'OFFLINE'">OFFLINE</span>
+            </div>
+          </div>
+          <a href="{% url 'radio:dashboard' %}" class="text-xs text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Kelola Siaran →</a>
         </div>
-        <template x-if="isLive">
-          <div class="flex items-center gap-4 p-4 rounded-xl bg-[var(--amp-danger-light)]">
-            <div class="w-14 h-14 rounded-xl bg-[var(--amp-danger)] flex items-center justify-center flex-shrink-0 animate-pulse">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <div class="p-5">
+          <template x-if="isLive">
+            <div class="flex items-center gap-4 p-4 rounded-xl" style="background: var(--amp-danger-light); border: 1px solid rgba(229,57,53,0.15);">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style="background: var(--amp-danger);">
+                <div class="flex items-end gap-0.5 h-6">
+                  <div class="w-1.5 rounded-full bg-white" style="height:100%; animation: amp-bar1 1s ease-in-out infinite;"></div>
+                  <div class="w-1.5 rounded-full bg-white" style="height:65%; animation: amp-bar2 1s ease-in-out infinite;"></div>
+                  <div class="w-1.5 rounded-full bg-white" style="height:45%; animation: amp-bar3 1s ease-in-out infinite;"></div>
+                  <div class="w-1.5 rounded-full bg-white" style="height:80%; animation: amp-bar1 1s ease-in-out infinite 0.3s;"></div>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-[var(--amp-danger)] uppercase tracking-wider mb-0.5">Sedang Mengudara</p>
+                <p class="font-semibold text-[var(--amp-text-primary)] truncate" x-text="currentProgram || 'Program Tanpa Judul'">—</p>
+                <p class="text-sm text-[var(--amp-text-secondary)] mt-0.5" x-text="currentHost ? 'dengan ' + currentHost : 'Tanpa host'">—</p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="text-3xl font-bold" style="color: var(--amp-danger);" x-text="listenerCount">0</p>
+                <p class="text-xs text-[var(--amp-text-tertiary)]">pendengar</p>
+              </div>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-[var(--amp-danger)]">ON AIR</p>
-              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate" x-text="currentProgram || 'Program Tanpa Judul'"></p>
-              <p class="text-xs text-[var(--amp-text-secondary)]" x-text="currentHost ? 'Host: ' + currentHost : ''"></p>
+          </template>
+          <template x-if="!isLive">
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-[var(--amp-surface-tertiary)]">
+              <div class="w-14 h-14 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-default)] flex items-center justify-center flex-shrink-0">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              </div>
+              <div class="flex-1">
+                <p class="font-semibold text-[var(--amp-text-tertiary)] text-sm">Tidak ada siaran aktif</p>
+                <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Siaran akan tampil di sini saat aktif</p>
+              </div>
+              <a href="{% url 'radio:dashboard' %}" class="amp-btn amp-btn-secondary amp-btn-sm">Atur Siaran</a>
             </div>
-            <div class="text-right">
-              <p class="text-2xl font-bold text-[var(--amp-danger)]" x-text="listenerCount"></p>
-              <p class="text-xs text-[var(--amp-text-tertiary)]">pendengar</p>
-            </div>
-          </div>
-        </template>
-        <template x-if="!isLive">
-          <div class="flex items-center gap-4 p-4 rounded-xl bg-[var(--amp-surface-tertiary)]">
-            <div class="w-14 h-14 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-light)] flex items-center justify-center flex-shrink-0">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-[var(--amp-text-tertiary)]">OFFLINE</p>
-              <p class="text-sm text-[var(--amp-text-secondary)]">Tidak ada siaran aktif</p>
-            </div>
-            <a href="{% url 'radio:dashboard' %}" class="amp-btn amp-btn-secondary text-sm">Atur Siaran</a>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
 
       {# Today's Schedule #}
-      <div class="amp-card amp-card-elevated p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-[var(--amp-text-primary)]">Jadwal Hari Ini</h2>
-          <a href="{% url 'broadcast:schedule_list' %}" class="text-sm text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua</a>
+      <div class="amp-card overflow-hidden">
+        <div class="px-6 py-4 border-b border-[var(--amp-border-light)] flex items-center justify-between">
+          <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Jadwal Hari Ini</h2>
+          <a href="{% url 'broadcast:schedule_list' %}" class="text-xs text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua →</a>
         </div>
-        {% if today_schedule %}
-        <div class="space-y-3">
-          {% for item in today_schedule %}
-          <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
-            <div class="w-12 text-center flex-shrink-0">
-              <p class="text-sm font-bold text-[var(--amp-coffee-600)]">{{ item.start_time|time:"H:i" }}</p>
+        <div class="divide-y divide-[var(--amp-border-light)]">
+          {% if today_schedule %}
+            {% for item in today_schedule %}
+            <div class="flex items-center gap-4 px-5 py-3 hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+              <div class="w-11 text-center flex-shrink-0">
+                <p class="text-sm font-bold text-[var(--amp-coffee-600)]">{{ item.start_time|time:"H:i" }}</p>
+              </div>
+              <div class="w-0.5 h-10 rounded-full flex-shrink-0 {% if item.is_live %}bg-[var(--amp-danger)]{% else %}bg-[var(--amp-border-default)]{% endif %}"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ item.program_name }}</p>
+                <p class="text-xs text-[var(--amp-text-tertiary)]">{{ item.host_name|default:"Tanpa host" }}</p>
+              </div>
+              {% if item.is_live %}
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold" style="background: var(--amp-danger-light); color: var(--amp-danger);">
+                <span class="w-1.5 h-1.5 rounded-full bg-[var(--amp-danger)] animate-pulse"></span>ON AIR
+              </span>
+              {% elif item.is_past %}
+              <span class="text-xs text-[var(--amp-text-tertiary)]">Selesai</span>
+              {% endif %}
             </div>
-            <div class="w-1 h-10 rounded-full {% if item.is_live %}bg-[var(--amp-danger)]{% else %}bg-[var(--amp-border-medium)]{% endif %}"></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ item.program_name }}</p>
-              <p class="text-xs text-[var(--amp-text-tertiary)]">{{ item.host_name|default:"Tanpa host" }}</p>
+            {% endfor %}
+          {% else %}
+          <div class="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
-            {% if item.is_live %}
-            <span class="amp-badge amp-badge-danger text-xs">ON AIR</span>
-            {% elif item.is_past %}
-            <span class="text-xs text-[var(--amp-text-tertiary)]">Selesai</span>
-            {% endif %}
+            <div>
+              <p class="font-semibold text-sm text-[var(--amp-text-primary)]">Belum ada jadwal</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Atur jadwal siaran untuk hari ini</p>
+            </div>
+            <a href="{% url 'broadcast:schedule_list' %}" class="amp-btn amp-btn-primary amp-btn-sm">+ Buat Jadwal</a>
           </div>
-          {% endfor %}
+          {% endif %}
         </div>
-        {% else %}
-        <div class="amp-empty">
-          <div class="amp-empty-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <p class="amp-empty-title">Belum ada jadwal</p>
-          <p class="amp-empty-description">Atur jadwal siaran untuk hari ini.</p>
-          <a href="{% url 'broadcast:schedule_list' %}" class="amp-btn amp-btn-primary mt-3">Atur Jadwal</a>
-        </div>
-        {% endif %}
       </div>
 
       {# Recent Articles #}
-      <div class="amp-card amp-card-elevated p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-[var(--amp-text-primary)]">Artikel Terbaru</h2>
-          <a href="{% url 'news:cms_article_list' %}" class="text-sm text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua</a>
+      <div class="amp-card overflow-hidden">
+        <div class="px-6 py-4 border-b border-[var(--amp-border-light)] flex items-center justify-between">
+          <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Artikel Terbaru</h2>
+          <a href="{% url 'news:cms_article_list' %}" class="text-xs text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua →</a>
         </div>
-        {% if recent_articles %}
-        <div class="space-y-3">
-          {% for article in recent_articles %}
-          <a href="{% url 'news:cms_article_edit' article.pk %}" class="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
-            {% if article.featured_image %}
-            <img src="{{ article.featured_image.url }}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0" alt="">
-            {% else %}
-            <div class="w-14 h-14 rounded-lg bg-[var(--amp-coffee-50)] flex items-center justify-center flex-shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            {% endif %}
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ article.title }}</p>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="amp-badge amp-badge-sm
-                  {% if article.status == 'published' %}amp-badge-success
-                  {% elif article.status == 'draft' %}amp-badge-secondary
-                  {% elif article.status == 'pending_review' %}amp-badge-warning
-                  {% else %}amp-badge-secondary{% endif %}">
-                  {{ article.get_status_display }}
-                </span>
-                <span class="text-xs text-[var(--amp-text-tertiary)]">{{ article.created_at|timesince }} lalu</span>
+        <div class="divide-y divide-[var(--amp-border-light)]">
+          {% if recent_articles %}
+            {% for article in recent_articles %}
+            <a href="{% url 'news:cms_article_edit' article.pk %}" class="flex items-center gap-4 px-5 py-3 hover:bg-[var(--amp-surface-tertiary)] transition-colors group">
+              {% if article.featured_image %}
+              <img src="{{ article.featured_image.url }}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" alt="">
+              {% else %}
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--amp-coffee-50);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               </div>
+              {% endif %}
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ article.title }}</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium
+                    {% if article.status == 'published' %}bg-[var(--amp-success-light)] text-[var(--amp-success-dark)]
+                    {% elif article.status == 'draft' %}bg-[var(--amp-gray-100)] text-[var(--amp-gray-600)]
+                    {% elif article.status == 'pending_review' %}bg-[var(--amp-warning-light)] text-[var(--amp-warning-dark)]
+                    {% else %}bg-[var(--amp-gray-100)] text-[var(--amp-gray-600)]{% endif %}">
+                    {{ article.get_status_display }}
+                  </span>
+                  <span class="text-xs text-[var(--amp-text-tertiary)]">{{ article.created_at|timesince }} lalu</span>
+                </div>
+              </div>
+              <svg class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            {% endfor %}
+          {% else %}
+          <div class="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2" class="flex-shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-          </a>
-          {% endfor %}
+            <div>
+              <p class="font-semibold text-sm text-[var(--amp-text-primary)]">Belum ada artikel</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Mulai tulis artikel pertama Anda</p>
+            </div>
+            <a href="{% url 'news:cms_article_create' %}" class="amp-btn amp-btn-primary amp-btn-sm">+ Tulis Artikel</a>
+          </div>
+          {% endif %}
         </div>
-        {% else %}
-        <div class="amp-empty">
-          <p class="amp-empty-title">Belum ada artikel</p>
-          <a href="{% url 'news:cms_article_create' %}" class="amp-btn amp-btn-primary mt-3">Buat Artikel</a>
-        </div>
-        {% endif %}
       </div>
+
     </div>
 
     {# ── Right Column (1/3) ── #}
-    <div class="space-y-6">
+    <div class="space-y-5">
+
+      {# Quick Actions #}
+      <div class="amp-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)]">
+          <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Aksi Cepat</h2>
+        </div>
+        <div class="p-4 grid grid-cols-2 gap-2">
+          <a href="{% url 'news:cms_article_create' %}" class="group flex flex-col items-center gap-2 p-3 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-info)] hover:bg-[var(--amp-info-light)] transition-all">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: var(--amp-info-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)] text-center">Artikel</span>
+          </a>
+          <a href="{% url 'podcast:cms_episode_create' %}" class="group flex flex-col items-center gap-2 p-3 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-success)] hover:bg-[var(--amp-success-light)] transition-all">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: var(--amp-success-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+            </div>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)] text-center">Podcast</span>
+          </a>
+          <a href="{% url 'media_manager:upload' %}" class="group flex flex-col items-center gap-2 p-3 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-warning)] hover:bg-[var(--amp-warning-light)] transition-all">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: var(--amp-warning-light);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)] text-center">Upload</span>
+          </a>
+          <a href="{% url 'broadcast:cms_program_create' %}" class="group flex flex-col items-center gap-2 p-3 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: var(--amp-coffee-100);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+            </div>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)] text-center">Siaran</span>
+          </a>
+        </div>
+      </div>
 
       {# Pending Reviews #}
-      <div class="amp-card amp-card-elevated p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-[var(--amp-text-primary)]">Menunggu Review</h2>
-          <span class="amp-badge amp-badge-warning">{{ pending_reviews|length }}</span>
+      {% if pending_reviews %}
+      <div class="amp-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)] flex items-center justify-between">
+          <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Menunggu Review</h2>
+          <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold" style="background: var(--amp-warning-light); color: var(--amp-warning-dark);">{{ pending_reviews|length }}</span>
         </div>
-        {% if pending_reviews %}
-        <div class="space-y-3">
+        <div class="divide-y divide-[var(--amp-border-light)]">
           {% for item in pending_reviews %}
-          <div class="p-3 rounded-xl border border-[var(--amp-warning)] bg-[var(--amp-warning-light)]">
-            <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ item.title }}</p>
-            <div class="flex items-center justify-between mt-2">
-              <span class="text-xs text-[var(--amp-text-secondary)]">{{ item.content_type }} · {{ item.author_name|default:"—" }}</span>
-              <a href="{% url 'content:dashboard' %}" class="text-xs font-medium text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)]">Review →</a>
+          <div class="px-5 py-3">
+            <div class="flex items-start gap-2">
+              <div class="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style="background: var(--amp-warning);"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ item.title }}</p>
+                <div class="flex items-center justify-between mt-1 gap-2">
+                  <span class="text-xs text-[var(--amp-text-tertiary)] truncate">{{ item.content_type }} · {{ item.author_name|default:"—" }}</span>
+                  <a href="{% url 'content:dashboard' %}" class="text-xs font-medium text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] flex-shrink-0">Review →</a>
+                </div>
+              </div>
             </div>
           </div>
           {% endfor %}
         </div>
-        {% else %}
-        <div class="p-4 text-center text-sm text-[var(--amp-text-tertiary)]">
-          Tidak ada konten menunggu review.
-        </div>
-        {% endif %}
       </div>
+      {% endif %}
 
-      {# Quick Actions #}
-      <div class="amp-card amp-card-elevated p-6">
-        <h2 class="font-semibold text-[var(--amp-text-primary)] mb-4">Aksi Cepat</h2>
-        <div class="grid grid-cols-2 gap-3">
-          <a href="{% url 'news:cms_article_create' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Artikel</span>
-          </a>
-          <a href="{% url 'podcast:cms_episode_create' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
-            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Podcast</span>
-          </a>
-          <a href="{% url 'media_manager:upload' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Upload</span>
-          </a>
-          <a href="{% url 'broadcast:cms_program_create' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
-            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Siaran</span>
-          </a>
-        </div>
-      </div>
-
-      {# ── Sprint 3.5 P3: System Health Widget ── #}
+      {# System Health #}
       {% include 'amp_studio/components/health_widget.html' %}
 
-      {# Notifications Widget #}
-      <div class="amp-card amp-card-elevated p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-[var(--amp-text-primary)]">Notifikasi</h2>
-          <button @click="notificationPanelOpen = true" class="text-sm text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua</button>
+      {# Storage #}
+      <div class="amp-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)]">
+          <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Penyimpanan</h2>
         </div>
-        <div class="space-y-3">
-          <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
-            <div class="w-8 h-8 rounded-full bg-[var(--amp-warning-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm text-[var(--amp-text-primary)]">Artikel menunggu review</p>
-              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">5 menit yang lalu</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
-            <div class="w-8 h-8 rounded-full bg-[var(--amp-success-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm text-[var(--amp-text-primary)]">Episode podcast berhasil diunggah</p>
-              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">1 jam yang lalu</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {# Storage Usage #}
-      <div class="amp-card amp-card-elevated p-6">
-        <h2 class="font-semibold text-[var(--amp-text-primary)] mb-4">Penyimpanan</h2>
-        <div class="space-y-4">
+        <div class="p-5 space-y-4">
           <div>
-            <div class="flex justify-between text-sm mb-1.5">
-              <span class="text-[var(--amp-text-secondary)]">Media</span>
-              <span class="font-medium text-[var(--amp-text-primary)]">{{ storage.used_gb|default:"0.0" }} GB / {{ storage.total_gb|default:"50" }} GB</span>
+            <div class="flex justify-between text-xs mb-2">
+              <span class="text-[var(--amp-text-secondary)] font-medium">Media tersimpan</span>
+              <span class="font-semibold text-[var(--amp-text-primary)]">{{ storage.used_gb|default:"0.0" }} / {{ storage.total_gb|default:"50" }} GB</span>
             </div>
-            <div class="w-full h-2 bg-[var(--amp-surface-tertiary)] rounded-full overflow-hidden">
-              <div class="h-full bg-[var(--amp-coffee-500)] rounded-full transition-all" style="width: {{ storage.percent|default:"0" }}%"></div>
+            <div class="h-2 bg-[var(--amp-surface-tertiary)] rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500" style="width: {{ storage.percent|default:"0" }}%; background: {% if storage.percent > 80 %}var(--amp-danger){% elif storage.percent > 60 %}var(--amp-warning){% else %}var(--amp-coffee-500){% endif %};"></div>
             </div>
+            <p class="text-xs text-[var(--amp-text-tertiary)] mt-1.5">{{ storage.percent|default:"0" }}% terpakai</p>
           </div>
-          <div class="grid grid-cols-2 gap-3 text-center">
-            <div class="p-3 rounded-lg bg-[var(--amp-surface-tertiary)]">
-              <p class="text-lg font-bold text-[var(--amp-text-primary)]">{{ storage.audio_count|default:"0" }}</p>
-              <p class="text-xs text-[var(--amp-text-tertiary)]">Audio</p>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-3 rounded-xl text-center" style="background: var(--amp-surface-tertiary);">
+              <p class="text-xl font-bold text-[var(--amp-text-primary)]">{{ storage.audio_count|default:"0" }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Audio</p>
             </div>
-            <div class="p-3 rounded-lg bg-[var(--amp-surface-tertiary)]">
-              <p class="text-lg font-bold text-[var(--amp-text-primary)]">{{ storage.image_count|default:"0" }}</p>
-              <p class="text-xs text-[var(--amp-text-tertiary)]">Gambar</p>
+            <div class="p-3 rounded-xl text-center" style="background: var(--amp-surface-tertiary);">
+              <p class="text-xl font-bold text-[var(--amp-text-primary)]">{{ storage.image_count|default:"0" }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">Gambar</p>
             </div>
           </div>
         </div>
@@ -407,12 +463,14 @@
 
       {# Popular Programs #}
       {% if popular_programs %}
-      <div class="amp-card amp-card-elevated p-6">
-        <h2 class="font-semibold text-[var(--amp-text-primary)] mb-4">Program Populer</h2>
-        <div class="space-y-3">
+      <div class="amp-card overflow-hidden">
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)]">
+          <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Program Populer</h2>
+        </div>
+        <div class="divide-y divide-[var(--amp-border-light)]">
           {% for program in popular_programs %}
-          <div class="flex items-center gap-3">
-            <span class="text-sm font-bold text-[var(--amp-text-tertiary)] w-5">{{ forloop.counter }}</span>
+          <div class="flex items-center gap-3 px-5 py-3">
+            <span class="text-sm font-bold text-[var(--amp-text-tertiary)] w-4 text-center">{{ forloop.counter }}</span>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ program.name }}</p>
               <p class="text-xs text-[var(--amp-text-tertiary)]">{{ program.episode_count }} episode</p>
@@ -426,30 +484,34 @@
     </div>
   </div>
 
-  {# ── Latest Activity ── #}
+  {# ── Recent Activity ── #}
   {% if recent_activity %}
-  <div class="amp-card amp-card-elevated p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="font-semibold text-[var(--amp-text-primary)]">Aktivitas Terbaru</h2>
+  <div class="amp-card overflow-hidden">
+    <div class="px-6 py-4 border-b border-[var(--amp-border-light)]">
+      <h2 class="font-semibold text-sm text-[var(--amp-text-primary)]">Aktivitas Terbaru</h2>
     </div>
-    <div class="space-y-4">
+    <div class="divide-y divide-[var(--amp-border-light)]">
       {% for activity in recent_activity %}
-      <div class="flex items-start gap-3">
-        <div class="w-8 h-8 rounded-full bg-[var(--amp-coffee-50)] flex items-center justify-center flex-shrink-0 mt-0.5">
+      <div class="flex items-start gap-3 px-6 py-3 hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5
+          {% if activity.action == 'create' %}bg-[var(--amp-coffee-100)]
+          {% elif activity.action == 'publish' %}bg-[var(--amp-success-light)]
+          {% elif activity.action == 'update' %}bg-[var(--amp-info-light)]
+          {% else %}bg-[var(--amp-surface-tertiary)]{% endif %}">
           {% if activity.action == 'create' %}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           {% elif activity.action == 'publish' %}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           {% elif activity.action == 'update' %}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           {% else %}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
           {% endif %}
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm text-[var(--amp-text-primary)]">
             <span class="font-medium">{{ activity.user_name }}</span>
-            <span class="text-[var(--amp-text-secondary)]">{{ activity.description }}</span>
+            <span class="text-[var(--amp-text-secondary)]"> {{ activity.description }}</span>
           </p>
           <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{{ activity.timestamp|timesince }} lalu</p>
         </div>
@@ -460,4 +522,11 @@
   {% endif %}
 
 </div>
+
+<style>
+@keyframes amp-bar1 { 0%, 100% { height: 100%; } 50% { height: 30%; } }
+@keyframes amp-bar2 { 0%, 100% { height: 65%; } 50% { height: 100%; } }
+@keyframes amp-bar3 { 0%, 100% { height: 45%; } 50% { height: 80%; } }
+</style>
+
 {% endblock %}
