@@ -1,0 +1,210 @@
+SPRINT 3.4C — Temporary Live Streaming Integration (Demo Mode)
+
+Objective
+
+For the July 21 demonstration, AMP Studio and the Kabulhaden website must display REAL live streaming information.
+
+This is a temporary integration.
+
+DO NOT hardcode Broadcastindo logic throughout the application.
+
+Instead, build a temporary adapter that can later be replaced by the official AMP Streaming Connector.
+
+======================================================
+ARCHITECTURE
+======================================================
+
+Website
+↓
+
+AMP Backend
+
+↓
+
+Temporary Broadcastindo Adapter
+
+↓
+
+https://a7.siar.us/api/nowplaying/kabulhaden
+
+The website and frontend MUST consume ONLY AMP endpoints.
+
+======================================================
+TASKS
+======================================================
+
+1.
+
+Create a service
+
+apps/radio/services/broadcastindo_adapter.py
+
+(or similar)
+
+Responsibilities:
+
+- fetch now playing
+
+- fetch listener count
+
+- fetch current DJ/program if available
+
+- normalize response
+
+Never expose provider-specific fields.
+
+======================================================
+
+2.
+
+Create internal API
+
+/api/v1/radio/live/
+
+Return normalized JSON
+
+Example
+
+{
+    "status":"live",
+    "station":"Kabulhaden",
+    "program":"Pagi Bersama Kabulhaden",
+    "title":"Song Title",
+    "artist":"Artist",
+    "listeners":96,
+    "cover":"",
+    "started_at":"...",
+    "provider":"broadcastindo"
+}
+
+======================================================
+
+3.
+
+Update AMP Studio
+
+Dashboard
+
+Streaming Center
+
+Player Bar
+
+Listener Widget
+
+Now Playing Widget
+
+Use ONLY
+
+/api/v1/radio/live/
+
+Never call a7.siar.us directly from templates.
+
+======================================================
+
+4.
+
+Update Public Website
+
+Hero Player
+
+Sticky Player
+
+Now Playing
+
+Listener Counter
+
+Schedule Highlight
+
+Consume the AMP endpoint.
+
+======================================================
+
+5.
+
+Implement polling
+
+Refresh every 20–30 seconds.
+
+Avoid excessive requests.
+
+======================================================
+
+6.
+
+Error Handling
+
+If Broadcastindo is unavailable
+
+show
+
+Last update
+
+Offline
+
+Unable to retrieve live data
+
+Do NOT crash the page.
+
+======================================================
+
+7.
+
+Configuration
+
+Create settings
+
+STREAM_PROVIDER=broadcastindo
+
+STREAM_API_URL=https://a7.siar.us/api/nowplaying/kabulhaden
+
+These values MUST come from settings or environment variables.
+
+No hardcoded URL inside templates or JavaScript.
+
+======================================================
+
+8.
+
+Future Ready
+
+Design the adapter so it can later become
+
+StreamingConnector
+
+BroadcastindoConnector
+
+without rewriting the UI.
+
+======================================================
+
+9.
+
+Testing
+
+Verify
+
+Dashboard
+
+Streaming Center
+
+Public Website
+
+Player
+
+Dummy data fallback
+
+======================================================
+
+OUTPUT
+
+Provide
+
+✓ files modified
+
+✓ API endpoint
+
+✓ adapter implementation
+
+✓ screenshots
+
+✓ remaining work before replacing with AMP Connector architecture
