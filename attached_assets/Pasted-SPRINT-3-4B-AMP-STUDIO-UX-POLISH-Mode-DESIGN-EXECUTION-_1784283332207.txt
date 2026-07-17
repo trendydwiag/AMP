@@ -1,0 +1,221 @@
+SPRINT 3.4B — AMP STUDIO UX POLISH
+Mode: DESIGN EXECUTION
+
+STOP adding new features.
+
+The backend is sufficient for demo purposes.
+
+The goal of this sprint is to make AMP Studio feel like a polished SaaS product.
+
+Target quality:
+
+Notion
+Spotify Studio
+Riverside
+Linear
+Vercel Dashboard
+
+==========================
+1. FIX ALL BROKEN LAYOUTS
+==========================
+
+Audit every Studio page.
+
+Fix:
+
+- broken spacing
+- overlapping cards
+- inconsistent padding
+- oversized empty containers
+- typography hierarchy
+- broken icons
+- missing CSS classes
+- responsive layout
+
+Nothing should look like raw HTML.
+
+==========================
+2. SETUP WIZARD REDESIGN
+==========================
+
+Redesign Setup Wizard completely.
+
+Do NOT show every step simultaneously.
+
+Instead:
+
+Left side:
+
+Vertical stepper
+
+✓ Identity
+○ Logo
+○ Streaming
+○ Social
+○ Finish
+
+Right side:
+
+Only ONE card for current step.
+
+Each step contains:
+
+title
+
+description
+
+inputs
+
+primary CTA
+
+secondary CTA
+
+At bottom:
+
+Previous
+
+Next
+
+Progress
+
+Step X of 5
+
+Add success animation after completing each step.
+
+==========================
+3. DASHBOARD REDESIGN
+==========================
+
+The landing page after login should immediately answer:
+
+Is my radio healthy?
+
+Create hero cards:
+
+Live Status
+
+Listeners
+
+Current Program
+
+Now Playing
+
+Latest Article
+
+Latest Podcast
+
+Storage
+
+Pending Content
+
+Latest Notifications
+
+Today's Schedule
+
+Recent Activities
+
+Everything populated using dummy data.
+
+Never show empty widgets.
+
+==========================
+4. FIX ICONS
+==========================
+
+Every placeholder icon must render.
+
+No "(o)"
+
+No broken SVG
+
+No raw unicode fallback
+
+Standardize on Lucide icons.
+
+==========================
+5. TYPOGRAPHY
+==========================
+
+Improve hierarchy.
+
+Page title
+
+Section title
+
+Widget title
+
+Body
+
+Caption
+
+Use consistent spacing.
+
+==========================
+6. EMPTY STATES
+==========================
+
+Replace every blank widget.
+
+Example:
+
+No Podcast Yet
+
+Create your first podcast episode.
+
+[Create Podcast]
+
+instead of
+
+0
+
+==========================
+7. RESPONSIVE
+==========================
+
+Verify:
+
+Desktop
+
+Tablet
+
+Mobile
+
+Sidebar
+
+Player
+
+Wizard
+
+Dashboard
+
+==========================
+8. VISUAL QA
+==========================
+
+Open every Studio page manually.
+
+Fix visual issues until no page looks unfinished.
+
+==========================
+9. IMPORTANT
+==========================
+
+DO NOT modify backend logic unless required.
+
+DO NOT create new features.
+
+Focus only on UX quality.
+
+==========================
+OUTPUT
+==========================
+
+When finished provide:
+
+✓ pages improved
+
+✓ screenshots
+
+✓ remaining visual issues
+
+✓ files modified

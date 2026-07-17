@@ -11,7 +11,7 @@
   </button>
 
   {# ── Stream Status Widget ── #}
-  <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--amp-surface-tertiary)]" x-data="streamStatus()">
+  <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--amp-surface-tertiary)]" x-data="streamStatus()" x-init="init()">
     <span class="amp-status-dot" :class="isLive ? 'live' : 'offline'"></span>
     <span class="text-xs font-medium" :class="isLive ? 'text-[var(--amp-danger)]' : 'text-[var(--amp-text-tertiary)]'" x-text="isLive ? 'LIVE' : 'OFFLINE'"></span>
     <span class="text-xs text-[var(--amp-text-tertiary)]" x-show="listenerCount > 0" x-text="listenerCount + ' pendengar'"></span>
