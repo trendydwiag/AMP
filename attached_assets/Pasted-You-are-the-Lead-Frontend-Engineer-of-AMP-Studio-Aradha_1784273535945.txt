@@ -1,0 +1,174 @@
+You are the Lead Frontend Engineer of AMP Studio (Aradhana Media Platform).
+
+The Frontend Discovery Report has already been analyzed and stored in the project context. Do not repeat the audit. Use it as the implementation reference.
+
+This sprint must preserve all existing architecture, templates, Django views, models, services, Partner Engine, and backend functionality.
+
+Do NOT refactor the backend.
+
+Only improve frontend UX and usability.
+
+========================================
+
+SPRINT 3.5
+Founder Experience
+
+GOAL
+
+Make AMP Studio understandable for a non-technical radio owner.
+
+The first design partner is Kabulhaden Online.
+
+Every improvement must also be reusable for future AMP partners.
+
+========================================
+
+PRIORITY 1
+
+Create a new "Streaming Center".
+
+This page becomes the main place for radio streaming.
+
+Display:
+
+• Stream URL
+• Copy Stream URL
+• Test Stream
+• Streaming Status
+• Last Connection
+• Listener Count
+• Bitrate
+• Codec
+• RadioBoss Status
+• Auto Refresh Status
+
+If backend data does not yet exist, use placeholders without breaking architecture.
+
+========================================
+
+PRIORITY 2
+
+Improve Dashboard.
+
+Replace passive statistics with actionable cards.
+
+Examples:
+
+No Stream URL
+→ Configure Streaming
+
+No Program Today
+→ Create Program
+
+No Podcast
+→ Create Podcast
+
+No Sponsor
+→ Add Sponsor
+
+No News
+→ Write News
+
+Never leave the dashboard visually empty.
+
+========================================
+
+PRIORITY 3
+
+Create Radio Health widget.
+
+Display:
+
+Streaming
+Website
+Database
+Storage
+SSL
+Backup
+
+Use status indicators:
+
+Green
+Yellow
+Red
+
+Dummy data is acceptable if API is not available.
+
+========================================
+
+PRIORITY 4
+
+Improve every Empty State.
+
+Every empty page must contain:
+
+Illustration
+
+Short explanation
+
+Primary Action Button
+
+Never display blank tables.
+
+========================================
+
+PRIORITY 5
+
+Floating Help Button.
+
+Bottom-right.
+
+Contains:
+
+Documentation
+
+Video Tutorial
+
+FAQ
+
+Contact Administrator
+
+Reuse existing component styles.
+
+========================================
+
+RULES
+
+Reuse existing AMP Studio components.
+
+Reuse Design Tokens.
+
+Reuse Coffee Theme.
+
+No duplicated CSS.
+
+No inline CSS.
+
+No breaking changes.
+
+Responsive.
+
+Accessible.
+
+Production ready.
+
+========================================
+
+DELIVERABLES
+
+- Updated UI
+- Responsive layout
+- Reusable components
+- docs/ui/FOUNDER_EXPERIENCE.md
+- Sprint Report
+
+Sprint Report must include:
+
+Completed
+Files Modified
+Known Issues
+UI Score (0-100)
+Ready for Founder Review (YES/NO)
+
+Execute the sprint completely.
+Do not ask what to do next.

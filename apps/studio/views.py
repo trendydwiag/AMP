@@ -214,6 +214,9 @@ class AMPStudioDashboardView(TemplateView):
         # ── Setup Wizard: check completion ──
         context['setup_wizard_done'] = self.request.session.get('setup_wizard_done', False)
 
+        # ── P3: System Health Widget ──
+        context['system_health'] = self._get_system_health()
+
         # ── Site Identity for welcome banner ──
         try:
             from apps.settings.models import SiteSettings
@@ -229,6 +232,106 @@ class AMPStudioDashboardView(TemplateView):
             context['SITE_LOGO'] = None
 
         return context
+
+    def _get_system_health(self):
+        """Compute system health for 6 services. Never raises — always returns a dict."""
+        def s(status, label, detail=''):
+            # status: 'healthy' | 'degraded' | 'down' | 'unknown'
+            return {'status': status, 'label': label, 'detail': detail}
+
+        health = {}
+
+        # ── Streaming ──
+        try:
+            from apps.radio.models import StreamHealth, RadioStation
+            station = RadioStation.objects.filter(is_active=True).first()
+            if station:
+                h = StreamHealth.objects.filter(station=station).order_by('-last_checked').first()
+                if h:
+                    ps = h.provider_status.upper()
+                    if ps == 'HEALTHY':
+                        health['streaming'] = s('healthy', 'Streaming', f'{h.stream_bitrate or "—"} kbps')
+                    elif ps == 'DEGRADED':
+                        health['streaming'] = s('degraded', 'Streaming', f'Respons {h.response_time or "—"}ms')
+                    elif ps in ('DOWN', 'TIMEOUT'):
+                        health['streaming'] = s('down', 'Streaming', h.error_message or 'Tidak dapat dijangkau')
+                    else:
+                        health['streaming'] = s('unknown', 'Streaming', 'Belum ada data')
+                else:
+                    health['streaming'] = s('unknown', 'Streaming', 'Belum ada data')
+            else:
+                health['streaming'] = s('down', 'Streaming', 'Tidak ada stasiun aktif')
+        except Exception:
+            health['streaming'] = s('unknown', 'Streaming', 'Tidak dapat diperiksa')
+
+        # ── Website ──
+        try:
+            from apps.settings.models import SiteSettings
+            site = SiteSettings.objects.first()
+            if site and site.site_url:
+                health['website'] = s('healthy', 'Website', site.site_url[:40])
+            else:
+                health['website'] = s('degraded', 'Website', 'URL situs belum dikonfigurasi')
+        except Exception:
+            health['website'] = s('unknown', 'Website', 'Tidak dapat diperiksa')
+
+        # ── Database ──
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT 1')
+            health['database'] = s('healthy', 'Database', 'Koneksi aktif')
+        except Exception as e:
+            health['database'] = s('down', 'Database', str(e)[:60])
+
+        # ── Storage ──
+        try:
+            import shutil
+            from django.conf import settings as dj_settings
+            media_root = getattr(dj_settings, 'MEDIA_ROOT', '/tmp')
+            total, used, free = shutil.disk_usage(media_root or '/')
+            free_gb = round(free / (1024 ** 3), 1)
+            pct_used = round(used / total * 100)
+            if pct_used > 90:
+                health['storage'] = s('down', 'Storage', f'{pct_used}% penuh')
+            elif pct_used > 75:
+                health['storage'] = s('degraded', 'Storage', f'{free_gb} GB tersisa')
+            else:
+                health['storage'] = s('healthy', 'Storage', f'{free_gb} GB tersisa')
+        except Exception:
+            health['storage'] = s('unknown', 'Storage', 'Tidak dapat diperiksa')
+
+        # ── SSL ──
+        try:
+            request = self.request
+            is_https = request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https'
+            if is_https:
+                health['ssl'] = s('healthy', 'SSL / HTTPS', 'Sertifikat aktif')
+            else:
+                health['ssl'] = s('degraded', 'SSL / HTTPS', 'HTTP saja (development)')
+        except Exception:
+            health['ssl'] = s('unknown', 'SSL / HTTPS', 'Tidak dapat diperiksa')
+
+        # ── Backup ──
+        try:
+            import os
+            from django.conf import settings as dj_settings
+            backup_dir = getattr(dj_settings, 'BACKUP_DIR', None)
+            if backup_dir and os.path.exists(backup_dir):
+                backups = sorted([
+                    f for f in os.listdir(backup_dir)
+                    if f.endswith(('.sql', '.gz', '.zip'))
+                ])
+                if backups:
+                    health['backup'] = s('healthy', 'Backup', f'Terakhir: {backups[-1][:20]}')
+                else:
+                    health['backup'] = s('degraded', 'Backup', 'Tidak ada file backup')
+            else:
+                health['backup'] = s('degraded', 'Backup', 'Direktori backup belum dikonfigurasi')
+        except Exception:
+            health['backup'] = s('degraded', 'Backup', 'Tidak terkonfigurasi')
+
+        return health
 
 
 @method_decorator(login_required, name='dispatch')
