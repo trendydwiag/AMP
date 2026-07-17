@@ -1,0 +1,230 @@
+SPRINT 3.5 — AMP Studio UX Transformation
+
+GOAL
+
+Do NOT modify business logic.
+
+Do NOT modify models.
+
+Do NOT modify permissions.
+
+Do NOT remove Django Admin.
+
+Instead, create a completely new experience for users after login.
+
+=================================================
+
+CURRENT PROBLEM
+
+The current login redirects users directly into Django Admin.
+
+This interface is suitable for developers but confusing for radio owners and non-technical users.
+
+Users should interact with AMP Studio Dashboard first.
+
+Django Admin becomes an advanced maintenance tool only.
+
+=================================================
+
+OBJECTIVES
+
+Transform AMP Studio into the main application.
+
+Django Admin must become secondary.
+
+=================================================
+
+1. NEW LOGIN FLOW
+
+After login
+
+redirect to
+
+/amp-studio/
+
+instead of
+
+/admin/
+
+according to user role.
+
+=================================================
+
+2. CREATE REAL DASHBOARD
+
+Instead of showing model lists.
+
+Show:
+
+• Welcome Card
+• Current Radio Status
+• Live Stream Status
+• Current Program
+• Listener Count
+• Recent Activities
+• Quick Actions
+• Latest Articles
+• Latest Podcasts
+• Upcoming Schedule
+• Media Storage Usage
+• Notifications
+
+=================================================
+
+3. ROLE BASED HOMEPAGE
+
+Owner
+
+Administrator
+
+Editor
+
+Announcer
+
+Sponsor Manager
+
+Community Manager
+
+Each role must have different widgets and quick actions.
+
+=================================================
+
+4. NEW SIDEBAR
+
+Replace technical model names with business language.
+
+Example
+
+Dashboard
+
+Radio
+
+    Programs
+
+    Schedule
+
+    Live Broadcast
+
+Podcast
+
+News
+
+Media Library
+
+Community
+
+Sponsors
+
+Reports
+
+Settings
+
+Advanced
+
+    Django Admin
+
+=================================================
+
+5. QUICK ACTIONS
+
+Large cards.
+
+Publish News
+
+Start Broadcast
+
+Upload Podcast
+
+Upload Media
+
+Create Program
+
+Invite User
+
+=================================================
+
+6. EMPTY STATES
+
+No blank pages.
+
+Every empty page must explain
+
+what this feature does
+
+and provide
+
+the first action button.
+
+=================================================
+
+7. DJANGO ADMIN
+
+Do not remove.
+
+Hide it inside
+
+Advanced
+
+↓
+
+Developer Tools
+
+Only Superuser can access.
+
+=================================================
+
+8. UI
+
+Continue using the AMP Studio Design System.
+
+Do not introduce another design language.
+
+=================================================
+
+9. DEMO EXPERIENCE
+
+The application must feel like
+
+Spotify Studio
+
++
+
+WordPress
+
++
+
+Notion
+
+for Radio Management.
+
+=================================================
+
+10. OUTPUT
+
+Generate
+
+docs/ui/UX_TRANSFORMATION.md
+
+including
+
+Old UX
+
+New UX
+
+Navigation Tree
+
+Dashboard Layout
+
+Role Layout
+
+Future Improvements
+
+=================================================
+
+No business logic changes.
+
+No database changes.
+
+No permission changes.
+
+Focus only on UX transformation.

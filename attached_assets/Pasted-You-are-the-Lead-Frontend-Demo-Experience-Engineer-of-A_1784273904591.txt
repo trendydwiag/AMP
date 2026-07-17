@@ -1,0 +1,180 @@
+You are the Lead Frontend & Demo Experience Engineer of AMP Studio.
+
+This sprint is for DEMO PREPARATION.
+
+Do NOT modify existing architecture.
+
+Do NOT remove any feature.
+
+==========================================
+
+GOAL
+
+Create a complete demo environment for Kabulhaden Online.
+
+The system must look like a production platform already used every day.
+
+No page should look empty.
+
+==========================================
+
+IMPLEMENT
+
+Create a new Django management command:
+
+python manage.py demo_seed
+
+or equivalent.
+
+The command must safely reset and recreate demo data.
+
+==========================================
+
+Create realistic demo data for ALL modules.
+
+Populate:
+
+- Partner
+- Users
+- Roles
+- Memberships
+- Radio Station
+- Streaming
+- Programs
+- Weekly Schedule
+- Episodes
+- Podcasts
+- Podcast Episodes
+- Categories
+- Tags
+- Articles
+- Media Library
+- Sponsors
+- Advertisements
+- Community
+- Notifications
+- Analytics
+- Settings
+- Theme
+- Feature Flags
+
+==========================================
+
+Create demo users for every available role.
+
+Each role must have different permissions and visible menus.
+
+Use realistic Indonesian names.
+
+Use Kabulhaden organization structure whenever applicable.
+
+==========================================
+
+Use Kabulhaden Pitch Deck as inspiration for:
+
+- Organization
+- Programs
+- Schedule
+- Community
+- Vision
+- About
+- Team
+- Sponsors
+
+Create believable content instead of placeholder Lorem Ipsum.
+
+==========================================
+
+Streaming Demo
+
+Create a working demo configuration.
+
+Status:
+
+ONLINE
+
+Dummy listener count
+
+Dummy bitrate
+
+Dummy codec
+
+Dummy heartbeat
+
+==========================================
+
+Analytics
+
+Generate realistic metrics.
+
+Daily
+
+Weekly
+
+Monthly
+
+==========================================
+
+Every dashboard must look alive.
+
+No empty charts.
+
+No empty tables.
+
+No empty widgets.
+
+==========================================
+
+Create fake notifications.
+
+Create fake activities.
+
+Create fake audit logs.
+
+==========================================
+
+Create realistic timestamps.
+
+Spread records across the last 90 days.
+
+==========================================
+
+Create documentation:
+
+docs/demo/DEMO_GUIDE.md
+
+Include:
+
+Available users
+
+Passwords
+
+Role descriptions
+
+Demo scenarios
+
+Suggested presentation flow
+
+==========================================
+
+Generate Sprint Report.
+
+Include:
+
+Records created
+
+Users created
+
+Roles
+
+Files modified
+
+Known Issues
+
+Demo Readiness Score
+
+Ready for Founder Demo (YES/NO)
+
+Do not ask questions.
+
+Execute the sprint completely.

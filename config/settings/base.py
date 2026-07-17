@@ -63,6 +63,9 @@ MIDDLEWARE = [
     'apps.users.middleware.SessionTimeoutMiddleware',
     'apps.users.middleware.LastActivityMiddleware',
 
+    # AMP Studio — redirect /admin/ to /studio/ (Sprint 3.5)
+    'apps.core.middleware.AdminRedirectMiddleware',
+
     # Security/Audit Logging middleware
     'apps.core.middleware.AuditLoggingMiddleware',
 

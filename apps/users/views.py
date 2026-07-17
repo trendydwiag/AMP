@@ -123,13 +123,12 @@ class LoginView(FormView):
         security_logger.info(f"[LOGIN SUCCESS] User: {user.username} | IP: {ip_addr}")
 
     def _get_next_url(self) -> str:
-        """Get the redirect URL after login."""
+        """Get the redirect URL after login — always land on AMP Studio."""
         next_url = self.request.GET.get('next', '')
-        if next_url and next_url.startswith('/'):
+        # Honor explicit next= param, but never send users back into /admin/ directly
+        if next_url and next_url.startswith('/') and not next_url.startswith('/admin'):
             return next_url
-        if self.request.user.is_staff:
-            return reverse('admin:index')
-        return reverse('core:home')
+        return reverse('studio:dashboard')
 
     def _get_client_ip(self) -> str:
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
@@ -216,9 +215,9 @@ class TwoFactorVerifyView(FormView):
 
     def _get_next_url(self) -> str:
         next_url = self.request.GET.get('next', '')
-        if next_url and next_url.startswith('/'):
+        if next_url and next_url.startswith('/') and not next_url.startswith('/admin'):
             return next_url
-        return reverse('core:home')
+        return reverse('studio:dashboard')
 
     def _get_client_ip(self) -> str:
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')

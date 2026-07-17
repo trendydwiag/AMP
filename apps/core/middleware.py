@@ -1,7 +1,50 @@
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 import logging
 
 security_logger = logging.getLogger('security')
+
+
+class AdminRedirectMiddleware:
+    """
+    Sprint 3.5 — AMP Studio as primary interface.
+
+    Rules:
+    • Unauthenticated request to /admin/ or /admin/login/
+      → redirect to /akun/masuk/?next=/studio/ (AMP Studio login).
+    • Authenticated non-superuser at /admin/* → redirect to /studio/.
+    • Authenticated superuser at /admin/ (root only) → redirect to /studio/.
+      (Superusers can still navigate to /admin/broadcast/program/ etc. directly.)
+    """
+
+    STUDIO_URL = '/studio/'
+    LOGIN_URL = '/akun/masuk/'
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:
+        path = request.path
+
+        if path.startswith('/admin/'):
+            user = request.user
+
+            # Unauthenticated → always send to AMP Studio login
+            if not user.is_authenticated:
+                return HttpResponseRedirect(
+                    f"{self.LOGIN_URL}?next={self.STUDIO_URL}"
+                )
+
+            # Non-superuser reached /admin/* → redirect to studio
+            if not user.is_superuser:
+                return HttpResponseRedirect(self.STUDIO_URL)
+
+            # Superuser hit the root /admin/ or /admin/login/ → redirect to studio
+            # (They can still go to /admin/broadcast/ etc. directly)
+            if path in ('/admin/', '/admin/login/', '/admin/login'):
+                return HttpResponseRedirect(self.STUDIO_URL)
+
+        return self.get_response(request)
 
 class AuditLoggingMiddleware:
     """Middleware to audit log write actions (POST/PUT/DELETE) and attach client IP address to request users."""

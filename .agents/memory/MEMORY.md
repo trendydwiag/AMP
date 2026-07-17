@@ -1,2 +1,3 @@
-- [Sprint 3.5 Founder Experience](sprint-3-5.md) — 7 UX features added to AMP Studio; no schema changes; wizard uses session, tour uses localStorage.
+- [Sprint 3.5 Founder Experience](sprint-3-5.md) — 7 UX features + health widget; wizard uses session, tour uses localStorage; User.get_full_name is a property not method.
 - [AMP Studio Architecture](amp-studio-arch.md) — Design tokens, component patterns, and Alpine.js conventions for AMP Studio templates.
+- [Demo Seed Command](demo-seed.md) — `python manage.py demo_seed [--reset]`; ~340 records of REAL Kabulhaden data (pitch deck); model field + content string gotchas.
