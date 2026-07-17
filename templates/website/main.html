@@ -77,8 +77,6 @@
 {% endblock %}
 
 {% block extra_js %}
-{# radio-player.js must load BEFORE homepage.js and before deferred Alpine,
-   so x-data="radioPlayer()" resolves whether Alpine.data or global function is used #}
-<script src="{% static 'js/radio-player.js' %}" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
+<script src="{% static 'js/radio-player.js' %}?v=2" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
 <script src="{% static 'js/homepage.js' %}" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
 {% endblock %}

@@ -30,7 +30,7 @@ document.addEventListener('alpine:init', () => {
             this.audio.preload = 'none';
             // crossOrigin intentionally NOT set — Icecast does not send CORS headers
             // by default, and setting crossOrigin='anonymous' causes the browser to
-            // block playback silently. Radio streaming does not require canvas access.
+            // block playback silently.
             this.audio.volume = this.volume / 100;
 
             this.audio.addEventListener('playing', () => {
@@ -43,9 +43,15 @@ document.addEventListener('alpine:init', () => {
             });
             this.audio.addEventListener('ended', () => {
                 this.isPlaying = false;
+                this.isLoading = false;
                 this.scheduleReconnect();
             });
             this.audio.addEventListener('error', () => {
+                const err = this.audio.error;
+                if (err) {
+                    // code 1=ABORTED 2=NETWORK 3=DECODE 4=SRC_NOT_SUPPORTED
+                    console.warn('[Radio] audio error code=' + err.code + ' msg=' + err.message);
+                }
                 this.isPlaying = false;
                 this.isLoading = false;
                 this.scheduleReconnect();
@@ -55,6 +61,10 @@ document.addEventListener('alpine:init', () => {
             });
             this.audio.addEventListener('canplay', () => {
                 this.isLoading = false;
+            });
+            this.audio.addEventListener('stalled', () => {
+                // Stream stalled — treat as recoverable, keep isLoading true
+                console.warn('[Radio] stream stalled, waiting...');
             });
             this.audio.addEventListener('timeupdate', () => {
                 this.currentTime = this.audio.currentTime;
@@ -71,7 +81,10 @@ document.addEventListener('alpine:init', () => {
                 this.isOffline = false;
                 if (this.streamUrl) this.scheduleReconnect();
             });
-            window.addEventListener('offline', () => { this.isOffline = true; });
+            window.addEventListener('offline', () => {
+                this.isOffline = true;
+                this.isLoading = false;
+            });
 
             this.loadVolumePreference();
             this.fetchStatus();
@@ -92,17 +105,31 @@ document.addEventListener('alpine:init', () => {
         },
 
         scheduleReconnect() {
-            if (this.reconnectAttempts >= this.maxReconnectAttempts) return;
+            if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+                console.warn('[Radio] max reconnect attempts reached');
+                this.isLoading = false;
+                return;
+            }
             if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
             const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
             this.reconnectAttempts++;
             this.reconnectTimer = setTimeout(() => {
-                if (!navigator.onLine) return;
+                if (!navigator.onLine) {
+                    this.isLoading = false;
+                    return;
+                }
                 this.fetchStatus();
                 if (this.streamUrl) {
                     this.isLoading = true;
                     this.audio.src = this.streamUrl;
-                    this.audio.play().catch(() => {});
+                    this.audio.play()
+                        .then(() => { this.isLoading = false; })
+                        // BUG FIX: always reset isLoading in catch so next manual
+                        // click is not blocked by the isLoading guard in togglePlay()
+                        .catch((err) => {
+                            console.warn('[Radio] reconnect play() failed:', err && err.name);
+                            this.isLoading = false;
+                        });
                 }
             }, delay);
         },
@@ -142,20 +169,49 @@ document.addEventListener('alpine:init', () => {
         },
 
         togglePlay() {
-            if (this.isLoading) return;
-            if (!this.streamUrl) { this.fetchStatus(); return; }
+            // If currently playing — pause immediately, no guard needed
             if (this.isPlaying) {
                 this.audio.pause();
                 this.isPlaying = false;
-            } else {
-                this.isLoading = true;
-                if (!this.audio.src || this.audio.src === window.location.href) {
-                    this.audio.src = this.streamUrl;
-                }
-                this.audio.play()
-                    .then(() => { this.isPlaying = true; this.isLoading = false; this.reconnectAttempts = 0; })
-                    .catch(() => { this.isPlaying = false; this.isLoading = false; this.scheduleReconnect(); });
+                this.isLoading = false;
+                return;
             }
+
+            // User explicitly clicked play — cancel any pending reconnect and
+            // proceed regardless of isLoading state (fixes stuck-isLoading bug)
+            if (this.reconnectTimer) {
+                clearTimeout(this.reconnectTimer);
+                this.reconnectTimer = null;
+            }
+            this.isLoading = false;
+
+            if (!this.streamUrl) {
+                this.fetchStatus();
+                return;
+            }
+
+            this.isLoading = true;
+
+            // Set src only if not already pointing at the stream
+            const resolvedUrl = this.streamUrl.startsWith('http')
+                ? this.streamUrl
+                : window.location.origin + this.streamUrl;
+            if (!this.audio.src || this.audio.src === window.location.href || this.audio.src !== resolvedUrl) {
+                this.audio.src = this.streamUrl;
+            }
+
+            this.audio.play()
+                .then(() => {
+                    this.isPlaying = true;
+                    this.isLoading = false;
+                    this.reconnectAttempts = 0;
+                })
+                .catch((err) => {
+                    console.warn('[Radio] play() rejected:', err && err.name, err && err.message);
+                    this.isPlaying = false;
+                    this.isLoading = false;
+                    this.scheduleReconnect();
+                });
         },
 
         toggleMute() {
@@ -196,7 +252,7 @@ document.addEventListener('alpine:init', () => {
             navigator.mediaSession.setActionHandler('play', () => this.togglePlay());
             navigator.mediaSession.setActionHandler('pause', () => this.togglePlay());
             navigator.mediaSession.setActionHandler('stop', () => {
-                this.audio.pause(); this.audio.currentTime = 0; this.isPlaying = false;
+                this.audio.pause(); this.audio.currentTime = 0; this.isPlaying = false; this.isLoading = false;
             });
             navigator.mediaSession.setActionHandler('seekbackward', () => {
                 this.audio.currentTime = Math.max(0, this.audio.currentTime - 10);
@@ -208,7 +264,6 @@ document.addEventListener('alpine:init', () => {
 
         copyStreamLink() {
             if (this.streamUrl) {
-                // streamUrl may be an absolute URL or a relative path
                 const url = this.streamUrl.startsWith('http')
                     ? this.streamUrl
                     : window.location.origin + this.streamUrl;
