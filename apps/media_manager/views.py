@@ -6,7 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse
 from django.urls import reverse
 from apps.users.decorators import admin_required
-from .models import Folder, Tag, MediaFile
+from .models import Folder, Tag, MediaFile, PipelineStatus
 from .forms import FolderForm, TagForm, MediaFileUploadForm, MediaFileEditForm, MediaSearchForm
 from .services import FolderService, TagService, MediaFileService
 
@@ -282,4 +282,56 @@ class TagsView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['tags'] = Tag.objects.all()
         context['form'] = TagForm()
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(admin_required, name='dispatch')
+class MediaInspectorView(ListView):
+    """
+    Media Inspector — Sprint 4.2
+    Shows all MediaFile records with pipeline metadata: filename, duration,
+    bitrate, pipeline_status, storage_backend, uploaded_by, processed_at.
+    Supports filter by pipeline_status and file_type.
+    """
+    model = MediaFile
+    template_name = 'media_manager/inspector.html'
+    context_object_name = 'files'
+    paginate_by = 50
+
+    def get_queryset(self):
+        qs = MediaFile.objects.select_related('uploaded_by', 'folder').order_by('-created_at')
+        status = self.request.GET.get('status')
+        file_type = self.request.GET.get('type')
+        query = self.request.GET.get('q')
+        if status:
+            qs = qs.filter(pipeline_status=status)
+        if file_type:
+            qs = qs.filter(file_type=file_type)
+        if query:
+            from django.db.models import Q
+            qs = qs.filter(
+                Q(original_filename__icontains=query) |
+                Q(title__icontains=query) |
+                Q(audio_title__icontains=query) |
+                Q(audio_artist__icontains=query)
+            )
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from django.db.models import Count, Q
+        context['pipeline_statuses'] = PipelineStatus.choices
+        context['file_types'] = MediaFile.objects.values_list('file_type', flat=True).distinct()
+        context['current_status'] = self.request.GET.get('status', '')
+        context['current_type'] = self.request.GET.get('type', '')
+        context['current_q'] = self.request.GET.get('q', '')
+        # Summary counts
+        context['status_counts'] = {
+            s: MediaFile.objects.filter(pipeline_status=s).count()
+            for s, _ in PipelineStatus.choices
+        }
+        context['total'] = MediaFile.objects.count()
+        context['failed_count'] = context['status_counts'].get('FAILED', 0)
+        context['processing_count'] = context['status_counts'].get('PROCESSING', 0)
         return context

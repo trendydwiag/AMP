@@ -5,6 +5,14 @@ from utils.mixins import TimeStampedModel, UUIDPrimaryKeyMixin
 from utils.storage import generate_uuid_filename
 
 
+class PipelineStatus(models.TextChoices):
+    UPLOADING = 'UPLOADING', 'Sedang Upload'
+    PROCESSING = 'PROCESSING', 'Diproses'
+    READY = 'READY', 'Siap'
+    FAILED = 'FAILED', 'Gagal'
+    ARCHIVED = 'ARCHIVED', 'Diarsipkan'
+
+
 class Folder(UUIDPrimaryKeyMixin, TimeStampedModel):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
@@ -113,6 +121,24 @@ class MediaFile(UUIDPrimaryKeyMixin, TimeStampedModel):
     thumbnail = models.FileField(upload_to='thumbnails/', blank=True, null=True)
     is_public = models.BooleanField(default=True)
 
+    # ── Pipeline fields (Sprint 4.2) ─────────────────────────────────────────
+    pipeline_status = models.CharField(
+        max_length=20, choices=PipelineStatus.choices,
+        default=PipelineStatus.READY,
+        verbose_name='Status Pipeline'
+    )
+    processed_at = models.DateTimeField(null=True, blank=True, verbose_name='Diproses Pada')
+    storage_backend = models.CharField(
+        max_length=50, default='local', verbose_name='Storage Backend'
+    )
+    # Audio/video metadata extracted by MediaPipelineService.extract_metadata()
+    duration = models.FloatField(null=True, blank=True, verbose_name='Durasi (detik)')
+    bitrate = models.IntegerField(null=True, blank=True, verbose_name='Bitrate (kbps)')
+    audio_title = models.CharField(max_length=255, blank=True, default='', verbose_name='Judul (Tag)')
+    audio_artist = models.CharField(max_length=255, blank=True, default='', verbose_name='Artist (Tag)')
+    audio_album = models.CharField(max_length=255, blank=True, default='', verbose_name='Album (Tag)')
+    pipeline_error = models.TextField(blank=True, default='', verbose_name='Error Pipeline')
+
     class Meta:
         verbose_name = 'File Media'
         verbose_name_plural = 'File Media'
@@ -140,6 +166,25 @@ class MediaFile(UUIDPrimaryKeyMixin, TimeStampedModel):
     @property
     def is_audio(self):
         return self.file_type == 'AUDIO'
+
+    @property
+    def duration_formatted(self):
+        if not self.duration:
+            return '—'
+        minutes = int(self.duration // 60)
+        seconds = int(self.duration % 60)
+        return f'{minutes:02d}:{seconds:02d}'
+
+    @property
+    def pipeline_status_badge(self):
+        colors = {
+            'UPLOADING': 'bg-blue-100 text-blue-800',
+            'PROCESSING': 'bg-yellow-100 text-yellow-800',
+            'READY': 'bg-green-100 text-green-800',
+            'FAILED': 'bg-red-100 text-red-800',
+            'ARCHIVED': 'bg-gray-100 text-gray-800',
+        }
+        return colors.get(self.pipeline_status, 'bg-gray-100 text-gray-800')
 
     @property
     def formatted_size(self):

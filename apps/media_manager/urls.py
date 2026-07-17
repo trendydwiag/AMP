@@ -17,4 +17,5 @@ urlpatterns = [
     path('tag/buat/', views.TagCreateView.as_view(), name='tag_create'),
     path('tag/<uuid:pk>/hapus/', views.TagDeleteView.as_view(), name='tag_delete'),
     path('api/search/', views.MediaSearchAPIView.as_view(), name='api_search'),
+    path('inspector/', views.MediaInspectorView.as_view(), name='inspector'),
 ]

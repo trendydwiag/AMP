@@ -3,6 +3,7 @@ from django.db import models
 from utils.services import BaseService
 from .repositories import FolderRepository, TagRepository, MediaFileRepository
 from .models import Folder, Tag, MediaFile
+from .pipeline import MediaPipelineService, PipelineContext
 
 
 class FolderService(BaseService[FolderRepository]):
@@ -86,35 +87,29 @@ class MediaFileService(BaseService[MediaFileRepository]):
     def get_file_detail(self, file_id):
         return self.repository.get_by_id(file_id)
 
-    def upload_file(self, file_obj, title, user, folder_id=None, alt_text='', caption='', is_public=True, tag_ids=None):
-        import mimetypes
-        from django.utils.text import slugify
-
-        original_filename = file_obj.name
-        ext = os.path.splitext(original_filename)[1].lower()
-        mime_type = mimetypes.guess_type(original_filename)[0] or 'application/octet-stream'
-
-        file_type = self._detect_file_type(mime_type, ext)
-
-        media = MediaFile(
-            title=title,
-            file=file_obj,
-            original_filename=original_filename,
-            file_type=file_type,
-            mime_type=mime_type,
-            file_size=file_obj.size,
+    def upload_file(self, file_obj, title, user, folder_id=None, alt_text='', caption='', is_public=True, tag_ids=None, partner=None):
+        """
+        Upload a file through the Media Pipeline Engine.
+        All validation, metadata extraction, and storage are handled by MediaPipelineService.
+        Raises ValueError if the pipeline fails (validation error, size limit, etc.).
+        """
+        context = PipelineContext(
+            user=user,
+            title=title or '',
+            folder_id=folder_id,
             alt_text=alt_text,
             caption=caption,
-            folder_id=folder_id,
-            uploaded_by=user,
             is_public=is_public,
+            tag_ids=tag_ids,
+            partner=partner,
         )
-        media.save()
+        pipeline = MediaPipelineService()
+        result = pipeline.process(file_obj, context)
 
-        if tag_ids:
-            media.tags.set(tag_ids)
+        if not result.success:
+            raise ValueError(result.error)
 
-        return media
+        return result.media_file
 
     def update_file(self, file_id, **kwargs):
         media = self.repository.get_by_id(file_id)
@@ -137,18 +132,6 @@ class MediaFileService(BaseService[MediaFileRepository]):
     def bulk_delete(self, file_ids):
         for file_id in file_ids:
             self.delete_file(file_id)
-
-    def _detect_file_type(self, mime_type, ext):
-        if mime_type and mime_type.startswith('image/'):
-            return 'IMAGE'
-        if mime_type and mime_type.startswith('video/'):
-            return 'VIDEO'
-        if mime_type and mime_type.startswith('audio/'):
-            return 'AUDIO'
-        doc_exts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv']
-        if ext in doc_exts:
-            return 'DOCUMENT'
-        return 'OTHER'
 
     def get_stats(self):
         from django.db.models import Sum, Count

@@ -1,0 +1,295 @@
+# SPRINT 4.2 — MEDIA PIPELINE ENGINE
+
+## OBJECTIVE
+
+Bangun Media Pipeline Engine sebagai fondasi seluruh proses upload media di AMP Studio.
+
+Pipeline ini akan digunakan oleh:
+
+- Lagu
+- Podcast
+- Jingle
+- Iklan
+- Sponsor
+- Sound Effect
+- Voice Insert
+- Cover
+- Thumbnail
+
+Jangan mengubah UI.
+
+Fokus backend architecture.
+
+--------------------------------------------------
+
+RULES
+
+Gunakan struktur project yang SUDAH ADA.
+
+Jangan membuat app baru apabila sudah tersedia app media.
+
+Lakukan analisis terlebih dahulu terhadap folder:
+
+apps/media/
+
+atau modul upload yang sudah ada.
+
+Jika sudah ada service upload, lakukan refactor bertahap.
+
+--------------------------------------------------
+
+TASK 1
+
+Analisis seluruh upload flow.
+
+Identifikasi:
+
+- upload service
+- storage
+- model
+- media path
+- validation
+
+Jangan mengubah behaviour.
+
+--------------------------------------------------
+
+TASK 2
+
+Buat MediaPipelineService
+
+Jika services.py sudah ada:
+
+tambahkan class baru.
+
+Contoh:
+
+MediaPipelineService
+
+dengan tahapan:
+
+validate()
+
+extract_metadata()
+
+generate_waveform() (stub)
+
+analyze_audio() (stub)
+
+generate_preview() (stub)
+
+save()
+
+dispatch_event()
+
+--------------------------------------------------
+
+TASK 3
+
+Metadata Extraction
+
+Minimal baca:
+
+filename
+
+extension
+
+mime type
+
+size
+
+duration
+
+bitrate (jika tersedia)
+
+artist
+
+album
+
+title
+
+--------------------------------------------------
+
+TASK 4
+
+Media Status
+
+Tambahkan lifecycle:
+
+UPLOADING
+
+PROCESSING
+
+READY
+
+FAILED
+
+ARCHIVED
+
+--------------------------------------------------
+
+TASK 5
+
+Storage Abstraction
+
+Jangan hardcode media storage.
+
+Siapkan interface agar nanti mudah dipindah ke:
+
+Local Storage
+
+S3
+
+Cloudflare R2
+
+MinIO
+
+--------------------------------------------------
+
+TASK 6
+
+Event Hook
+
+Siapkan event internal:
+
+MediaUploaded
+
+MediaProcessed
+
+MediaDeleted
+
+MediaUpdated
+
+Belum perlu message broker.
+
+Cukup struktur.
+
+--------------------------------------------------
+
+TASK 7
+
+Validation
+
+Semua upload harus melalui validator.
+
+Contoh:
+
+maksimum ukuran
+
+extension
+
+mime
+
+duplicate filename
+
+--------------------------------------------------
+
+TASK 8
+
+Background Ready
+
+Pipeline harus siap dipindahkan ke async worker.
+
+Belum perlu Celery.
+
+Jangan blocking architecture.
+
+--------------------------------------------------
+
+TASK 9
+
+Media Inspector
+
+Tambahkan halaman admin sederhana:
+
+Media Inspector
+
+Menampilkan:
+
+filename
+
+duration
+
+bitrate
+
+status
+
+storage
+
+uploaded by
+
+processed at
+
+--------------------------------------------------
+
+TASK 10
+
+Audit Existing Upload
+
+Cari seluruh upload di project.
+
+Pastikan semuanya menggunakan pipeline.
+
+Jika belum,
+
+laporkan di changelog.
+
+Jangan menghapus kode lama.
+
+--------------------------------------------------
+
+TASK 11
+
+Documentation
+
+Update:
+
+docs/AI_CONTEXT.md
+
+Feature Status
+
+Architecture
+
+Media Pipeline
+
+--------------------------------------------------
+
+TASK 12
+
+CHANGELOG
+
+docs/changelog/sprint-4.2.md
+
+Isi:
+
+Architecture
+
+Flow
+
+Class
+
+Known Limitation
+
+Future Enhancement
+
+Compatibility
+
+Files Changed
+
+--------------------------------------------------
+
+Definition of Done
+
+✓ Semua upload melewati MediaPipelineService
+
+✓ Tidak ada upload langsung ke storage
+
+✓ Metadata otomatis terbaca
+
+✓ Lifecycle media tersedia
+
+✓ Siap untuk async processing
+
+✓ Tidak merusak upload yang sudah ada
+
+✓ Dokumentasi diperbarui

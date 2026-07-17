@@ -238,10 +238,10 @@ Analytics saat ini **stub** — view dan template ada tapi data belum real. Data
 
 ## Current Sprint
 
-**Sprint 4.0 — Knowledge Base Refresh & Project Reindex**
-- Jenis: Documentation sprint (tidak ada perubahan kode)
-- Deliverables: current-project-map.md, feature-status.md, routes.md, models.md, services.md, AI_CONTEXT.md, changelog/sprint-4.0.md
-- Status: Berjalan (17 Juli 2026)
+**Sprint 4.2 — Media Pipeline Engine**
+- Jenis: Backend architecture — tidak ada perubahan UI
+- Deliverables: pipeline.py, storage.py, events.py, migration 0003, Media Inspector view, changelog/sprint-4.2.md
+- Status: Selesai (17 Juli 2026)
 
 ---
 
