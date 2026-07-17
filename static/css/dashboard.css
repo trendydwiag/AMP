@@ -260,3 +260,55 @@
     transition: none;
   }
 }
+
+/* ── Form Controls – bare Django widget renders need explicit colours ────── */
+/* Scoped broadly so they apply on /pengaturan but don't leak into AMP Studio */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]),
+textarea,
+select {
+  color-scheme: light;
+  appearance: auto;
+  background-color: #ffffff;
+  color: #1A0F0B;           /* coffee-900 */
+  border: 1px solid #C89B6D; /* coffee-300 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  width: 100%;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]):focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #6B4226;   /* coffee-500 */
+  box-shadow: 0 0 0 3px rgba(107, 66, 38, 0.15);
+}
+
+/* Dark-mode variants */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]),
+.dark textarea,
+.dark select {
+  color-scheme: dark;
+  background-color: #3A2318; /* coffee-700 — readable, not pure-black */
+  color: #F5F0EA;            /* coffee-100 */
+  border-color: #4E2F1F;    /* coffee-600 */
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]):focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #8C5A3C;    /* coffee-400 */
+  box-shadow: 0 0 0 3px rgba(140, 90, 60, 0.2);
+}
+
+/* Checkboxes/radios – accent colour only */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #6B4226;    /* coffee-500 */
+  width: 1rem;
+  height: 1rem;
+}
