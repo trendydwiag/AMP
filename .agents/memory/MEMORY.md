@@ -3,3 +3,5 @@
 - [Demo Seed Command](demo-seed.md) — `python manage.py demo_seed [--reset]`; ~340 records of REAL Kabulhaden data (pitch deck); model field + content string gotchas.
 - [Alpine Radio Store Pattern](alpine-radio-store.md) — Use Alpine.store('radio') not x-data="radioPlayer()"; ProfilingPanel crash fix for dev toolbar.
 - [Global Context Processor](global-context-processor.md) — SiteSettings + SocialMediaSettings fully exposed via context_processors; keys: SITE_LOGO_URL, SITE_ADDRESS, SITE_CONTACT_EMAIL/PHONE, SOCIAL_FACEBOOK/INSTAGRAM/TWITTER/YOUTUBE/TIKTOK etc.
+- [AMP Studio Dark Mode](amp-studio-dark-mode.md) — Must toggle both data-theme attr AND .dark class on <html>; Tailwind CDN needs darkMode:'class' + coffee palette in config.
+- [StreamHealth Model Fields](streamhealth-fields.md) — Correct field names for StreamHealth; common wrong names used in templates.
