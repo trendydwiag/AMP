@@ -3,7 +3,7 @@
    Version: 1.0.0
    ======================================== */
 
-const CACHE_NAME = 'kabulhaden-v1';
+const CACHE_NAME = 'kabulhaden-v2';
 const OFFLINE_URL = '/static/offline.html';
 const STATIC_ASSETS = [
     '/',

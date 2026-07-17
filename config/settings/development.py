@@ -39,6 +39,11 @@ try:
     INTERNAL_IPS = ['127.0.0.1', 'localhost']
     DEBUG_TOOLBAR_CONFIG = {
         'INTERCEPT_REDIRECTS': False,
+        # ProfilingPanel crashes with "Another profiling tool is already active"
+        # when concurrent requests arrive (e.g. radio status poller every 10s).
+        'DISABLE_PANELS': {
+            'debug_toolbar.panels.profiling.ProfilingPanel',
+        },
     }
 except ImportError:
     pass

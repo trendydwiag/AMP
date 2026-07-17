@@ -1,0 +1,220 @@
+/* ============================================================
+   AMP Studio — Layout System
+   ============================================================ */
+
+/* ── App Shell ── */
+.amp-app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--amp-surface-secondary);
+}
+
+/* ── Sidebar ── */
+.amp-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--amp-sidebar-width);
+  background: var(--amp-surface-primary);
+  border-right: 1px solid var(--amp-border-light);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--amp-z-sidebar);
+  transition: width var(--amp-transition-base);
+  overflow: hidden;
+}
+.amp-sidebar.collapsed {
+  width: var(--amp-sidebar-collapsed-width);
+}
+
+/* ── Sidebar Logo ── */
+.amp-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--amp-space-3);
+  padding: var(--amp-space-5) var(--amp-space-5);
+  border-bottom: 1px solid var(--amp-border-light);
+  height: var(--amp-header-height);
+  flex-shrink: 0;
+}
+.amp-sidebar-logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--amp-radius-lg);
+  background: var(--amp-coffee-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.amp-sidebar-logo-text {
+  font-family: var(--amp-font-heading);
+  font-weight: var(--amp-weight-bold);
+  font-size: var(--amp-text-lg);
+  color: var(--amp-text-primary);
+  white-space: nowrap;
+}
+
+/* ── Sidebar Navigation ── */
+.amp-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--amp-space-3);
+}
+.amp-nav-section {
+  margin-bottom: var(--amp-space-4);
+}
+.amp-nav-section-title {
+  font-size: var(--amp-text-xs);
+  font-weight: var(--amp-weight-semibold);
+  color: var(--amp-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--amp-space-2) var(--amp-space-3);
+  white-space: nowrap;
+}
+.amp-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--amp-space-3);
+  padding: var(--amp-space-2) var(--amp-space-3);
+  border-radius: var(--amp-radius-md);
+  font-size: var(--amp-text-sm);
+  font-weight: var(--amp-weight-medium);
+  color: var(--amp-text-secondary);
+  cursor: pointer;
+  transition: all var(--amp-transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.amp-nav-item:hover {
+  background: var(--amp-surface-tertiary);
+  color: var(--amp-text-primary);
+}
+.amp-nav-item.active {
+  background: var(--amp-coffee-50);
+  color: var(--amp-coffee-700);
+}
+.amp-nav-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.amp-nav-item .amp-nav-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--amp-weight-semibold);
+  border-radius: var(--amp-radius-full);
+  background: var(--amp-danger);
+  color: var(--amp-text-inverse);
+}
+
+/* ── Main Content Area ── */
+.amp-main {
+  flex: 1;
+  margin-left: var(--amp-sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left var(--amp-transition-base);
+}
+.amp-main.expanded {
+  margin-left: var(--amp-sidebar-collapsed-width);
+}
+
+/* ── Header ── */
+.amp-header {
+  position: sticky;
+  top: 0;
+  height: var(--amp-header-height);
+  background: var(--amp-surface-primary);
+  border-bottom: 1px solid var(--amp-border-light);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--amp-space-6);
+  gap: var(--amp-space-4);
+  z-index: var(--amp-z-header);
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+}
+[data-theme="dark"] .amp-header {
+  background: rgba(17, 17, 17, 0.85);
+}
+
+/* ── Content Area ── */
+.amp-content {
+  flex: 1;
+  padding: var(--amp-space-6);
+  max-width: var(--amp-content-max-width);
+  width: 100%;
+}
+
+/* ── Page Header ── */
+.amp-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--amp-space-6);
+  flex-wrap: wrap;
+  gap: var(--amp-space-4);
+}
+.amp-page-title {
+  font-family: var(--amp-font-heading);
+  font-size: var(--amp-text-2xl);
+  font-weight: var(--amp-weight-bold);
+  color: var(--amp-text-primary);
+}
+.amp-page-subtitle {
+  font-size: var(--amp-text-sm);
+  color: var(--amp-text-secondary);
+  margin-top: var(--amp-space-1);
+}
+
+/* ── Grid System ── */
+.amp-grid {
+  display: grid;
+  gap: var(--amp-space-6);
+}
+.amp-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.amp-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.amp-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.amp-grid-auto {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* ── Player Bar ── */
+.amp-player-bar {
+  position: fixed;
+  bottom: 0;
+  left: var(--amp-sidebar-width);
+  right: 0;
+  height: var(--amp-player-height);
+  background: var(--amp-surface-primary);
+  border-top: 1px solid var(--amp-border-light);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--amp-space-6);
+  gap: var(--amp-space-4);
+  z-index: var(--amp-z-player);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .amp-sidebar { transform: translateX(-100%); }
+  .amp-sidebar.open { transform: translateX(0); }
+  .amp-main { margin-left: 0; }
+  .amp-player-bar { left: 0; }
+  .amp-grid-3, .amp-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .amp-grid-2, .amp-grid-3, .amp-grid-4 { grid-template-columns: 1fr; }
+  .amp-content { padding: var(--amp-space-4); }
+}

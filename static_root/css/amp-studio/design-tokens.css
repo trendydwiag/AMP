@@ -1,0 +1,221 @@
+/* ============================================================
+   AMP Studio — Design Tokens
+   Aradhana Media Platform
+   Tenant: Kabulhaden Online (#0001)
+   ============================================================ */
+
+:root {
+  /* ── Brand Colors: Coffee Palette ── */
+  --amp-coffee-50: #FAF7F3;
+  --amp-coffee-100: #F5F0EA;
+  --amp-coffee-200: #E7DDD3;
+  --amp-coffee-300: #C89B6D;
+  --amp-coffee-400: #8C5A3C;
+  --amp-coffee-500: #6B4226;
+  --amp-coffee-600: #4E2F1F;
+  --amp-coffee-700: #3A2318;
+  --amp-coffee-800: #2B1A13;
+  --amp-coffee-900: #1A0F0B;
+
+  /* ── Semantic Colors ── */
+  --amp-success: #2F9E44;
+  --amp-success-light: #D3F9D8;
+  --amp-success-dark: #1B7A30;
+  --amp-warning: #E67700;
+  --amp-warning-light: #FFF3BF;
+  --amp-warning-dark: #B35C00;
+  --amp-danger: #E53935;
+  --amp-danger-light: #FFE3E3;
+  --amp-danger-dark: #C62828;
+  --amp-info: #1C7ED6;
+  --amp-info-light: #D0EBFF;
+  --amp-info-dark: #1156A0;
+
+  /* ── Neutral Palette ── */
+  --amp-gray-25: #FCFCFD;
+  --amp-gray-50: #F9FAFB;
+  --amp-gray-100: #F2F4F7;
+  --amp-gray-200: #EAECF0;
+  --amp-gray-300: #D0D5DD;
+  --amp-gray-400: #98A2B3;
+  --amp-gray-500: #667085;
+  --amp-gray-600: #475467;
+  --amp-gray-700: #344054;
+  --amp-gray-800: #1D2939;
+  --amp-gray-900: #101828;
+  --amp-gray-950: #0C111D;
+
+  /* ── Surface Colors ── */
+  --amp-surface-primary: #FFFFFF;
+  --amp-surface-secondary: #F9FAFB;
+  --amp-surface-tertiary: #F2F4F7;
+  --amp-surface-elevated: #FFFFFF;
+  --amp-surface-overlay: rgba(16, 24, 40, 0.6);
+
+  /* ── Text Colors ── */
+  --amp-text-primary: #101828;
+  --amp-text-secondary: #475467;
+  --amp-text-tertiary: #667085;
+  --amp-text-inverse: #FFFFFF;
+  --amp-text-link: #6B4226;
+  --amp-text-link-hover: #4E2F1F;
+
+  /* ── Border Colors ── */
+  --amp-border-light: #EAECF0;
+  --amp-border-default: #D0D5DD;
+  --amp-border-strong: #98A2B3;
+  --amp-border-focus: #6B4226;
+
+  /* ── Typography ── */
+  --amp-font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --amp-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --amp-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* ── Font Sizes ── */
+  --amp-text-xs: 0.75rem;    /* 12px */
+  --amp-text-sm: 0.875rem;   /* 14px */
+  --amp-text-base: 1rem;     /* 16px */
+  --amp-text-lg: 1.125rem;   /* 18px */
+  --amp-text-xl: 1.25rem;    /* 20px */
+  --amp-text-2xl: 1.5rem;    /* 24px */
+  --amp-text-3xl: 1.875rem;  /* 30px */
+  --amp-text-4xl: 2.25rem;   /* 36px */
+
+  /* ── Font Weights ── */
+  --amp-weight-regular: 400;
+  --amp-weight-medium: 500;
+  --amp-weight-semibold: 600;
+  --amp-weight-bold: 700;
+
+  /* ── Line Heights ── */
+  --amp-leading-tight: 1.25;
+  --amp-leading-snug: 1.375;
+  --amp-leading-normal: 1.5;
+  --amp-leading-relaxed: 1.625;
+
+  /* ── Spacing Scale (4px base) ── */
+  --amp-space-0: 0;
+  --amp-space-1: 0.25rem;   /* 4px */
+  --amp-space-2: 0.5rem;    /* 8px */
+  --amp-space-3: 0.75rem;   /* 12px */
+  --amp-space-4: 1rem;      /* 16px */
+  --amp-space-5: 1.25rem;   /* 20px */
+  --amp-space-6: 1.5rem;    /* 24px */
+  --amp-space-8: 2rem;      /* 32px */
+  --amp-space-10: 2.5rem;   /* 40px */
+  --amp-space-12: 3rem;     /* 48px */
+  --amp-space-16: 4rem;     /* 64px */
+  --amp-space-20: 5rem;     /* 80px */
+  --amp-space-24: 6rem;     /* 96px */
+
+  /* ── Border Radius ── */
+  --amp-radius-none: 0;
+  --amp-radius-sm: 6px;
+  --amp-radius-md: 8px;
+  --amp-radius-lg: 12px;
+  --amp-radius-xl: 16px;
+  --amp-radius-2xl: 20px;
+  --amp-radius-3xl: 24px;
+  --amp-radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --amp-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --amp-shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
+  --amp-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+  --amp-shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+  --amp-shadow-xl: 0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03);
+  --amp-shadow-2xl: 0 24px 48px -12px rgba(16, 24, 40, 0.18);
+  --amp-shadow-card: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --amp-shadow-card-hover: 0 4px 12px rgba(16, 24, 40, 0.1), 0 2px 4px rgba(16, 24, 40, 0.06);
+  --amp-shadow-dropdown: 0 12px 36px rgba(16, 24, 40, 0.12);
+  --amp-shadow-modal: 0 24px 48px rgba(16, 24, 40, 0.18);
+
+  /* ── Layout ── */
+  --amp-sidebar-width: 260px;
+  --amp-sidebar-collapsed-width: 72px;
+  --amp-header-height: 64px;
+  --amp-player-height: 64px;
+  --amp-content-max-width: 1440px;
+  --amp-content-width: 1280px;
+
+  /* ── Z-Index Scale ── */
+  --amp-z-base: 0;
+  --amp-z-dropdown: 1000;
+  --amp-z-sticky: 1020;
+  --amp-z-sidebar: 1030;
+  --amp-z-header: 1040;
+  --amp-z-player: 1050;
+  --amp-z-modal-backdrop: 1060;
+  --amp-z-modal: 1070;
+  --amp-z-command-palette: 1080;
+  --amp-z-notification: 1090;
+  --amp-z-toast: 1100;
+
+  /* ── Transitions ── */
+  --amp-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --amp-transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --amp-transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --amp-transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Breakpoints (for reference) ── */
+  /* sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px */
+}
+
+/* ============================================================
+   Dark Theme
+   ============================================================ */
+[data-theme="dark"] {
+  --amp-surface-primary: #111111;
+  --amp-surface-secondary: #1A1A1A;
+  --amp-surface-tertiary: #222222;
+  --amp-surface-elevated: #1E1E1E;
+  --amp-surface-overlay: rgba(0, 0, 0, 0.7);
+
+  --amp-text-primary: #F0F0F0;
+  --amp-text-secondary: #A0A0A0;
+  --amp-text-tertiary: #707070;
+  --amp-text-inverse: #101828;
+  --amp-text-link: #C89B6D;
+  --amp-text-link-hover: #E7DDD3;
+
+  --amp-border-light: #2A2A2A;
+  --amp-border-default: #333333;
+  --amp-border-strong: #555555;
+  --amp-border-focus: #C89B6D;
+
+  --amp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --amp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --amp-shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --amp-shadow-lg: 0 12px 16px -4px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --amp-shadow-xl: 0 20px 24px -4px rgba(0, 0, 0, 0.3), 0 8px 8px -4px rgba(0, 0, 0, 0.2);
+  --amp-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --amp-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --amp-shadow-dropdown: 0 12px 36px rgba(0, 0, 0, 0.5);
+  --amp-shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
+   Light Theme (default — same as :root)
+   ============================================================ */
+[data-theme="light"] {
+  /* Inherits from :root */
+}
+
+/* ============================================================
+   Coffee Theme (brand warm)
+   ============================================================ */
+[data-theme="coffee"] {
+  --amp-surface-primary: #FAF7F3;
+  --amp-surface-secondary: #F5F0EA;
+  --amp-surface-tertiary: #E7DDD3;
+  --amp-surface-elevated: #FFFFFF;
+
+  --amp-text-primary: #2B1A13;
+  --amp-text-secondary: #4E2F1F;
+  --amp-text-tertiary: #6B4226;
+
+  --amp-border-light: #E7DDD3;
+  --amp-border-default: #C89B6D;
+  --amp-border-strong: #8C5A3C;
+  --amp-border-focus: #6B4226;
+}

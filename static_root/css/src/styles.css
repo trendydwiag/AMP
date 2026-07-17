@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#FAF7F3] text-[#2D2D2D] font-body transition-colors duration-250;
+  }
+}

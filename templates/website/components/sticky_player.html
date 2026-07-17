@@ -1,5 +1,5 @@
 {% load static %}
-<div x-data="radioPlayer()" x-init="init()" class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-coffee-200 shadow-player transition-colors duration-250" role="region" aria-label="Pemutar radio" style="height: 84px;">
+<div x-data="{}" class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-coffee-200 shadow-player transition-colors duration-250" role="region" aria-label="Pemutar radio" style="height: 84px;">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div class="flex items-center gap-3 md:gap-4 h-full">
 
@@ -7,13 +7,13 @@
             <div class="hidden sm:flex items-center gap-3 flex-shrink-0">
                 <div class="relative">
                     <div class="w-12 h-12 rounded-xl bg-coffee-100 overflow-hidden shadow-sm">
-                        <img :src="currentTrack.artwork" alt="" class="w-full h-full object-cover" loading="lazy" x-show="currentTrack.artwork" style="display:none">
-                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-coffee-100 to-coffee-50" x-show="!currentTrack.artwork">
+                        <img :src="$store.radio.currentTrack.artwork" alt="" class="w-full h-full object-cover" loading="lazy" x-show="$store.radio.currentTrack.artwork" style="display:none">
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-coffee-100 to-coffee-50" x-show="!$store.radio.currentTrack.artwork">
                             <svg class="w-5 h-5 text-coffee-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
                         </div>
                     </div>
                     {# Audio visualizer (small, inside artwork) #}
-                    <div x-show="isPlaying" class="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-end gap-[2px] h-3" style="display:none">
+                    <div x-show="$store.radio.isPlaying" class="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-end gap-[2px] h-3" style="display:none">
                         <div class="w-[3px] bg-coffee-400 rounded-full audio-bar" style="height:100%"></div>
                         <div class="w-[3px] bg-coffee-400 rounded-full audio-bar" style="height:70%"></div>
                         <div class="w-[3px] bg-coffee-400 rounded-full audio-bar" style="height:40%"></div>
@@ -25,48 +25,48 @@
 
             {# Track Info — Center #}
             <div class="hidden sm:flex flex-1 min-w-0 flex-col justify-center">
-                <p class="text-[10px] font-heading font-bold uppercase tracking-wider mb-0.5" :class="isLive ? 'text-live' : 'text-coffee-400'" x-text="isLive ? 'LIVE' : 'NOW PLAYING'">NOW PLAYING</p>
-                <p class="text-sm font-heading font-semibold text-[#2D2D2D] truncate leading-tight" x-text="currentTrack.title || 'Kabulhaden Radio'">Kabulhaden Radio</p>
-                <p class="text-xs font-body text-[#666666] truncate" x-text="currentTrack.artist || 'Menunggu siaran...'">Menunggu siaran...</p>
+                <p class="text-[10px] font-heading font-bold uppercase tracking-wider mb-0.5" :class="$store.radio.isLive ? 'text-live' : 'text-coffee-400'" x-text="$store.radio.isLive ? 'LIVE' : 'NOW PLAYING'">NOW PLAYING</p>
+                <p class="text-sm font-heading font-semibold text-[#2D2D2D] truncate leading-tight" x-text="$store.radio.currentTrack.title || 'Kabulhaden Radio'">Kabulhaden Radio</p>
+                <p class="text-xs font-body text-[#666666] truncate" x-text="$store.radio.currentTrack.artist || 'Menunggu siaran...'">Menunggu siaran...</p>
             </div>
 
             {# Track Info — Mobile #}
-            <div class="flex-1 min-w-0 sm:hidden" @click="openMobilePlayer()">
-                <p class="text-sm font-heading font-semibold text-[#2D2D2D] truncate leading-tight" x-text="currentTrack.title || 'Kabulhaden Radio'">Kabulhaden Radio</p>
-                <p class="text-xs font-body text-[#666666] truncate" x-text="currentTrack.artist || 'Menunggu siaran...'">Menunggu siaran...</p>
+            <div class="flex-1 min-w-0 sm:hidden">
+                <p class="text-sm font-heading font-semibold text-[#2D2D2D] truncate leading-tight" x-text="$store.radio.currentTrack.title || 'Kabulhaden Radio'">Kabulhaden Radio</p>
+                <p class="text-xs font-body text-[#666666] truncate" x-text="$store.radio.currentTrack.artist || 'Menunggu siaran...'">Menunggu siaran...</p>
             </div>
 
             {# Waveform / Progress — Center-Right #}
             <div class="hidden md:flex items-center gap-2.5 flex-1 max-w-sm">
-                <span class="text-[11px] font-body text-coffee-300 w-9 text-right tabular-nums" x-text="formatTime(currentTime)">0:00</span>
-                <div class="flex-1 h-1 bg-coffee-200 rounded-full overflow-hidden cursor-pointer group relative" @click="seek($event)">
-                    <div class="h-full bg-coffee-400 rounded-full transition-all duration-150" :style="'width: ' + progress + '%'">
+                <span class="text-[11px] font-body text-coffee-300 w-9 text-right tabular-nums" x-text="$store.radio.formatTime($store.radio.currentTime)">0:00</span>
+                <div class="flex-1 h-1 bg-coffee-200 rounded-full overflow-hidden cursor-pointer group relative" @click="$store.radio.seek($event)">
+                    <div class="h-full bg-coffee-400 rounded-full transition-all duration-150" :style="'width: ' + $store.radio.progress + '%'">
                         <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-coffee-400 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                 </div>
-                <span class="text-[11px] font-body text-coffee-300 w-9 tabular-nums" x-text="formatTime(duration)">0:00</span>
+                <span class="text-[11px] font-body text-coffee-300 w-9 tabular-nums" x-text="$store.radio.formatTime($store.radio.duration)">0:00</span>
             </div>
 
             {# Play/Pause — Center #}
-            <button @click="togglePlay()" class="flex-shrink-0 w-12 h-12 rounded-full bg-coffee-400 flex items-center justify-center text-white hover:bg-coffee-500 transition-all shadow-md hover:shadow-lg active:scale-95" :aria-label="isPlaying ? 'Jeda' : 'Putar'">
-                <svg x-show="!isPlaying" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg x-show="isPlaying" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                <svg x-show="isLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" style="display:none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            <button @click="$store.radio.togglePlay()" class="flex-shrink-0 w-12 h-12 rounded-full bg-coffee-400 flex items-center justify-center text-white hover:bg-coffee-500 transition-all shadow-md hover:shadow-lg active:scale-95" :aria-label="$store.radio.isPlaying ? 'Jeda' : 'Putar'">
+                <svg x-show="!$store.radio.isPlaying && !$store.radio.isLoading" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg x-show="$store.radio.isPlaying && !$store.radio.isLoading" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                <svg x-show="$store.radio.isLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" style="display:none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
             </button>
 
             {# Volume — Right #}
             <div class="hidden lg:flex items-center gap-1.5">
-                <button @click="toggleMute()" class="p-1.5 rounded-lg text-[#666666] hover:text-coffee-500 hover:bg-coffee-50 transition-colors" :aria-label="isMuted ? 'Bunyikan' : 'Bisukan'">
-                    <svg x-show="volume > 0 && !isMuted" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                    <svg x-show="volume === 0 || isMuted" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                <button @click="$store.radio.toggleMute()" class="p-1.5 rounded-lg text-[#666666] hover:text-coffee-500 hover:bg-coffee-50 transition-colors" :aria-label="$store.radio.isMuted ? 'Bunyikan' : 'Bisukan'">
+                    <svg x-show="$store.radio.volume > 0 && !$store.radio.isMuted" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                    <svg x-show="$store.radio.volume === 0 || $store.radio.isMuted" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
                 </button>
-                <div class="w-20 h-1 bg-coffee-200 rounded-full overflow-hidden cursor-pointer group" @click="setVolume($event)">
-                    <div class="h-full bg-coffee-400 rounded-full transition-all duration-150" :style="'width: ' + volume + '%'"></div>
+                <div class="w-20 h-1 bg-coffee-200 rounded-full overflow-hidden cursor-pointer group" @click="$store.radio.setVolume($event)">
+                    <div class="h-full bg-coffee-400 rounded-full transition-all duration-150" :style="'width: ' + $store.radio.volume + '%'"></div>
                 </div>
             </div>
 
             {# Share / Copy Link #}
-            <button @click="copyStreamLink()" class="hidden sm:flex p-1.5 rounded-lg text-[#666666] hover:text-coffee-500 hover:bg-coffee-50 transition-colors" aria-label="Salin link siaran">
+            <button @click="$store.radio.copyStreamLink()" class="hidden sm:flex p-1.5 rounded-lg text-[#666666] hover:text-coffee-500 hover:bg-coffee-50 transition-colors" aria-label="Salin link siaran">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
             </button>
 
