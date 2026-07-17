@@ -3,6 +3,16 @@
 
 {% block title %}Pratinjau Konten{% endblock %}
 
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{% url 'studio:dashboard' %}">Studio</a></li>
+    <li><span class="sep">/</span></li>
+    <li>Pratinjau Konten</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-3xl mx-auto">
   <div class="amp-page-header">

@@ -1,0 +1,219 @@
+
+SPRINT 3.6 — PLATFORM UI CONSISTENCY & NAVIGATION HARDENING
+IMPORTANT
+Ini BUKAN sprint penambahan fitur.
+Ini sprint QUALITY ASSURANCE.
+Jangan mengubah business logic.
+Jangan rollback pekerjaan Sprint 3.4 maupun Sprint 3.5.
+Fokus hanya memperbaiki inkonsistensi seluruh AMP Studio.
+
+OBJECTIVE
+AMP Studio harus terasa sebagai SATU aplikasi profesional.
+Semua halaman wajib menggunakan design system yang sama.
+Tidak boleh ada halaman yang terasa dibuat oleh komponen berbeda.
+
+TASK 1
+Audit seluruh halaman Studio
+Scan seluruh route:
+/studio/ /studio/streaming/ /studio/program/ /studio/episode/ /studio/jadwal/ /studio/host/ /studio/content/ /studio/articles/ /studio/podcast/ /studio/community/ /studio/media/ /studio/analytics/ /studio/partner/ /studio/settings/ /studio/setup/
+Cari seluruh halaman yang:
+* memakai layout berbeda
+* memakai sidebar berbeda
+* memakai navbar berbeda
+* memakai padding berbeda
+* memakai warna berbeda
+* memakai card berbeda
+* memakai font berbeda
+* memakai spacing berbeda
+Samakan semuanya.
+Gunakan SATU layout global.
+
+TASK 2
+Gunakan Base Layout Tunggal
+Seluruh halaman Studio HARUS menggunakan:
+base_studio.html
+Tidak boleh ada halaman yang masih memakai:
+dashboard.html
+legacy_admin.html
+old_layout.html
+atau layout lama lainnya.
+Semua harus extend base layout yang sama.
+
+TASK 3
+Konsistensi Sidebar
+Sidebar harus identik di seluruh halaman.
+Tidak boleh berubah ketika membuka submenu.
+Menu aktif harus otomatis highlight.
+Contoh:
+Studio
+Beranda
+Streaming
+Program
+Episode
+Jadwal
+dst.
+Tetap sama di seluruh aplikasi.
+
+TASK 4
+Perbaiki Tombol Beranda
+Saat login:
+Beranda HARUS menuju
+/studio/
+BUKAN
+/
+Landing page hanya untuk user yang belum login.
+
+TASK 5
+Header Konsisten
+Header harus identik di semua halaman.
+Logo
+Partner Selector
+Search
+Notification
+Dark Mode
+Profile
+Status Streaming
+tidak boleh berubah.
+
+TASK 6
+Breadcrumb
+Tambahkan breadcrumb otomatis.
+Contoh
+Studio
+
+Streaming
+
+Program
+atau
+Studio
+
+Konten
+
+Artikel
+Setiap halaman wajib memiliki breadcrumb.
+
+TASK 7
+Audit Semua Menu
+Klik satu-persatu seluruh menu sidebar.
+Pastikan:
+tidak ada 404
+tidak ada template error
+tidak ada page kosong
+tidak ada placeholder
+tidak ada TODO
+tidak ada halaman legacy
+tidak ada route mati
+Jika menu belum memiliki fungsi:
+buat halaman minimal yang layak.
+
+TASK 8
+Bersihkan Comment yang Bocor
+Saat ini ditemukan comment seperti
+{# radio-player.js must load BEFORE homepage.js ... #}
+dan
+{# Sprint 3.5 P3: Radio Health Widget ... #}
+yang tampil ke user.
+Cari seluruh file.
+Hilangkan seluruh template comment yang ikut dirender.
+Pastikan tidak ada lagi internal developer notes yang muncul di UI.
+
+TASK 9
+Audit Asset
+Pastikan
+CSS
+JS
+Alpine
+HTMX
+Player
+Charts
+di-load melalui pipeline yang konsisten.
+Tidak boleh ada page yang load asset berbeda.
+
+TASK 10
+Component Consistency
+Gunakan satu design system.
+Button
+Card
+Badge
+Input
+Dropdown
+Table
+Modal
+Tooltip
+Alert
+harus identik.
+Tidak boleh ada style lama.
+
+TASK 11
+Responsive Audit
+Pastikan seluruh halaman:
+Desktop
+Laptop
+Tablet
+Mobile
+tetap konsisten.
+Sidebar collapse harus bekerja.
+
+TASK 12
+Route Validation
+Scan seluruh urlpatterns.
+Pastikan semua route:
+punya view
+punya template
+punya permission
+tidak ada dead link.
+
+TASK 13
+Functional Validation
+Simulasikan login sebagai:
+Super Admin
+Partner Admin
+Editor
+Host
+Kontributor
+Lakukan klik seluruh menu.
+Pastikan tidak ada error.
+
+TASK 14
+Dummy Data Validation
+Seluruh halaman harus menampilkan data dummy yang realistis.
+Tidak boleh ada halaman kosong.
+Program
+Episode
+Host
+Artikel
+Podcast
+Analytics
+Media
+Sponsor
+Playlist
+Schedule
+Partner
+semuanya harus terlihat hidup.
+
+TASK 15
+CHANGELOG
+Tambahkan
+docs/changelog/sprint-3.6.md
+berisi:
+* seluruh halaman yang diaudit
+* halaman yang diperbaiki
+* route yang diperbaiki
+* menu yang diperbaiki
+* asset yang diperbaiki
+* komponen yang disamakan
+* bug yang ditemukan
+* bug yang diperbaiki
+* halaman yang sebelumnya placeholder
+* halaman yang kini sudah aktif
+Jangan menghapus changelog sprint sebelumnya.
+
+Definition of Done
+Sprint dianggap selesai jika:
+* Tidak ada halaman dengan layout berbeda.
+* Tidak ada menu yang mati.
+* Tidak ada komentar developer tampil di UI.
+* Semua halaman memakai base layout yang sama.
+* Semua menu mengarah ke tujuan yang benar.
+* Seluruh dashboard terasa seperti satu produk profesional.
+* Tidak ada perubahan business logic, hanya peningkatan kualitas UI/UX, konsistensi, dan stabilitas platform.

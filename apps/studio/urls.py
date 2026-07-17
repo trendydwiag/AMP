@@ -18,4 +18,7 @@ urlpatterns = [
     # Broken-link redirect: /studio/stream/ → /studio/streaming/
     path('stream/', RedirectView.as_view(pattern_name='studio:streaming_center', permanent=True)),
     path('stream', RedirectView.as_view(pattern_name='studio:streaming_center', permanent=True)),
+    # Sprint 3.6 — stub pages for previously dead sidebar links
+    path('komunitas/', views.CommunityView.as_view(), name='community'),
+    path('iklan/', views.IklanView.as_view(), name='iklan'),
 ]

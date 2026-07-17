@@ -3,6 +3,16 @@
 
 {% block title %}Streaming Center{% endblock %}
 
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{% url 'studio:dashboard' %}">Studio</a></li>
+    <li><span class="sep">/</span></li>
+    <li>Streaming Center</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="space-y-8" x-data="streamingCenter()" x-init="init()">
 

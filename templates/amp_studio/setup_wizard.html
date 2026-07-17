@@ -3,6 +3,16 @@
 
 {% block title %}Setup Wizard{% endblock %}
 
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{% url 'studio:dashboard' %}">Studio</a></li>
+    <li><span class="sep">/</span></li>
+    <li>Setup Wizard</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-5xl mx-auto" x-data="setupWizard({{ current_step }})" x-init="init()">
 

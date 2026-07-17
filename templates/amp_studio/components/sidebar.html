@@ -1,7 +1,7 @@
 {# AMP Studio — Sidebar Navigation #}
 {% load role_tags %}
 <aside class="amp-sidebar" :class="{ 'collapsed': sidebarCollapsed, 'open': sidebarMobileOpen }" @click.outside="sidebarMobileOpen = false">
-  
+
   {# ── Logo ── #}
   <div class="amp-sidebar-logo">
     <div class="amp-sidebar-logo-icon">
@@ -50,107 +50,140 @@
 
   {# ── Navigation ── #}
   <nav class="amp-sidebar-nav" aria-label="Main Navigation">
-    
-    {# Dashboard #}
-    <a id="nav-dashboard" href="{% url 'studio:dashboard' %}" class="amp-nav-item {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'studio' %}active{% endif %}">
+
+    {# Beranda #}
+    <a id="nav-dashboard" href="{% url 'studio:dashboard' %}"
+       class="amp-nav-item {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'studio' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span x-show="!sidebarCollapsed">Beranda</span>
     </a>
 
     {# Streaming Center #}
-    <a id="nav-streaming" href="{% url 'studio:streaming_center' %}" class="amp-nav-item {% if request.resolver_match.url_name == 'streaming_center' %}active{% endif %}">
+    <a id="nav-streaming" href="{% url 'studio:streaming_center' %}"
+       class="amp-nav-item {% if request.resolver_match.url_name == 'streaming_center' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
       <span x-show="!sidebarCollapsed">Streaming</span>
     </a>
 
     {# Siaran #}
-    <div id="nav-broadcast" class="amp-nav-section" x-data="{ open: false }">
-      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'broadcast' %}active{% endif %}">
+    {% with is_broadcast=request.resolver_match.app_name %}
+    <div id="nav-broadcast" class="amp-nav-section"
+         x-data="{ open: {% if request.resolver_match.app_name == 'broadcast' %}true{% else %}false{% endif %} }">
+      <button @click="open = !open"
+              class="amp-nav-item w-full {% if request.resolver_match.app_name == 'broadcast' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
         <span x-show="!sidebarCollapsed">Siaran</span>
         <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
-        <a href="{% url 'broadcast:cms_program_list' %}" class="amp-nav-item">Program</a>
-        <a href="{% url 'broadcast:cms_episode_list' %}" class="amp-nav-item">Episode</a>
-        <a href="{% url 'broadcast:schedule_list' %}" class="amp-nav-item">Jadwal</a>
-        <a href="{% url 'broadcast:host_list' %}" class="amp-nav-item">Host</a>
-        <a href="{% url 'broadcast:announcement_list' %}" class="amp-nav-item">Pengumuman</a>
+        <a href="{% url 'broadcast:cms_program_list' %}"
+           class="amp-nav-item {% if 'program' in request.resolver_match.url_name %}active{% endif %}">Program</a>
+        <a href="{% url 'broadcast:cms_episode_list' %}"
+           class="amp-nav-item {% if 'episode' in request.resolver_match.url_name and request.resolver_match.app_name == 'broadcast' %}active{% endif %}">Episode</a>
+        <a href="{% url 'broadcast:schedule_list' %}"
+           class="amp-nav-item {% if 'schedule' in request.resolver_match.url_name %}active{% endif %}">Jadwal</a>
+        <a href="{% url 'broadcast:host_list' %}"
+           class="amp-nav-item {% if 'host' in request.resolver_match.url_name %}active{% endif %}">Host</a>
+        <a href="{% url 'broadcast:announcement_list' %}"
+           class="amp-nav-item {% if 'announcement' in request.resolver_match.url_name %}active{% endif %}">Pengumuman</a>
       </div>
     </div>
+    {% endwith %}
 
     {# Konten #}
-    <div id="nav-content" class="amp-nav-section" x-data="{ open: false }">
-      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'news' %}active{% endif %}">
+    <div id="nav-content" class="amp-nav-section"
+         x-data="{ open: {% if request.resolver_match.app_name == 'news' or request.resolver_match.app_name == 'content' %}true{% else %}false{% endif %} }">
+      <button @click="open = !open"
+              class="amp-nav-item w-full {% if request.resolver_match.app_name == 'news' or request.resolver_match.app_name == 'content' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         <span x-show="!sidebarCollapsed">Konten</span>
         <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
-        <a href="{% url 'news:cms_article_list' %}" class="amp-nav-item">Artikel</a>
-        <a href="{% url 'content:category_list' %}" class="amp-nav-item">Kategori</a>
-        <a href="{% url 'content:tag_list' %}" class="amp-nav-item">Tag</a>
-        <a href="{% url 'content:author_list' %}" class="amp-nav-item">Penulis</a>
-        <a href="{% url 'content:seo_list' %}" class="amp-nav-item">SEO</a>
+        <a href="{% url 'news:cms_article_list' %}"
+           class="amp-nav-item {% if 'article' in request.resolver_match.url_name %}active{% endif %}">Artikel</a>
+        <a href="{% url 'content:category_list' %}"
+           class="amp-nav-item {% if 'category' in request.resolver_match.url_name %}active{% endif %}">Kategori</a>
+        <a href="{% url 'content:tag_list' %}"
+           class="amp-nav-item {% if 'tag' in request.resolver_match.url_name and request.resolver_match.app_name == 'content' %}active{% endif %}">Tag</a>
+        <a href="{% url 'content:author_list' %}"
+           class="amp-nav-item {% if 'author' in request.resolver_match.url_name %}active{% endif %}">Penulis</a>
+        <a href="{% url 'content:seo_list' %}"
+           class="amp-nav-item {% if 'seo' in request.resolver_match.url_name %}active{% endif %}">SEO</a>
       </div>
     </div>
 
     {# Podcast #}
-    <div class="amp-nav-section" x-data="{ open: false }">
-      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'podcast' %}active{% endif %}">
+    <div class="amp-nav-section"
+         x-data="{ open: {% if request.resolver_match.app_name == 'podcast' %}true{% else %}false{% endif %} }">
+      <button @click="open = !open"
+              class="amp-nav-item w-full {% if request.resolver_match.app_name == 'podcast' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         <span x-show="!sidebarCollapsed">Podcast</span>
         <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
-        <a href="{% url 'podcast:cms_podcast_list' %}" class="amp-nav-item">Program</a>
-        <a href="{% url 'podcast:cms_episode_list' %}" class="amp-nav-item">Episode</a>
+        <a href="{% url 'podcast:cms_podcast_list' %}"
+           class="amp-nav-item {% if 'podcast' in request.resolver_match.url_name %}active{% endif %}">Program</a>
+        <a href="{% url 'podcast:cms_episode_list' %}"
+           class="amp-nav-item {% if 'episode' in request.resolver_match.url_name and request.resolver_match.app_name == 'podcast' %}active{% endif %}">Episode</a>
       </div>
     </div>
 
     {# Komunitas #}
-    <a href="#" class="amp-nav-item">
+    <a href="{% url 'studio:community' %}"
+       class="amp-nav-item {% if request.resolver_match.url_name == 'community' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
       <span x-show="!sidebarCollapsed">Komunitas</span>
     </a>
 
     {# Iklan #}
-    <a href="#" class="amp-nav-item">
+    <a href="{% url 'studio:iklan' %}"
+       class="amp-nav-item {% if request.resolver_match.url_name == 'iklan' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       <span x-show="!sidebarCollapsed">Iklan</span>
     </a>
 
     {# Media #}
-    <div class="amp-nav-section" x-data="{ open: false }">
-      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'media_manager' %}active{% endif %}">
+    <div class="amp-nav-section"
+         x-data="{ open: {% if request.resolver_match.app_name == 'media_manager' %}true{% else %}false{% endif %} }">
+      <button @click="open = !open"
+              class="amp-nav-item w-full {% if request.resolver_match.app_name == 'media_manager' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <span x-show="!sidebarCollapsed">Media</span>
         <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
-        <a href="{% url 'media_manager:list' %}" class="amp-nav-item">Semua File</a>
-        <a href="{% url 'media_manager:upload' %}" class="amp-nav-item">Upload</a>
-        <a href="{% url 'media_manager:folders' %}" class="amp-nav-item">Folder</a>
-        <a href="{% url 'media_manager:tags' %}" class="amp-nav-item">Tag</a>
+        <a href="{% url 'media_manager:list' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'list' and request.resolver_match.app_name == 'media_manager' %}active{% endif %}">Semua File</a>
+        <a href="{% url 'media_manager:upload' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">Upload</a>
+        <a href="{% url 'media_manager:folders' %}"
+           class="amp-nav-item {% if 'folder' in request.resolver_match.url_name %}active{% endif %}">Folder</a>
+        <a href="{% url 'media_manager:tags' %}"
+           class="amp-nav-item {% if 'tag' in request.resolver_match.url_name and request.resolver_match.app_name == 'media_manager' %}active{% endif %}">Tag</a>
       </div>
     </div>
 
     {# Analytics #}
-    <a href="{% url 'radio:analytics' %}" class="amp-nav-item">
+    <a href="{% url 'radio:analytics' %}"
+       class="amp-nav-item {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       <span x-show="!sidebarCollapsed">Analytics</span>
     </a>
 
     {# Partner #}
     {% if user.role == 'SUPERUSER' or user.role == 'ADMINISTRATOR' %}
-    <a href="{% url 'platform:partner_list' %}" class="amp-nav-item {% if request.resolver_match.app_name == 'platform' %}active{% endif %}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    <a href="{% url 'platform:partner_list' %}"
+       class="amp-nav-item {% if request.resolver_match.app_name == 'platform' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-4 0v2M8 7V5a2 2 0 00-4 0v2"/></svg>
       <span x-show="!sidebarCollapsed">Partner</span>
     </a>
     {% endif %}
 
     {# Setup Wizard #}
-    <a href="{% url 'studio:setup_wizard' %}" class="amp-nav-item {% if request.resolver_match.url_name == 'setup_wizard' %}active{% endif %}">
+    <a href="{% url 'studio:setup_wizard' %}"
+       class="amp-nav-item {% if request.resolver_match.url_name == 'setup_wizard' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <span x-show="!sidebarCollapsed">Setup Wizard</span>
     </a>
@@ -158,25 +191,34 @@
     <div class="amp-separator my-3"></div>
 
     {# Radio Status #}
-    <a href="{% url 'radio:dashboard' %}" class="amp-nav-item">
+    <a href="{% url 'radio:dashboard' %}"
+       class="amp-nav-item {% if request.resolver_match.app_name == 'radio' and request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
       <span x-show="!sidebarCollapsed">Radio</span>
     </a>
 
     {# Pengaturan #}
-    <div id="nav-settings" class="amp-nav-section" x-data="{ open: false }">
-      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'settings' %}active{% endif %}">
+    <div id="nav-settings" class="amp-nav-section"
+         x-data="{ open: {% if request.resolver_match.app_name == 'settings' %}true{% else %}false{% endif %} }">
+      <button @click="open = !open"
+              class="amp-nav-item w-full {% if request.resolver_match.app_name == 'settings' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         <span x-show="!sidebarCollapsed">Pengaturan</span>
         <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
-        <a href="{% url 'settings:site' %}" class="amp-nav-item">Situs</a>
-        <a href="{% url 'settings:appearance' %}" class="amp-nav-item">Tampilan</a>
-        <a href="{% url 'settings:email' %}" class="amp-nav-item">Email</a>
-        <a href="{% url 'settings:language' %}" class="amp-nav-item">Bahasa</a>
-        <a href="{% url 'settings:security' %}" class="amp-nav-item">Keamanan</a>
-        <a href="{% url 'users:admin_user_list' %}" class="amp-nav-item">Pengguna</a>
+        <a href="{% url 'settings:site' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'site' %}active{% endif %}">Situs</a>
+        <a href="{% url 'settings:appearance' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'appearance' %}active{% endif %}">Tampilan</a>
+        <a href="{% url 'settings:email' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'email' %}active{% endif %}">Email</a>
+        <a href="{% url 'settings:language' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'language' %}active{% endif %}">Bahasa</a>
+        <a href="{% url 'settings:security' %}"
+           class="amp-nav-item {% if request.resolver_match.url_name == 'security' %}active{% endif %}">Keamanan</a>
+        <a href="{% url 'users:admin_user_list' %}"
+           class="amp-nav-item {% if 'user' in request.resolver_match.url_name and request.resolver_match.app_name == 'users' %}active{% endif %}">Pengguna</a>
       </div>
     </div>
 

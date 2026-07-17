@@ -532,3 +532,43 @@ class SetupWizardView(TemplateView):
         request.session['setup_wizard_done'] = True
         messages.success(request, 'Selamat! Setup Kabulhaden Anda sudah selesai.')
         return redirect('studio:dashboard')
+
+
+@method_decorator(login_required, name='dispatch')
+class CommunityView(TemplateView):
+    """Community hub — discussions and listener interactions."""
+    template_name = 'amp_studio/community.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            from apps.community.models import Discussion, Reply
+            context['discussion_count'] = Discussion.objects.count()
+            context['reply_count'] = Reply.objects.count()
+            context['discussions'] = Discussion.objects.select_related(
+                'author'
+            ).order_by('-created_at')[:10]
+        except Exception:
+            context['discussion_count'] = 0
+            context['reply_count'] = 0
+            context['discussions'] = []
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class IklanView(TemplateView):
+    """Advertising & sponsor management."""
+    template_name = 'amp_studio/iklan.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            from apps.sponsor.models import Sponsor, Advertisement
+            context['sponsors'] = Sponsor.objects.order_by('-is_active', 'name')[:20]
+            context['active_sponsors'] = Sponsor.objects.filter(is_active=True).count()
+            context['ad_count'] = Advertisement.objects.count()
+        except Exception:
+            context['sponsors'] = []
+            context['active_sponsors'] = 0
+            context['ad_count'] = 0
+        return context

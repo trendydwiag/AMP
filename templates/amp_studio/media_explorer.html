@@ -3,6 +3,16 @@
 
 {% block title %}Media Explorer{% endblock %}
 
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{% url 'studio:dashboard' %}">Studio</a></li>
+    <li><span class="sep">/</span></li>
+    <li>Media Explorer</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div x-data="mediaExplorer()">
   <div class="amp-page-header">
