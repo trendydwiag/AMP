@@ -11,11 +11,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+  {# Tailwind CSS (utility classes used throughout all templates) #}
+  <script>
+    // Configure Tailwind before loading — no custom scale needed since
+    // templates use CSS-variable arbitrary values like text-[var(--amp-coffee-600)]
+    window.tailwind = { config: { corePlugins: { preflight: false } } };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   
-  {# AMP Studio Styles #}
+  {# AMP Studio Styles — loaded after Tailwind so AMP classes always win #}
   <link rel="stylesheet" href="{% static 'css/amp-studio/amp-studio.css' %}">
-  
-  {# Alpine.js — served locally to avoid CDN SRI/CSP issues #}
+
+  {# Alpine.js plugins (Collapse for sidebar smooth expand) #}
+  <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+  {# Alpine.js — served locally #}
   <script defer src="{% static 'js/alpine.min.js' %}"></script>
   
   {# HTMX #}
@@ -55,14 +65,6 @@
 
   {# ── Toast Container ── #}
   <div id="toast-container" class="fixed bottom-24 right-6 z-[1100] flex flex-col gap-3"></div>
-
-  {# ── Sprint 3.5: Floating Help Button ── #}
-  {% include 'amp_studio/components/help_button.html' %}
-
-  {# ── Sprint 3.5: Guided Tour ── #}
-  <div x-data="guidedTour()" x-init="init()">
-    {% include 'amp_studio/components/guided_tour.html' %}
-  </div>
 
   {# ── AMP Studio JS ── #}
   <script src="{% static 'js/amp-studio/amp-studio.js' %}"></script>

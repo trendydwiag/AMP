@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 from . import views
 
 app_name = 'studio'
@@ -14,4 +15,7 @@ urlpatterns = [
     # Sprint 3.5 — Founder Experience
     path('streaming/', views.StreamingCenterView.as_view(), name='streaming_center'),
     path('setup/', views.SetupWizardView.as_view(), name='setup_wizard'),
+    # Broken-link redirect: /studio/stream/ → /studio/streaming/
+    path('stream/', RedirectView.as_view(pattern_name='studio:streaming_center', permanent=True)),
+    path('stream', RedirectView.as_view(pattern_name='studio:streaming_center', permanent=True)),
 ]
