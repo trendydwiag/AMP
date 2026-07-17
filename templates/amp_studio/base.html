@@ -12,11 +12,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 
-  {# Tailwind CSS (utility classes used throughout all templates) #}
+  {# Tailwind CSS — coffee palette + dark-mode class strategy configured before load #}
   <script>
-    // Configure Tailwind before loading — no custom scale needed since
-    // templates use CSS-variable arbitrary values like text-[var(--amp-coffee-600)]
-    window.tailwind = { config: { corePlugins: { preflight: false } } };
+    window.tailwind = {
+      config: {
+        darkMode: 'class',
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            colors: {
+              coffee: {
+                50:  '#FAF7F3',
+                100: '#F5F0EA',
+                200: '#E7DDD3',
+                300: '#C89B6D',
+                400: '#8C5A3C',
+                500: '#6B4226',
+                600: '#4E2F1F',
+                700: '#3A2318',
+                800: '#2B1A13',
+                900: '#1A0F0B',
+              }
+            }
+          }
+        }
+      }
+    };
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   

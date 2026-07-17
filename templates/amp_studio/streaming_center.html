@@ -232,15 +232,15 @@
             <tbody class="divide-y divide-[var(--amp-border-light)]">
               {% for h in health_history %}
               <tr class="hover:bg-[var(--amp-surface-tertiary)] transition-colors">
-                <td class="py-3 pr-4 text-[var(--amp-text-secondary)] whitespace-nowrap">{{ h.checked_at|timesince }} lalu</td>
+                <td class="py-3 pr-4 text-[var(--amp-text-secondary)] whitespace-nowrap">{{ h.last_checked|timesince }} lalu</td>
                 <td class="py-3 pr-4">
-                  <span class="amp-badge amp-badge-sm {% if h.status == 'healthy' %}amp-badge-success{% elif h.status == 'degraded' %}amp-badge-warning{% else %}amp-badge-danger{% endif %}">
-                    {{ h.get_status_display|default:h.status }}
+                  <span class="amp-badge amp-badge-sm {% if h.provider_status == 'HEALTHY' %}amp-badge-success{% elif h.provider_status == 'DEGRADED' %}amp-badge-warning{% else %}amp-badge-danger{% endif %}">
+                    {{ h.get_provider_status_display }}
                   </span>
                 </td>
-                <td class="py-3 pr-4 text-[var(--amp-text-primary)]">{{ h.listener_count|default:"—" }}</td>
-                <td class="py-3 pr-4 text-[var(--amp-text-secondary)]">{{ h.bitrate|default:"—" }}</td>
-                <td class="py-3 text-[var(--amp-text-secondary)]">{{ h.codec|default:"—" }}</td>
+                <td class="py-3 pr-4 text-[var(--amp-text-primary)]">{{ h.response_time|floatformat:0|default:"—" }} ms</td>
+                <td class="py-3 pr-4 text-[var(--amp-text-secondary)]">{% if h.stream_bitrate %}{{ h.stream_bitrate }} kbps{% else %}—{% endif %}</td>
+                <td class="py-3 text-[var(--amp-text-secondary)]">{{ h.stream_format|default:"—" }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -284,16 +284,16 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               <span class="text-sm text-[var(--amp-text-secondary)]">Bitrate</span>
             </div>
-            <span class="text-sm font-medium text-[var(--amp-text-primary)]">{{ health.bitrate|default:"—" }}</span>
+            <span class="text-sm font-medium text-[var(--amp-text-primary)]">{% if health.stream_bitrate %}{{ health.stream_bitrate }} kbps{% else %}—{% endif %}</span>
           </div>
 
           {# Codec #}
           <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--amp-surface-tertiary)]">
             <div class="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-              <span class="text-sm text-[var(--amp-text-secondary)]">Codec</span>
+              <span class="text-sm text-[var(--amp-text-secondary)]">Format</span>
             </div>
-            <span class="text-sm font-medium text-[var(--amp-text-primary)]">{{ health.codec|default:"—" }}</span>
+            <span class="text-sm font-medium text-[var(--amp-text-primary)]">{{ health.stream_format|default:"—" }}</span>
           </div>
 
           {# Last Heartbeat #}
@@ -302,7 +302,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               <span class="text-sm text-[var(--amp-text-secondary)]">Heartbeat</span>
             </div>
-            <span class="text-xs text-[var(--amp-text-tertiary)]">{{ health.checked_at|timesince }} lalu</span>
+            <span class="text-xs text-[var(--amp-text-tertiary)]">{{ health.last_checked|timesince }} lalu</span>
           </div>
           {% else %}
           <div class="p-4 text-center text-sm text-[var(--amp-text-tertiary)]">
