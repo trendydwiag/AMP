@@ -1,0 +1,31 @@
+{# Version History Panel #}
+<div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+  <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4 flex items-center gap-2">
+    <svg class="w-5 h-5 text-coffee-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Riwayat Versi
+  </h3>
+  <div class="space-y-3">
+    {% for version in versions %}
+    <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-colors">
+      <div class="w-8 h-8 rounded-full bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center shrink-0">
+        <span class="text-xs font-bold text-coffee-600 dark:text-coffee-300">v{{ version.version_number }}</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-coffee-800 dark:text-coffee-100">{{ version.change_summary|default:"Tanpa deskripsi" }}</p>
+        <p class="text-xs text-coffee-400 dark:text-coffee-500">
+          {% if version.author %}{{ version.author.username }} &middot; {% endif %}
+          {{ version.created_at|date:"d M Y H:i" }}
+        </p>
+      </div>
+      {% if version.is_current %}
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Aktif</span>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-sm text-coffee-400 dark:text-coffee-500 text-center py-4">Belum ada riwayat versi</p>
+    {% endfor %}
+  </div>
+  {% if versions %}
+  <a href="{% url 'content:version_list' %}" class="block mt-4 text-center text-sm text-coffee-600 dark:text-coffee-300 hover:text-coffee-800 dark:hover:text-coffee-100">Lihat Semua Riwayat &rarr;</a>
+  {% endif %}
+</div>

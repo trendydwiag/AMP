@@ -1,0 +1,29 @@
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": "{{ article.seo_title|default:article.title }}",
+    "description": "{{ article.seo_description|default:article.excerpt }}",
+    {% if article.featured_image %}"image": "{{ article.featured_image.url }}",{% endif %}
+    "author": {
+        "@type": "Person",
+        "name": "{{ article.author_name|default:'Redaksi' }}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ SITE_NAME }}",
+        {% if SITE_LOGO %}"logo": {
+            "@type": "ImageObject",
+            "url": "{{ SITE_LOGO }}"
+        }{% endif %}
+    },
+    {% if article.publish_date %}"datePublished": "{{ article.publish_date|date:'c' }}",{% endif %}
+    {% if article.updated_at %}"dateModified": "{{ article.updated_at|date:'c' }}",{% endif %}
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ SITE_URL|default:'https://kabulhaden.id' }}{{ request.path }}"
+    },
+    "articleSection": "{{ article.category.name|default:'' }}",
+    "wordCount": "{{ article.content|wordcount }}"
+}
+</script>

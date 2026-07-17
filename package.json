@@ -1,0 +1,17 @@
+{
+  "name": "kabulhaden-cms",
+  "version": "1.0.0",
+  "description": "Production foundation for Kabulhaden CMS",
+  "main": "index.js",
+  "scripts": {
+    "build": "tailwindcss -i ./static/css/src/styles.css -o ./static/css/styles.css --minify",
+    "build:dev": "tailwindcss -i ./static/css/src/styles.css -o ./static/css/styles.css",
+    "watch": "tailwindcss -i ./static/css/src/styles.css -o ./static/css/styles.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.4"
+  }
+}

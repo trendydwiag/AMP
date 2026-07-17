@@ -1,0 +1,138 @@
+{% extends 'website/main.html' %}
+{% load static %}
+
+{% block page_title %}Kebijakan Privasi - {{ SITE_NAME }}{% endblock %}
+{% block page_description %}Kebijakan privasi Kabulhaden mengenai pengumpulan dan penggunaan data pribadi{% endblock %}
+
+{% block content %}
+
+<section class="bg-gradient-to-br from-coffee-600 via-coffee-700 to-coffee-900 dark:from-coffee-600 dark:via-coffee-700 dark:to-slate-900 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        {% include 'website/components/breadcrumb.html' with breadcrumbs=breadcrumbs %}
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Kebijakan Privasi</h1>
+        <p class="text-lg text-white/80">Terakhir diperbarui: 1 Januari 2025</p>
+    </div>
+</section>
+
+<article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="prose prose-slate dark:prose-invert max-w-none">
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 mb-8">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Ringkasan</h2>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                Kabulhaden ("kami") menghargai privasi Anda. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan situs web dan layanan kami.
+            </p>
+        </div>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">1. Informasi yang Kami Kumpulkan</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed space-y-4">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Informasi yang Anda Berikan</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Nama dan alamat email saat Anda mengirimkan formulir kontak atau berlangganan newsletter</li>
+                    <li>Nama dan email saat Anda berpartisipasi dalam diskusi komunitas</li>
+                    <li>Informasi akun jika Anda mendaftar sebagai pengguna</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mt-6">Informasi yang dikumpulkan secara otomatis</h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Alamat IP dan data lokasi umum</li>
+                    <li>Jenis browser dan sistem operasi</li>
+                    <li>Halaman yang dikunjungi dan durasi kunjungan</li>
+                    <li>Sumber lalu lintas (referral)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">2. Penggunaan Informasi</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p class="mb-3">Kami menggunakan informasi yang dikumpulkan untuk:</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Menyediakan dan memelihara layanan kami</li>
+                    <li>Memproses formulir kontak dan berlangganan newsletter</li>
+                    <li>Mengirim informasi yang Anda minta</li>
+                    <li>Menganalisis penggunaan situs untuk peningkatan layanan</li>
+                    <li>Menjaga keamanan dan mencegah penyalahgunaan</li>
+                    <li>Mematuhi kewajiban hukum</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">3. Cookie</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed space-y-3">
+                <p>Kami menggunakan cookie dan teknologi serupa untuk:</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li><strong>Cookie esensial:</strong> Diperlukan untuk fungsi dasar situs</li>
+                    <li><strong>Cookie preferensi:</strong> Mengingat pengaturan Anda seperti mode gelap</li>
+                    <li><strong>Cookie analitik:</strong> Membantu kami memahami penggunaan situs</li>
+                </ul>
+                <p>Anda dapat mengontrol penggunaan cookie melalui pengaturan browser Anda.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">4. Berbagi Informasi</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p class="mb-3">Kami tidak menjual atau menyewakan informasi pribadi Anda kepada pihak ketiga. Kami dapat membagikan informasi dalam keadaan berikut:</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Dengan persetujuan Anda</li>
+                    <li>Untuk mematuhi hukum atau proses hukum</li>
+                    <li>Untuk melindungi hak dan keamanan kami</li>
+                    <li>Dengan penyedia layanan yang membantu operasi kami (dikaitkan dengan perjanjian kerahasiaan)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">5. Keamanan Data</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Kami menerapkan langkah-langkah keamanan teknis dan organisasi yang wajar untuk melindungi informasi pribadi Anda dari akses, penggunaan, atau pengungkapan yang tidak sah. Namun, tidak ada metode transmisi internet atau penyimpanan elektronik yang 100% aman.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">6. Hak Anda</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p class="mb-3">Anda memiliki hak untuk:</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Mengakses informasi pribadi yang kami miliki tentang Anda</li>
+                    <li>Meminta koreksi informasi yang tidak akurat</li>
+                    <li>Meminta penghapusan informasi pribadi Anda</li>
+                    <li>Menolak atau membatasi pemrosesan informasi Anda</li>
+                    <li>Meminta portabilitas data</li>
+                    <li>Menarik persetujuan kapan saja</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">7. Tautan Pihak Ketiga</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Situs kami mungkin berisi tautan ke situs web pihak ketiga. Kami tidak bertanggung jawab atas praktik privasi situs-situs tersebut. Kami mendorong Anda untuk membaca kebijakan privasi setiap situs yang Anda kunjungi.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">8. Perubahan Kebijakan</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Kami dapat memperbarui kebijakan privasi ini dari waktu ke waktu. Perubahan akan dipublikasikan di halaman ini dengan tanggal pembaruan terbaru. Penggunaan layanan kami setelah perubahan berarti Anda menerima kebijakan yang diperbarui.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">9. Hubungi Kami</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Jika Anda memiliki pertanyaan tentang kebijakan privasi ini, silakan hubungi kami melalui:</p>
+                <ul class="list-disc pl-6 mt-3 space-y-2">
+                    <li>Email: <a href="mailto:info@kabulhaden.id" class="text-coffee-500 dark:text-coffee-400 hover:underline">info@kabulhaden.id</a></li>
+                    <li>Halaman kontak kami: <a href="{% url 'website:contact' %}" class="text-coffee-500 dark:text-coffee-400 hover:underline">Kontak</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+</article>
+
+{% endblock %}

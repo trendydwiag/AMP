@@ -1,0 +1,360 @@
+{% extends 'amp_studio/base.html' %}
+{% load static %}
+
+{% block title %}Beranda{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+
+  {# ── Welcome Banner ── #}
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="amp-page-title">Selamat datang kembali, {{ user.get_full_name|default:user.username }}</h1>
+      <p class="amp-page-subtitle">Berikut ringkasan aktivitas Kabulhaden Online hari ini.</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2">
+      <a href="{% url 'news:cms_article_create' %}" class="amp-btn amp-btn-primary gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Artikel Baru
+      </a>
+    </div>
+  </div>
+
+  {# ── Metric Cards Row ── #}
+  <div class="amp-grid amp-grid-4">
+    {# Live Listeners #}
+    <div class="amp-card amp-card-elevated p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="amp-badge amp-badge-success">
+          <span class="amp-status-dot live"></span>
+          LIVE
+        </span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <p class="amp-metric" x-data="streamStatus()" x-init="init()">
+        <span class="amp-metric-value" x-text="listenerCount || '—'">—</span>
+      </p>
+      <p class="amp-metric-label">Pendengar Online</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1" x-data="streamStatus()" x-init="init()">
+        <span x-text="currentProgram || 'Tidak ada program'"></span>
+      </p>
+    </div>
+
+    {# Articles Today #}
+    <div class="amp-card amp-card-elevated p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="amp-badge amp-badge-secondary">Hari ini</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <p class="amp-metric-value">{{ stats.articles_today|default:"0" }}</p>
+      <p class="amp-metric-label">Artikel Diterbitkan</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ stats.articles_pending|default:"0" }} menunggu review</p>
+    </div>
+
+    {# Podcast Episodes #}
+    <div class="amp-card amp-card-elevated p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="amp-badge amp-badge-secondary">Podcast</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+      </div>
+      <p class="amp-metric-value">{{ stats.podcast_episodes|default:"0" }}</p>
+      <p class="amp-metric-label">Episode Podcast</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ stats.podcast_total|default:"0" }} total episode</p>
+    </div>
+
+    {# Active Programs #}
+    <div class="amp-card amp-card-elevated p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="amp-badge amp-badge-secondary">Program</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+      </div>
+      <p class="amp-metric-value">{{ stats.programs_active|default:"0" }}</p>
+      <p class="amp-metric-label">Program Aktif</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ stats.episodes_scheduled|default:"0" }} episode terjadwal</p>
+    </div>
+  </div>
+
+  {# ── Main Content Grid ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    {# ── Left Column (2/3) ── #}
+    <div class="lg:col-span-2 space-y-6">
+
+      {# Live Broadcast Status #}
+      <div class="amp-card amp-card-elevated p-6" x-data="streamStatus()" x-init="init()">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-[var(--amp-text-primary)]">Siaran Langsung</h2>
+          <span class="amp-status-dot" :class="isLive ? 'live' : 'offline'"></span>
+        </div>
+        <template x-if="isLive">
+          <div class="flex items-center gap-4 p-4 rounded-xl bg-[var(--amp-danger-light)]">
+            <div class="w-14 h-14 rounded-xl bg-[var(--amp-danger)] flex items-center justify-center flex-shrink-0 animate-pulse">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-[var(--amp-danger)]">ON AIR</p>
+              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate" x-text="currentProgram || 'Program Tanpa Judul'"></p>
+              <p class="text-xs text-[var(--amp-text-secondary)]" x-text="currentHost ? 'Host: ' + currentHost : ''"></p>
+            </div>
+            <div class="text-right">
+              <p class="text-2xl font-bold text-[var(--amp-danger)]" x-text="listenerCount"></p>
+              <p class="text-xs text-[var(--amp-text-tertiary)]">pendengar</p>
+            </div>
+          </div>
+        </template>
+        <template x-if="!isLive">
+          <div class="flex items-center gap-4 p-4 rounded-xl bg-[var(--amp-surface-tertiary)]">
+            <div class="w-14 h-14 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-light)] flex items-center justify-center flex-shrink-0">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-[var(--amp-text-tertiary)]">OFFLINE</p>
+              <p class="text-sm text-[var(--amp-text-secondary)]">Tidak ada siaran aktif</p>
+            </div>
+            <a href="{% url 'radio:dashboard' %}" class="amp-btn amp-btn-secondary text-sm">Atur Siaran</a>
+          </div>
+        </template>
+      </div>
+
+      {# Today's Schedule #}
+      <div class="amp-card amp-card-elevated p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-[var(--amp-text-primary)]">Jadwal Hari Ini</h2>
+          <a href="{% url 'broadcast:schedule_list' %}" class="text-sm text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua</a>
+        </div>
+        {% if today_schedule %}
+        <div class="space-y-3">
+          {% for item in today_schedule %}
+          <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+            <div class="w-12 text-center flex-shrink-0">
+              <p class="text-sm font-bold text-[var(--amp-coffee-600)]">{{ item.start_time|time:"H:i" }}</p>
+            </div>
+            <div class="w-1 h-10 rounded-full {% if item.is_live %}bg-[var(--amp-danger)]{% else %}bg-[var(--amp-border-medium)]{% endif %}"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ item.program_name }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)]">{{ item.host_name|default:"Tanpa host" }}</p>
+            </div>
+            {% if item.is_live %}
+            <span class="amp-badge amp-badge-danger text-xs">ON AIR</span>
+            {% elif item.is_past %}
+            <span class="text-xs text-[var(--amp-text-tertiary)]">Selesai</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="amp-empty">
+          <div class="amp-empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <p class="amp-empty-title">Belum ada jadwal</p>
+          <p class="amp-empty-description">Atur jadwal siaran untuk hari ini.</p>
+          <a href="{% url 'broadcast:schedule_list' %}" class="amp-btn amp-btn-primary mt-3">Atur Jadwal</a>
+        </div>
+        {% endif %}
+      </div>
+
+      {# Recent Articles #}
+      <div class="amp-card amp-card-elevated p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-[var(--amp-text-primary)]">Artikel Terbaru</h2>
+          <a href="{% url 'news:cms_article_list' %}" class="text-sm text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua</a>
+        </div>
+        {% if recent_articles %}
+        <div class="space-y-3">
+          {% for article in recent_articles %}
+          <a href="{% url 'news:cms_article_edit' article.pk %}" class="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+            {% if article.featured_image %}
+            <img src="{{ article.featured_image.url }}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0" alt="">
+            {% else %}
+            <div class="w-14 h-14 rounded-lg bg-[var(--amp-coffee-50)] flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-400)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            {% endif %}
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ article.title }}</p>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="amp-badge amp-badge-sm
+                  {% if article.status == 'published' %}amp-badge-success
+                  {% elif article.status == 'draft' %}amp-badge-secondary
+                  {% elif article.status == 'pending_review' %}amp-badge-warning
+                  {% else %}amp-badge-secondary{% endif %}">
+                  {{ article.get_status_display }}
+                </span>
+                <span class="text-xs text-[var(--amp-text-tertiary)]">{{ article.created_at|timesince }} lalu</span>
+              </div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2" class="flex-shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="amp-empty">
+          <p class="amp-empty-title">Belum ada artikel</p>
+          <a href="{% url 'news:cms_article_create' %}" class="amp-btn amp-btn-primary mt-3">Buat Artikel</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Right Column (1/3) ── #}
+    <div class="space-y-6">
+
+      {# Pending Reviews #}
+      <div class="amp-card amp-card-elevated p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-[var(--amp-text-primary)]">Menunggu Review</h2>
+          <span class="amp-badge amp-badge-warning">{{ pending_reviews|length }}</span>
+        </div>
+        {% if pending_reviews %}
+        <div class="space-y-3">
+          {% for item in pending_reviews %}
+          <div class="p-3 rounded-xl border border-[var(--amp-warning)] bg-[var(--amp-warning-light)]">
+            <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ item.title }}</p>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs text-[var(--amp-text-secondary)]">{{ item.content_type }} · {{ item.author_name|default:"—" }}</span>
+              <a href="{% url 'content:dashboard' %}" class="text-xs font-medium text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)]">Review →</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-sm text-[var(--amp-text-tertiary)]">
+          Tidak ada konten menunggu review.
+        </div>
+        {% endif %}
+      </div>
+
+      {# Quick Actions #}
+      <div class="amp-card amp-card-elevated p-6">
+        <h2 class="font-semibold text-[var(--amp-text-primary)] mb-4">Aksi Cepat</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <a href="{% url 'news:cms_article_create' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Artikel</span>
+          </a>
+          <a href="{% url 'podcast:cms_episode_create' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Podcast</span>
+          </a>
+          <a href="{% url 'media_manager:upload' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Upload</span>
+          </a>
+          <a href="{% url 'broadcast:cms_program_create' %}" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-[var(--amp-border-light)] hover:border-[var(--amp-coffee-400)] hover:bg-[var(--amp-coffee-50)] transition-all">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+            <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Siaran</span>
+          </a>
+        </div>
+      </div>
+
+      {# Notifications Widget #}
+      <div class="amp-card amp-card-elevated p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-[var(--amp-text-primary)]">Notifikasi</h2>
+          <button @click="notificationPanelOpen = true" class="text-sm text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Lihat Semua</button>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+            <div class="w-8 h-8 rounded-full bg-[var(--amp-warning-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-[var(--amp-text-primary)]">Artikel menunggu review</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">5 menit yang lalu</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+            <div class="w-8 h-8 rounded-full bg-[var(--amp-success-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-[var(--amp-text-primary)]">Episode podcast berhasil diunggah</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">1 jam yang lalu</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Storage Usage #}
+      <div class="amp-card amp-card-elevated p-6">
+        <h2 class="font-semibold text-[var(--amp-text-primary)] mb-4">Penyimpanan</h2>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-sm mb-1.5">
+              <span class="text-[var(--amp-text-secondary)]">Media</span>
+              <span class="font-medium text-[var(--amp-text-primary)]">{{ storage.used_gb|default:"0.0" }} GB / {{ storage.total_gb|default:"50" }} GB</span>
+            </div>
+            <div class="w-full h-2 bg-[var(--amp-surface-tertiary)] rounded-full overflow-hidden">
+              <div class="h-full bg-[var(--amp-coffee-500)] rounded-full transition-all" style="width: {{ storage.percent|default:"0" }}%"></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-center">
+            <div class="p-3 rounded-lg bg-[var(--amp-surface-tertiary)]">
+              <p class="text-lg font-bold text-[var(--amp-text-primary)]">{{ storage.audio_count|default:"0" }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)]">Audio</p>
+            </div>
+            <div class="p-3 rounded-lg bg-[var(--amp-surface-tertiary)]">
+              <p class="text-lg font-bold text-[var(--amp-text-primary)]">{{ storage.image_count|default:"0" }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)]">Gambar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Popular Programs #}
+      {% if popular_programs %}
+      <div class="amp-card amp-card-elevated p-6">
+        <h2 class="font-semibold text-[var(--amp-text-primary)] mb-4">Program Populer</h2>
+        <div class="space-y-3">
+          {% for program in popular_programs %}
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-bold text-[var(--amp-text-tertiary)] w-5">{{ forloop.counter }}</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ program.name }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)]">{{ program.episode_count }} episode</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  {# ── Latest Activity ── #}
+  {% if recent_activity %}
+  <div class="amp-card amp-card-elevated p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-[var(--amp-text-primary)]">Aktivitas Terbaru</h2>
+    </div>
+    <div class="space-y-4">
+      {% for activity in recent_activity %}
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-full bg-[var(--amp-coffee-50)] flex items-center justify-center flex-shrink-0 mt-0.5">
+          {% if activity.action == 'create' %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          {% elif activity.action == 'publish' %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          {% elif activity.action == 'update' %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          {% else %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+          {% endif %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm text-[var(--amp-text-primary)]">
+            <span class="font-medium">{{ activity.user_name }}</span>
+            <span class="text-[var(--amp-text-secondary)]">{{ activity.description }}</span>
+          </p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{{ activity.timestamp|timesince }} lalu</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

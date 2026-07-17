@@ -1,0 +1,16 @@
+{% extends 'website/main.html' %}
+
+{% block page_title %}Mitra - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-8">Mitra &amp; Partner</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for partner in partners %}
+        {% include 'website/components/sponsor_card.html' with partner=partner %}
+        {% empty %}
+        <p class="text-slate-500 dark:text-slate-400">Belum ada mitra.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

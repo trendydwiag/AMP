@@ -1,0 +1,44 @@
+{% extends 'website/main.html' %}
+{% load static %}
+
+{% block page_title %}Pemeliharaan - {{ SITE_NAME }}{% endblock %}
+{% block page_description %}Situs sedang dalam pemeliharaan{% endblock %}
+
+{% block content %}
+
+<section class="min-h-[70vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center max-w-lg">
+        <div class="relative w-24 h-24 mx-auto mb-8">
+            <div class="absolute inset-0 rounded-full bg-yellow-100 dark:bg-yellow-500/10 animate-ping opacity-30"></div>
+            <div class="relative w-24 h-24 rounded-full bg-yellow-100 dark:bg-yellow-500/10 flex items-center justify-center">
+                <svg class="w-12 h-12 text-yellow-500 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17l-5.1-5.1m0 0L2.73 5.09a2 2 0 012.83-2.83l4.6 4.6m5.07.01L21.27 6.73a2 2 0 010 2.83l-2.83 2.83m-7.07 7.07l-2.83 2.83a2 2 0 01-2.83 0l-2.83-2.83a2 2 0 010-2.83l2.83-2.83" />
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">Sedang Dalam Pemeliharaan</h1>
+        {% if site_settings and site_settings.maintenance_message %}
+        <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">{{ site_settings.maintenance_message }}</p>
+        {% else %}
+        <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">Kami sedang melakukan pemeliharaan sistem untuk meningkatkan kualitas layanan. Mohon maaf atas ketidaknyamanan ini.</p>
+        {% endif %}
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 mb-8">
+            <div class="flex items-center justify-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+                <svg class="w-5 h-5 text-yellow-500 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                <span>Perkiraan waktu pemeliharaan: beberapa jam</span>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button onclick="location.reload()" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-coffee-500 dark:bg-coffee-500 text-white font-bold text-sm hover:bg-coffee-600 dark:hover:bg-coffee-600 transition-colors shadow-md">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Muat Ulang
+            </button>
+            <a href="mailto:info@kabulhaden.id" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                Hubungi Kami
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "dashboard_base.html" %}
+{% block title %}{{ podcast.title }} - CMS{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <a href="{% url 'podcast:cms_podcast_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali</a>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">{{ podcast.title }}</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if podcast.status == 'PUBLISHED' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400{% else %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400{% endif %}">
+        {{ podcast.get_status_display }}
+      </span>
+      <a href="{% url 'podcast:cms_podcast_edit' podcast.pk %}" class="px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors">Edit</a>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <div class="prose prose-coffee max-w-none dark:prose-invert">{{ podcast.description|linebreaks }}</div>
+      </div>
+    </div>
+    <div class="space-y-6">
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Info</h3>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Kategori</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ podcast.get_category_display }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Episode</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ podcast.episode_count }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Dibuat</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ podcast.created_at|date:"d M Y" }}</dd></div>
+        </dl>
+      </div>
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Workflow</h3>
+        <div class="space-y-2">
+          {% if podcast.status == 'DRAFT' %}
+          <form method="post" action="{% url 'podcast:cms_podcast_workflow' podcast.pk %}">{% csrf_token %}<input type="hidden" name="action" value="PUBLISHED"><button type="submit" class="w-full px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition-colors text-sm">Terbitkan</button></form>
+          {% elif podcast.status == 'PUBLISHED' %}
+          <form method="post" action="{% url 'podcast:cms_podcast_workflow' podcast.pk %}">{% csrf_token %}<input type="hidden" name="action" value="ARCHIVED"><button type="submit" class="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">Arsipkan</button></form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

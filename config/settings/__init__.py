@@ -1,0 +1,1 @@
+"""Django split settings module."""

@@ -1,0 +1,119 @@
+{% load static %}
+<section class="relative overflow-hidden hero-bg text-white min-h-[85vh] md:min-h-[90vh] flex items-center">
+    {# Black 45% overlay #}
+    <div class="absolute inset-0 hero-overlay"></div>
+    {# Subtle noise texture #}
+    <div class="absolute inset-0 opacity-[0.04]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n%22/%3E%3C/svg%3E')"></div>
+
+    <div class="relative max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+            {# Left: Headline #}
+            <div class="animate-fade-in-up" style="max-width: 520px;">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm font-body font-medium mb-8">
+                    {% if now_playing %}
+                    <span class="relative w-2.5 h-2.5 bg-live rounded-full pulse-ring text-live"></span>
+                    <span>LIVE NOW</span>
+                    {% else %}
+                    <span class="w-2.5 h-2.5 bg-success rounded-full"></span>
+                    <span>Online</span>
+                    {% endif %}
+                    <span class="text-white/60">|</span>
+                    <span class="flex items-center gap-1 text-white/80">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        {{ current_broadcast.listeners|default:"0" }} pendengar
+                    </span>
+                </div>
+
+                <h1 class="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-6">
+                    Dengarkan <br class="hidden sm:block">
+                    Kabulhaden<br>
+                    Radio
+                </h1>
+
+                <p class="font-body text-lg md:text-xl text-white/70 mb-10 max-w-lg leading-relaxed">
+                    Suara komunitas. Musik, cerita, dan inspirasi untuk Anda.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-start gap-4">
+                    {# 120px play button #}
+                    <button x-data="radioPlayer()" @click="togglePlay()" class="group inline-flex items-center justify-center rounded-full bg-white hover:bg-white/90 transition-all duration-250 shadow-hero-card hover:shadow-2xl" style="width: 120px; height: 120px;" :aria-label="isPlaying ? 'Jeda' : 'Putar'">
+                        <div class="flex items-center justify-center transition-transform group-hover:scale-110">
+                            <svg x-show="!isPlaying" class="w-10 h-10 ml-1" style="color: #6B4226;" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg x-show="isPlaying" class="w-10 h-10" style="color: #6B4226;" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            <svg x-show="isLoading" class="w-10 h-10 animate-spin" style="color: #6B4226;" fill="none" viewBox="0 0 24 24" style="display:none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        </div>
+                    </button>
+
+                    <a href="{% url 'website:program_list' %}" class="inline-flex items-center gap-2 px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-heading font-semibold text-sm hover:bg-white/20 transition-all duration-250">
+                        Lihat Program
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </a>
+                </div>
+            </div>
+
+            {# Right: Floating Radio Card (glassmorphism) #}
+            <div class="hidden lg:block animate-slide-right delay-300">
+                <div class="rounded-card-lg p-8 shadow-hero-card" style="max-width: 500px; background: rgba(53,32,23,.92); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.08);">
+                    <div class="relative aspect-square rounded-2xl overflow-hidden mb-6 bg-white/5">
+                        <img x-show="currentTrack.artwork" :src="currentTrack.artwork" alt="Now Playing" class="w-full h-full object-cover" loading="lazy">
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-coffee-400/20 to-coffee-600/10">
+                            <svg class="w-24 h-24 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+                        </div>
+                        <div x-show="isPlaying" class="absolute inset-0 bg-black/20 flex items-center justify-center" style="display:none">
+                            <div class="flex items-end gap-1 h-16">
+                                <div class="w-2 bg-coffee-300 rounded-full audio-bar" style="height:100%"></div>
+                                <div class="w-2 bg-coffee-300 rounded-full audio-bar" style="height:80%"></div>
+                                <div class="w-2 bg-coffee-300 rounded-full audio-bar" style="height:60%"></div>
+                                <div class="w-2 bg-coffee-300 rounded-full audio-bar" style="height:90%"></div>
+                                <div class="w-2 bg-coffee-300 rounded-full audio-bar" style="height:70%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-6">
+                        <p class="text-xs font-heading font-bold text-coffee-300 uppercase tracking-wider mb-2" x-text="isLive ? 'LIVE NOW' : 'NOW PLAYING'">NOW PLAYING</p>
+                        <h3 class="text-xl font-heading font-bold text-white mb-1 truncate" x-text="currentTrack.title || 'Kabulhaden Radio'">Kabulhaden Radio</h3>
+                        <p class="text-sm font-body text-white/60 truncate" x-text="currentTrack.artist || 'Menunggu siaran...'">Menunggu siaran...</p>
+                    </div>
+
+                    {% if current_program_info and current_program_info.program %}
+                    <div class="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
+                        <p class="text-xs font-body text-white/40 uppercase tracking-wider mb-1">Program Saat Ini</p>
+                        <p class="text-sm font-heading font-semibold text-white">{{ current_program_info.program }}</p>
+                        {% if current_program_info.host %}
+                        <p class="text-xs font-body text-white/50 mt-1">dengan {{ current_program_info.host }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="flex items-center justify-center gap-4">
+                        <button @click="toggleMute()" class="p-2 rounded-lg text-white/60 hover:text-coffee-300 transition-colors" :aria-label="isMuted ? 'Bunyikan' : 'Bisukan'">
+                            <svg x-show="volume > 0 && !isMuted" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                            <svg x-show="volume === 0 || isMuted" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                        </button>
+
+                        <button @click="togglePlay()" class="w-16 h-16 rounded-full bg-white flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:scale-105" style="color: #6B4226;" :aria-label="isPlaying ? 'Jeda' : 'Putar'">
+                            <svg x-show="!isPlaying" class="w-7 h-7 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg x-show="isPlaying" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            <svg x-show="isLoading" class="w-7 h-7 animate-spin" fill="none" viewBox="0 0 24 24" style="display:none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        </button>
+
+                        <button @click="copyStreamLink()" class="p-2 rounded-lg text-white/60 hover:text-coffee-300 transition-colors" aria-label="Salin link">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Wave transition #}
+    <div class="absolute bottom-0 left-0 right-0 h-24 md:h-32 pointer-events-none">
+        <svg viewBox="0 0 1920 320" preserveAspectRatio="none" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <path class="wave-path-1" fill="rgba(250,247,243,0.3)" d="M0,160 C320,220 640,100 960,160 C1280,220 1600,100 1920,160 L1920,320 L0,320 Z"/>
+            <path class="wave-path-2" fill="rgba(250,247,243,0.5)" d="M0,200 C320,140 640,260 960,200 C1280,140 1600,260 1920,200 L1920,320 L0,320 Z"/>
+            <path class="wave-path-3" fill="#FAF7F3" d="M0,240 C320,280 640,200 960,240 C1280,280 1600,200 1920,240 L1920,320 L0,320 Z"/>
+        </svg>
+    </div>
+</section>

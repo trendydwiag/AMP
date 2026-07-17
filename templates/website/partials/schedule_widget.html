@@ -1,0 +1,57 @@
+<div id="schedule-widget" hx-get="{% url 'website:home' %}" hx-trigger="every 60s" hx-swap="outerHTML">
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-4 h-4 text-coffee-500 dark:text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Jadwal Hari Ini
+                </h3>
+                <a href="{% url 'website:schedule' %}" class="text-xs font-medium text-coffee-500 dark:text-coffee-400 hover:underline">Lihat Semua</a>
+            </div>
+
+            {% if schedules %}
+            <div class="space-y-0">
+                {% for schedule in schedules %}
+                <div class="relative flex gap-4 group">
+                    <div class="flex flex-col items-center">
+                        <div class="w-3 h-3 rounded-full border-2 border-coffee-500 dark:border-coffee-400 bg-white dark:bg-slate-800 flex-shrink-0 mt-1.5 group-hover:bg-coffee-500 dark:group-hover:bg-coffee-400 transition-colors {% if schedule.is_current %}bg-coffee-500 dark:bg-coffee-400 ring-4 ring-coffee-100 dark:ring-coffee-500/20{% endif %}"></div>
+                        {% if not forloop.last %}
+                        <div class="w-0.5 flex-1 bg-slate-200 dark:bg-slate-700 mt-1"></div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 pb-6 {% if schedule.is_current %}bg-coffee-50/50 dark:bg-coffee-500/5 rounded-lg p-3 -mt-1 border border-coffee-100 dark:border-coffee-500/10{% else %}py-1{% endif %}">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 mb-1">
+                            <time class="text-sm font-bold text-coffee-500 dark:text-coffee-400 tabular-nums">
+                                {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}
+                            </time>
+                            {% if schedule.is_current %}
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-coffee-500 dark:bg-coffee-500 text-white uppercase tracking-wider w-fit">
+                                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                                Sedang Tayang
+                            </span>
+                            {% endif %}
+                        </div>
+                        <h4 class="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{{ schedule.title }}</h4>
+                        {% if schedule.host %}
+                        <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            {{ schedule.host.get_full_name|default:schedule.host.username }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Belum ada jadwal untuk hari ini.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

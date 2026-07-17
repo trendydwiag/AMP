@@ -1,0 +1,91 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Pencarian - CMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">Pencarian Global</h1>
+    <p class="mt-1 text-sm text-coffee-500 dark:text-coffee-400">Cari konten di seluruh sistem</p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-4">
+    <form method="get" class="flex gap-3">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" name="q" value="{{ query }}" placeholder="Cari artikel, podcast, program..."
+          class="w-full pl-10 pr-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 text-sm focus:ring-2 focus:ring-coffee-400 focus:border-transparent">
+      </div>
+      <button type="submit" class="px-6 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 text-sm transition-colors font-medium">Cari</button>
+    </form>
+  </div>
+
+  {% if query %}
+    {% if results %}
+    <!-- Results grouped by type -->
+    {% for result_group in results %}
+      {% if result_group.items %}
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 overflow-hidden">
+        <div class="px-6 py-4 border-b border-coffee-100 dark:border-coffee-700 bg-coffee-50 dark:bg-coffee-700/50">
+          <h2 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100">
+            {% if result_group.type == 'article' %}
+            Artikel
+            {% elif result_group.type == 'podcast' %}
+            Podcast
+            {% elif result_group.type == 'program' %}
+            Program
+            {% else %}
+            {{ result_group.type }}
+            {% endif %}
+            <span class="text-sm font-normal text-coffee-400 ml-2">({{ result_group.items|length }})</span>
+          </h2>
+        </div>
+        <div class="divide-y divide-coffee-100 dark:divide-coffee-700">
+          {% for item in result_group.items %}
+          <div class="px-6 py-4 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-colors">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center flex-shrink-0">
+                {% if result_group.type == 'article' %}
+                <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                {% elif result_group.type == 'podcast' %}
+                <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                {% elif result_group.type == 'program' %}
+                <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                {% else %}
+                <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                {% endif %}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-coffee-800 dark:text-coffee-100 truncate">{{ item.title|default:"Tanpa Judul" }}</p>
+                {% if result_group.type == 'article' %}
+                <p class="text-xs text-coffee-400 mt-0.5">{{ item.author_name|default:"-" }} &middot; {{ item.created_at|date:"d M Y" }}</p>
+                {% elif result_group.type == 'podcast' %}
+                <p class="text-xs text-coffee-400 mt-0.5">{{ item.description|default:"-"|truncatechars:80 }}</p>
+                {% elif result_group.type == 'program' %}
+                <p class="text-xs text-coffee-400 mt-0.5">{{ item.full_description|default:"-"|truncatechars:80 }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+    {% else %}
+    <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-12 text-center">
+      <svg class="w-16 h-16 mx-auto mb-4 text-coffee-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <h3 class="text-lg font-heading font-semibold text-coffee-700 dark:text-coffee-200 mb-2">Tidak ada hasil</h3>
+      <p class="text-sm text-coffee-500 dark:text-coffee-400">Tidak ditemukan konten yang cocok dengan "<strong>{{ query }}</strong>"</p>
+    </div>
+    {% endif %}
+  {% else %}
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-12 text-center">
+    <svg class="w-16 h-16 mx-auto mb-4 text-coffee-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <h3 class="text-lg font-heading font-semibold text-coffee-700 dark:text-coffee-200 mb-2">Mulai Pencarian</h3>
+    <p class="text-sm text-coffee-500 dark:text-coffee-400">Masukkan kata kunci untuk mencari artikel, podcast, dan program</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'website/main.html' %}
+
+{% block page_title %}Komunitas - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-8">Komunitas</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-4">
+            {% for discussion in discussions %}
+            <article class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+                <a href="{% url 'website:community_discussion' discussion.slug %}">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">{{ discussion.title }}</h2>
+                </a>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">{{ discussion.content|truncatewords:30 }}</p>
+                <div class="flex items-center gap-4 mt-3 text-xs text-slate-400 dark:text-slate-500">
+                    <span>{{ discussion.author_name }}</span>
+                    <span>{{ discussion.reply_count }} balasan</span>
+                </div>
+            </article>
+            {% empty %}
+            <p class="text-slate-500 dark:text-slate-400">Belum ada diskusi.</p>
+            {% endfor %}
+        </div>
+        <div>
+            {% if pinned %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-3">Diskusi Terpinned</h3>
+                {% for d in pinned %}
+                <a href="{% url 'website:community_discussion' d.slug %}" class="block py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">{{ d.title }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

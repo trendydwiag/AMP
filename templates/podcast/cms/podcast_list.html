@@ -1,0 +1,82 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Kelola Podcast - CMS{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">Podcast</h1>
+      <p class="mt-1 text-sm text-coffee-500 dark:text-coffee-400">Kelola program podcast</p>
+    </div>
+    <a href="{% url 'podcast:cms_podcast_create' %}" class="inline-flex items-center px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Podcast Baru
+    </a>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white dark:bg-coffee-800 rounded-xl p-4 shadow-sm border border-coffee-100 dark:border-coffee-700">
+      <div class="text-2xl font-bold text-coffee-800 dark:text-coffee-100">{{ total_count }}</div>
+      <div class="text-sm text-coffee-500 dark:text-coffee-400">Total</div>
+    </div>
+    <div class="bg-white dark:bg-coffee-800 rounded-xl p-4 shadow-sm border border-coffee-100 dark:border-coffee-700">
+      <div class="text-2xl font-bold text-green-600">{{ published_count }}</div>
+      <div class="text-sm text-coffee-500 dark:text-coffee-400">Published</div>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-3">
+      <input type="text" name="q" value="{{ q }}" placeholder="Cari podcast..." class="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+      <select name="status" class="px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100">
+        <option value="">Semua Status</option>
+        {% for value, label in status_choices %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="px-4 py-2 bg-coffee-100 dark:bg-coffee-700 text-coffee-700 dark:text-coffee-200 rounded-lg hover:bg-coffee-200 dark:hover:bg-coffee-600">Filter</button>
+    </form>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for podcast in podcasts %}
+    <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 overflow-hidden hover:shadow-md transition-shadow">
+      {% if podcast.thumbnail %}
+      <img src="{{ podcast.thumbnail.url }}" class="w-full h-40 object-cover" alt="">
+      {% else %}
+      <div class="w-full h-40 bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
+        <svg class="w-12 h-12 text-coffee-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+      </div>
+      {% endif %}
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 truncate">{{ podcast.title }}</h3>
+          {% if podcast.status == 'PUBLISHED' %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Published</span>
+          {% elif podcast.status == 'DRAFT' %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Draft</span>
+          {% endif %}
+        </div>
+        <p class="text-sm text-coffee-500 dark:text-coffee-400 mb-3 line-clamp-2">{{ podcast.description|default:podcast.short_description|truncatechars:100 }}</p>
+        <div class="flex items-center gap-2 text-xs text-coffee-400 dark:text-coffee-500">
+          <span>{{ podcast.episode_count }} episode</span>
+          <span>&middot;</span>
+          <span>{{ podcast.get_category_display }}</span>
+        </div>
+        <div class="flex items-center gap-2 mt-4">
+          <a href="{% url 'podcast:cms_podcast_detail' podcast.pk %}" class="flex-1 px-3 py-1.5 text-center text-sm border border-coffee-200 dark:border-coffee-600 rounded-lg text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700">Detail</a>
+          <a href="{% url 'podcast:cms_podcast_edit' podcast.pk %}" class="flex-1 px-3 py-1.5 text-center text-sm bg-coffee-600 text-white rounded-lg hover:bg-coffee-700">Edit</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12 text-coffee-500 dark:text-coffee-400">
+      <svg class="w-12 h-12 mx-auto mb-4 text-coffee-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+      Belum ada podcast
+    </div>
+    {% endfor %}
+  </div>
+  {% if is_paginated %}
+  <div class="mt-6 flex justify-center">
+    <nav class="flex gap-1">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg border border-coffee-200 dark:border-coffee-600 text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700">Sebelumnya</a>{% endif %}
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg border border-coffee-200 dark:border-coffee-600 text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700">Berikutnya</a>{% endif %}
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

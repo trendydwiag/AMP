@@ -1,0 +1,22 @@
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Beranda",
+            "item": "{{ SITE_URL|default:'https://kabulhaden.id' }}/"
+        }
+        {% for crumb in breadcrumbs %}
+        ,{
+            "@type": "ListItem",
+            "position": {{ forloop.counter|add:"2" }},
+            "name": "{{ crumb.name }}"
+            {% if crumb.url %},"item": "{{ SITE_URL|default:'https://kabulhaden.id' }}{{ crumb.url }}"{% endif %}
+        }
+        {% endfor %}
+    ]
+}
+</script>

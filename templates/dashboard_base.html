@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% block dashboard_title %}Dashboard{% endblock %} - {{ SITE_NAME }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block layout %}
+<div x-data="dashboardApp()" x-init="init()" class="min-h-screen flex flex-col bg-coffee-50 dark:bg-coffee-900 transition-colors duration-250">
+
+    {# Top Navigation Bar #}
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-coffee-800/95 backdrop-blur-lg border-b border-coffee-200 dark:border-coffee-700 h-16 flex items-center justify-between px-4 sm:px-6 transition-colors duration-250" role="banner">
+        <div class="flex items-center gap-3">
+            {# Mobile Menu Toggle #}
+            <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-xl text-coffee-400 hover:text-coffee-600 hover:bg-coffee-100 dark:hover:bg-coffee-700 transition-colors" aria-label="Toggle sidebar">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            {# Logo #}
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2.5 group" aria-label="{{ SITE_NAME }}">
+                <div class="w-9 h-9 rounded-xl bg-coffee-600 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                </div>
+                <span class="text-lg font-heading font-bold text-coffee-700 dark:text-coffee-200 hidden sm:block">Kabulhaden</span>
+            </a>
+            {# Desktop Sidebar Toggle #}
+            <button @click="sidebarCollapsed = !sidebarCollapsed" class="hidden lg:flex p-2 rounded-xl text-coffee-400 hover:text-coffee-600 hover:bg-coffee-100 dark:hover:bg-coffee-700 transition-colors" aria-label="Toggle sidebar">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+            </button>
+        </div>
+
+        {# Right Actions #}
+        <div class="flex items-center gap-2">
+            {# Quick Search #}
+            <button @click="searchOpen = !searchOpen" class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-coffee-400 hover:text-coffee-600 bg-coffee-50 dark:bg-coffee-700 hover:bg-coffee-100 dark:hover:bg-coffee-600 border border-coffee-200 dark:border-coffee-600 transition-colors" aria-label="Cari">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <span class="hidden md:inline">Cari...</span>
+                <kbd class="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-coffee-300 bg-white dark:bg-coffee-800 border border-coffee-200 dark:border-coffee-600 rounded">⌘K</kbd>
+            </button>
+
+            {# Theme Toggle #}
+            <button @click="toggleTheme()" class="p-2 rounded-xl text-coffee-400 hover:text-coffee-600 hover:bg-coffee-100 dark:hover:bg-coffee-700 transition-colors" :aria-label="darkMode ? 'Mode terang' : 'Mode gelap'">
+                <svg x-show="!darkMode" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg x-show="darkMode" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+            </button>
+
+            {# Notifications #}
+            <div class="relative" x-data="{ notifOpen: false }">
+                <button @click="notifOpen = !notifOpen" class="relative p-2 rounded-xl text-coffee-400 hover:text-coffee-600 hover:bg-coffee-100 dark:hover:bg-coffee-700 transition-colors" aria-label="Notifikasi">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span x-show="notifications.length > 0" class="absolute top-1 right-1 w-2 h-2 bg-live rounded-full"></span>
+                </button>
+                {# Notification Dropdown #}
+                <div x-show="notifOpen" @click.away="notifOpen = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="absolute right-0 mt-2 w-80 bg-white dark:bg-coffee-800 rounded-2xl shadow-card-hover border border-coffee-200 dark:border-coffee-700 overflow-hidden z-50" style="display:none">
+                    <div class="p-4 border-b border-coffee-200 dark:border-coffee-700">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-heading font-semibold text-coffee-700 dark:text-coffee-200">Notifikasi</h3>
+                            <button class="text-xs text-coffee-400 hover:text-coffee-600">Tandai sudah dibaca</button>
+                        </div>
+                    </div>
+                    <div class="max-h-80 overflow-y-auto">
+                        <template x-for="notif in notifications" :key="notif.id">
+                            <div class="px-4 py-3 border-b border-coffee-100 dark:border-coffee-700 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-colors cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center" :class="notif.type === 'success' ? 'bg-green-100 text-green-600' : notif.type === 'error' ? 'bg-red-100 text-red-600' : notif.type === 'warning' ? 'bg-yellow-100 text-yellow-600' : 'bg-coffee-100 text-coffee-600'">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-coffee-700 dark:text-coffee-200" x-text="notif.title"></p>
+                                        <p class="text-xs text-coffee-400 mt-0.5" x-text="notif.message"></p>
+                                        <p class="text-[10px] text-coffee-300 mt-1" x-text="notif.time"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="notifications.length === 0" class="p-8 text-center">
+                            <svg class="w-10 h-10 mx-auto mb-2 text-coffee-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <p class="text-sm text-coffee-300">Tidak ada notifikasi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# User Menu #}
+            {% if user.is_authenticated %}
+            <div class="relative" x-data="{ userMenuOpen: false }">
+                <button @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-coffee-100 dark:hover:bg-coffee-700 transition-colors" aria-label="Menu pengguna">
+                    <div class="w-8 h-8 rounded-full bg-coffee-400 flex items-center justify-center text-white text-sm font-heading font-bold">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <div class="hidden md:block text-left">
+                        <p class="text-sm font-medium text-coffee-700 dark:text-coffee-200 leading-tight">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-[10px] text-coffee-400">{{ user.get_role_display }}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-coffee-400 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="userMenuOpen" @click.away="userMenuOpen = false" x-transition class="absolute right-0 mt-2 w-56 bg-white dark:bg-coffee-800 rounded-2xl shadow-card-hover border border-coffee-200 dark:border-coffee-700 overflow-hidden z-50" style="display:none">
+                    <div class="p-4 border-b border-coffee-200 dark:border-coffee-700">
+                        <p class="font-heading font-semibold text-coffee-700 dark:text-coffee-200">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-xs text-coffee-400">{{ user.email }}</p>
+                        <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-coffee-100 dark:bg-coffee-700 text-coffee-600 dark:text-coffee-300 rounded-full">{{ user.get_role_display }}</span>
+                    </div>
+                    <div class="p-2">
+                        <a href="{% url 'users:profile' %}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Profil Saya
+                        </a>
+                        <button @click="toggleTheme()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                            <span x-text="darkMode ? 'Mode Terang' : 'Mode Gelap'"></span>
+                        </button>
+                        <button @click="shortcutsOpen = true; userMenuOpen = false" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                            Pintasan Keyboard
+                        </button>
+                        <a href="https://docs.kabulhaden.online" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                            Dokumentasi
+                        </a>
+                    </div>
+                    <div class="p-2 border-t border-coffee-200 dark:border-coffee-700">
+                        <form action="{% url 'users:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Keluar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        {# Sidebar — Desktop (Fixed) #}
+        <aside x-show="!sidebarCollapsed" x-transition:enter="transition ease-out duration-200" class="hidden lg:flex flex-col w-64 bg-white dark:bg-coffee-800 border-r border-coffee-200 dark:border-coffee-700 flex-shrink-0 transition-colors duration-250" role="navigation" aria-label="Sidebar">
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 sidebar-scroll">
+                {% include 'dashboard/components/sidebar_menu.html' %}
+            </nav>
+            <div class="p-4 border-t border-coffee-200 dark:border-coffee-700">
+                <div class="flex items-center gap-2 text-xs text-coffee-400">
+                    <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                    <span>Sistem Aktif</span>
+                </div>
+            </div>
+        </aside>
+
+        {# Sidebar — Collapsed (Icons Only) #}
+        <aside x-show="sidebarCollapsed" class="hidden lg:flex flex-col w-16 bg-white dark:bg-coffee-800 border-r border-coffee-200 dark:border-coffee-700 flex-shrink-0 items-center py-4 transition-colors duration-250">
+            <nav class="flex-1 space-y-2">
+                {% include 'dashboard/components/sidebar_collapsed.html' %}
+            </nav>
+        </aside>
+
+        {# Sidebar — Mobile (Drawer) #}
+        <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="sidebarOpen = false" class="fixed inset-0 z-50 bg-black/50 lg:hidden" style="display:none"></div>
+        <aside x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-coffee-800 shadow-xl lg:hidden flex flex-col transition-colors duration-250" style="display:none">
+            <div class="flex items-center justify-between p-4 border-b border-coffee-200 dark:border-coffee-700">
+                <a href="{% url 'core:home' %}" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-coffee-600 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                    </div>
+                    <span class="font-heading font-bold text-coffee-700 dark:text-coffee-200">Kabulhaden</span>
+                </a>
+                <button @click="sidebarOpen = false" class="p-2 rounded-xl text-coffee-400 hover:bg-coffee-100 dark:hover:bg-coffee-700" aria-label="Tutup sidebar">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                {% include 'dashboard/components/sidebar_menu.html' %}
+            </nav>
+        </aside>
+
+        {# Main Content #}
+        <main class="flex-1 min-w-0 overflow-y-auto" role="main">
+            <div class="p-4 sm:p-6 lg:p-8 max-w-[1440px]">
+                {# Breadcrumbs #}
+                <nav class="flex items-center gap-2 text-sm text-coffee-400 mb-6" aria-label="Breadcrumb">
+                    <a href="{% url 'core:home' %}" class="hover:text-coffee-600 transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    </a>
+                    <svg class="w-3 h-3 text-coffee-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    <span class="text-coffee-600 dark:text-coffee-300 font-medium">{% block breadcrumb_current %}Dashboard{% endblock %}</span>
+                </nav>
+
+                {# Flash Messages #}
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                    <div x-data="{ show: true }" x-show="show" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="p-4 rounded-2xl flex items-center justify-between {% if message.tags == 'success' %}bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800{% elif message.tags == 'error' or message.tags == 'danger' %}bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800{% else %}bg-coffee-100 text-coffee-700 dark:bg-coffee-700/30 dark:text-coffee-300 border border-coffee-200 dark:border-coffee-600{% endif %}">
+                        <div class="flex items-center gap-3">
+                            {% if message.tags == 'success' %}<svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}<svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {% elif message.tags == 'warning' %}<svg class="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                            {% else %}<svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {% endif %}
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                        <button @click="show = false" class="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="Tutup">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {# Content #}
+                <div class="animate-fade-in">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {# Mobile Bottom Navigation #}
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-coffee-800/95 backdrop-blur-lg border-t border-coffee-200 dark:border-coffee-700 safe-area-bottom" role="navigation" aria-label="Navigasi bawah">
+        <div class="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
+            <a href="{% url 'core:home' %}" class="flex flex-col items-center gap-1 py-2 px-3 rounded-xl text-coffee-400 hover:text-coffee-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span class="text-[10px] font-medium">Beranda</span>
+            </a>
+            <a href="{% url 'broadcast:dashboard' %}" class="flex flex-col items-center gap-1 py-2 px-3 rounded-xl text-coffee-400 hover:text-coffee-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span class="text-[10px] font-medium">Siaran</span>
+            </a>
+            <button @click="quickActionsOpen = !quickActionsOpen" class="flex items-center justify-center w-14 h-14 -mt-5 rounded-full bg-coffee-400 text-white shadow-lg hover:bg-coffee-500 active:scale-95 transition-all" aria-label="Aksi cepat">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            </button>
+            <a href="{% url 'radio:dashboard' %}" class="flex flex-col items-center gap-1 py-2 px-3 rounded-xl text-coffee-400 hover:text-coffee-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                <span class="text-[10px] font-medium">Radio</span>
+            </a>
+            <button @click="sidebarOpen = true" class="flex flex-col items-center gap-1 py-2 px-3 rounded-xl text-coffee-400 hover:text-coffee-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <span class="text-[10px] font-medium">Menu</span>
+            </button>
+        </div>
+    </nav>
+
+    {# Quick Actions Panel (Mobile FAB) #}
+    <div x-show="quickActionsOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="quickActionsOpen = false" class="fixed inset-0 z-50 bg-black/50 lg:hidden" style="display:none"></div>
+    <div x-show="quickActionsOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full" class="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-coffee-800 rounded-t-3xl shadow-2xl p-6 pb-24 lg:hidden safe-area-bottom" style="display:none">
+        <div class="w-12 h-1 bg-coffee-200 dark:bg-coffee-600 rounded-full mx-auto mb-6"></div>
+        <h3 class="font-heading font-semibold text-coffee-700 dark:text-coffee-200 mb-4">Aksi Cepat</h3>
+        <div class="grid grid-cols-3 gap-4">
+            {% include 'dashboard/components/quick_actions.html' %}
+        </div>
+    </div>
+
+    {# Keyboard Shortcuts Modal #}
+    <div x-show="shortcutsOpen" x-transition class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" style="display:none">
+        <div @click.away="shortcutsOpen = false" class="bg-white dark:bg-coffee-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-scale-in">
+            <div class="p-6 border-b border-coffee-200 dark:border-coffee-700 flex items-center justify-between">
+                <h3 class="font-heading font-bold text-coffee-700 dark:text-coffee-200">Pintasan Keyboard</h3>
+                <button @click="shortcutsOpen = false" class="p-1 rounded-lg text-coffee-400 hover:bg-coffee-100 dark:hover:bg-coffee-700"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex items-center justify-between"><span class="text-sm text-coffee-600 dark:text-coffee-300">Buka pencarian</span><kbd class="px-2 py-1 text-xs font-mono bg-coffee-100 dark:bg-coffee-700 text-coffee-500 rounded">⌘ K</kbd></div>
+                <div class="flex items-center justify-between"><span class="text-sm text-coffee-600 dark:text-coffee-300">Toggle sidebar</span><kbd class="px-2 py-1 text-xs font-mono bg-coffee-100 dark:bg-coffee-700 text-coffee-500 rounded">[</kbd></div>
+                <div class="flex items-center justify-between"><span class="text-sm text-coffee-600 dark:text-coffee-300">Toggle tema</span><kbd class="px-2 py-1 text-xs font-mono bg-coffee-100 dark:bg-coffee-700 text-coffee-500 rounded">⌘ D</kbd></div>
+                <div class="flex items-center justify-between"><span class="text-sm text-coffee-600 dark:text-coffee-300">Tutup modal</span><kbd class="px-2 py-1 text-xs font-mono bg-coffee-100 dark:bg-coffee-700 text-coffee-500 rounded">Esc</kbd></div>
+                <div class="flex items-center justify-between"><span class="text-sm text-coffee-600 dark:text-coffee-300">Buka beranda</span><kbd class="px-2 py-1 text-xs font-mono bg-coffee-100 dark:bg-coffee-700 text-coffee-500 rounded">G H</kbd></div>
+            </div>
+        </div>
+    </div>
+
+    {# Mobile Bottom Spacer #}
+    <div class="lg:hidden h-16"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}>
+function dashboardApp() {
+    return {
+        sidebarOpen: false,
+        sidebarCollapsed: localStorage.getItem('sidebar_collapsed') === 'true',
+        darkMode: localStorage.getItem('theme') === 'dark',
+        searchOpen: false,
+        notifOpen: false,
+        userMenuOpen: false,
+        quickActionsOpen: false,
+        shortcutsOpen: false,
+        notifications: [
+            { id: 1, type: 'info', title: 'Sistem diperbarui', message: 'Kabulhaden CMS v2.0 berhasil diperbarui.', time: '2 menit yang lalu' },
+            { id: 2, type: 'success', title: 'Radio aktif', message: 'Siaran langsung sedang berjalan.', time: '15 menit yang lalu' },
+        ],
+
+        init() {
+            if (this.darkMode) document.documentElement.classList.add('dark');
+            this.setupKeyboardShortcuts();
+        },
+
+        toggleTheme() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+            if (this.darkMode) { document.documentElement.classList.add('dark'); } else { document.documentElement.classList.remove('dark'); }
+        },
+
+        setupKeyboardShortcuts() {
+            document.addEventListener('keydown', e => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); this.searchOpen = !this.searchOpen; }
+                if ((e.metaKey || e.ctrlKey) && e.key === 'd') { e.preventDefault(); this.toggleTheme(); }
+                if (e.key === '[') { e.preventDefault(); this.sidebarCollapsed = !this.sidebarCollapsed; localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed); }
+                if (e.key === 'Escape') { this.shortcutsOpen = false; this.quickActionsOpen = false; this.sidebarOpen = false; }
+            });
+        }
+    };
+}
+</script>
+{% endblock %}

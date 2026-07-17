@@ -1,0 +1,75 @@
+# ==========================================
+# Kabulhaden CMS — Systemd Service Unit
+# ==========================================
+# Install:
+#   sudo cp kabulhaden.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable kabulhaden
+#   sudo systemctl start kabulhaden
+#
+# Logs:
+#   sudo journalctl -u kabulhaden -f
+#   sudo journalctl -u kabulhaden --since "1 hour ago"
+
+[Unit]
+Description=Kabulhaden CMS Gunicorn Application Server
+Documentation=https://github.com/your-org/kabulhaden
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+User=kabulhaden
+Group=kabulhaden
+RuntimeDirectory=kabulhaden
+
+# Environment
+Environment="DJANGO_SETTINGS_MODULE=config.settings.production"
+Environment="PYTHONUNBUFFERED=1"
+EnvironmentFile=/var/www/kabulhaden/.env
+
+# Working directory
+WorkingDirectory=/var/www/kabulhaden
+
+# Pre-start: wait for DB, run migrations
+ExecStartPre=/var/www/kabulhaden/scripts/entrypoint.sh
+
+# Start Gunicorn
+ExecStart=/var/www/kabulhaden/venv/bin/gunicorn \
+    config.wsgi:application \
+    --config /var/www/kabulhaden/gunicorn.conf.py
+
+# Reload
+ExecReload=/bin/kill -s HUP $MAINPID
+
+# Stop
+ExecStop=/bin/kill -s TERM $MAINPID
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/kabulhaden/logs /var/www/kabulhaden/media /var/www/kabulhaden/static_root
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits
+LimitNOFILE=65535
+MemoryMax=1G
+CPUQuota=200%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kabulhaden
+
+[Install]
+WantedBy=multi-user.target

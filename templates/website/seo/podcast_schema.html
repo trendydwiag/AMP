@@ -1,0 +1,23 @@
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "PodcastSeries",
+    "name": "{{ podcast.seo_title|default:podcast.title }}",
+    "description": "{{ podcast.seo_description|default:podcast.description|truncatewords:50 }}",
+    {% if podcast.thumbnail %}"image": "{{ podcast.thumbnail.url }}",{% endif %}
+    "author": {
+        "@type": "Person",
+        "name": "{{ podcast.author_name|default:'Redaksi' }}"
+    },
+    "inLanguage": "{{ podcast.language|default:'id' }}",
+    "webFeed": {
+        "@type": "URL",
+        "url": "{{ SITE_URL|default:'https://kabulhaden.id' }}{{ request.path }}feed/"
+    },
+    "episode": {
+        "@type": "PodcastEpisode",
+        "name": "{{ podcast.title }}",
+        "numberOfEpisodes": {{ podcast.episode_count|default:0 }}
+    }
+}
+</script>

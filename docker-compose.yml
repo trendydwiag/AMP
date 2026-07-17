@@ -1,0 +1,112 @@
+# ==========================================
+# Kabulhaden CMS — Production Docker Compose
+# ==========================================
+# Usage:
+#   docker compose up -d --build
+#   docker compose exec web python manage.py migrate
+#   docker compose exec web python manage.py collectstatic --noinput
+#   docker compose exec web python manage.py createsuperuser
+
+version: '3.8'
+
+services:
+  # ── PostgreSQL Database ──────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: kabulhaden_db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kabulhaden_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-kabulhaden_db}
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - cms_network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ── Django Application ──────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: kabulhaden_web
+    restart: unless-stopped
+    volumes:
+      - static_files:/app/static_root
+      - media_files:/app/media
+      - app_logs:/app/logs
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-kabulhaden_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-kabulhaden_db}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - cms_network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # ── Nginx Reverse Proxy ──────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: kabulhaden_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_files:/app/static_root:ro
+      - media_files:/app/media:ro
+      - nginx_certs:/etc/nginx/certs:ro
+    depends_on:
+      - web
+    networks:
+      - cms_network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+volumes:
+  postgres_data:
+    driver: local
+  static_files:
+    driver: local
+  media_files:
+    driver: local
+  app_logs:
+    driver: local
+  nginx_certs:
+    driver: local
+
+networks:
+  cms_network:
+    driver: bridge

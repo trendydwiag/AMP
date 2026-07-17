@@ -1,0 +1,72 @@
+{% extends "media_manager/base.html" %}
+{% block media_content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-coffee-900 dark:text-coffee-100">Semua File Media</h1>
+    <a href="{% url 'media_manager:upload' %}" class="px-4 py-2 bg-coffee-500 dark:bg-coffee-400 text-white rounded-lg hover:bg-coffee-600 dark:hover:bg-coffee-300 font-medium">
+      Upload
+    </a>
+  </div>
+
+  <form method="get" class="flex gap-3">
+    <input type="text" name="q" value="{{ search_form.q.value|default:'' }}" placeholder="Cari file..."
+           class="flex-1 px-4 py-2 border border-coffee-300 dark:border-coffee-600 rounded-lg focus:ring-2 focus:ring-coffee-500 dark:bg-coffee-900 dark:text-coffee-100">
+    <select name="type" class="px-4 py-2 border border-coffee-300 dark:border-coffee-600 rounded-lg dark:bg-coffee-900 dark:text-coffee-100">
+      <option value="">Semua Tipe</option>
+      <option value="IMAGE" {% if current_type == 'IMAGE' %}selected{% endif %}>Gambar</option>
+      <option value="VIDEO" {% if current_type == 'VIDEO' %}selected{% endif %}>Video</option>
+      <option value="DOCUMENT" {% if current_type == 'DOCUMENT' %}selected{% endif %}>Dokumen</option>
+      <option value="AUDIO" {% if current_type == 'AUDIO' %}selected{% endif %}>Audio</option>
+    </select>
+    <button type="submit" class="px-4 py-2 bg-coffee-100 dark:bg-coffee-700 text-coffee-700 dark:text-coffee-300 rounded-lg hover:bg-coffee-200 dark:hover:bg-coffee-600">Cari</button>
+  </form>
+
+  <form method="post" action="{% url 'media_manager:bulk_delete' %}">
+    {% csrf_token %}
+    <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {% for file in files %}
+      <div class="bg-white dark:bg-coffee-800 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow relative group">
+        <input type="checkbox" name="file_ids" value="{{ file.pk }}" class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+        <a href="{% url 'media_manager:detail' pk=file.pk %}">
+          {% if file.is_image and file.file %}
+          <div class="aspect-square bg-coffee-100 dark:bg-coffee-700">
+            <img src="{{ file.file.url }}" alt="{{ file.title }}" class="w-full h-full object-cover">
+          </div>
+          {% else %}
+          <div class="aspect-square bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
+            <span class="text-4xl text-coffee-400 dark:text-coffee-300">{{ file.file_type|truncatechars:1 }}</span>
+          </div>
+          {% endif %}
+          <div class="p-2">
+            <p class="text-xs font-medium text-coffee-900 dark:text-coffee-100 truncate">{{ file.title }}</p>
+            <p class="text-xs text-coffee-500 dark:text-coffee-300">{{ file.formatted_size }}</p>
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <p class="col-span-full text-coffee-500 dark:text-coffee-300 text-sm">Tidak ada file ditemukan.</p>
+      {% endfor %}
+    </div>
+    {% if files %}
+    <div class="mt-4 flex justify-end">
+      <button type="submit" onclick="return confirm('Hapus file terpilih?')"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 text-sm">
+        Hapus Terpilih
+      </button>
+    </div>
+    {% endif %}
+  </form>
+
+  {% if is_paginated %}
+  <div class="flex justify-center gap-2">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-coffee-100 dark:bg-coffee-700 rounded">Sebelumnya</a>
+    {% endif %}
+    <span class="px-3 py-1">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-coffee-100 dark:bg-coffee-700 rounded">Selanjutnya</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

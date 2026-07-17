@@ -1,0 +1,88 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}{{ author.name }} - Penulis{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+  <div>
+    <a href="{% url 'content:author_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali ke Daftar</a>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">{{ author.name }}</h1>
+      <a href="{% url 'content:author_edit' author.pk %}" class="px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors text-sm font-medium">Edit</a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Profile Card -->
+    <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6 text-center">
+      {% if author.avatar %}
+      <img src="{{ author.avatar.url }}" class="w-24 h-24 rounded-full object-cover mx-auto mb-4" alt="">
+      {% else %}
+      <div class="w-24 h-24 rounded-full bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center text-2xl font-heading font-bold text-coffee-600 dark:text-coffee-300 mx-auto mb-4">
+        {{ author.name|slice:":1"|upper }}
+      </div>
+      {% endif %}
+      <h2 class="font-heading font-bold text-coffee-800 dark:text-coffee-100">{{ author.name }}</h2>
+      {% if author.email %}
+      <p class="text-sm text-coffee-500 dark:text-coffee-400 mt-1">{{ author.email }}</p>
+      {% endif %}
+      {% if author.website %}
+      <a href="{{ author.website }}" target="_blank" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mt-1 inline-block">{{ author.website }}</a>
+      {% endif %}
+      <div class="mt-4">
+        {% if author.active %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Aktif</span>
+        {% else %}
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-coffee-100 text-coffee-500 dark:bg-coffee-700 dark:text-coffee-400">Nonaktif</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Info & Stats -->
+    <div class="lg:col-span-2 space-y-6">
+      {% if author.bio %}
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-3">Bio</h3>
+        <p class="text-sm text-coffee-600 dark:text-coffee-300 leading-relaxed">{{ author.bio|linebreaksbr }}</p>
+      </div>
+      {% endif %}
+
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Statistik</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-4 rounded-lg bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700">
+            <p class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">{{ author.article_count|default:"0" }}</p>
+            <p class="text-xs text-coffee-500 dark:text-coffee-400 mt-1">Artikel</p>
+          </div>
+          <div class="p-4 rounded-lg bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700">
+            <p class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">{{ author.podcast_count|default:"0" }}</p>
+            <p class="text-xs text-coffee-500 dark:text-coffee-400 mt-1">Podcast</p>
+          </div>
+        </div>
+      </div>
+
+      {% if author.social_links %}
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-3">Tautan Sosial Media</h3>
+        <div class="space-y-2">
+          {% for key, value in author.social_links.items %}
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-coffee-600 dark:text-coffee-300 capitalize">{{ key }}</span>
+            <a href="{{ value }}" target="_blank" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 truncate">{{ value }}</a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-3">Informasi</h3>
+        <dl class="space-y-2 text-sm">
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Dibuat</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ author.created_at|date:"d M Y H:i" }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Terakhir Diperbarui</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ author.updated_at|date:"d M Y H:i" }}</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

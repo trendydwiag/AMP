@@ -1,0 +1,86 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Kalender Siaran - Broadcast Management{% endblock %}
+
+{% block breadcrumbs %}
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <a href="{% url 'broadcast:dashboard' %}" class="hover:text-coffee-500">Broadcast</a>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <span class="text-slate-700 dark:text-slate-300">Kalender</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Kalender Siaran</h1>
+        <div class="flex gap-2">
+            {% with prev_month=month|add:"-1" %}{% with prev_year=year %}
+            {% if prev_month < 1 %}
+            <a href="?year={{ prev_year|add:"-1" }}&month=12" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm">
+                &laquo; Sebelumnya
+            </a>
+            {% else %}
+            <a href="?year={{ prev_year }}&month={{ prev_month }}" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm">
+                &laquo; Sebelumnya
+            </a>
+            {% endif %}
+            {% endwith %}{% endwith %}
+
+            <span class="px-4 py-1 text-sm font-medium text-slate-900 dark:text-white">
+                {% with month_names="Januari Februari Maret April Mei Juni Juli Agustus September Oktober November Desember" %}{% endwith %}
+                {{ year }} - Bulan {{ month }}
+            </span>
+
+            {% with next_month=month|add:"1" %}{% with next_year=year %}
+            {% if next_month > 12 %}
+            <a href="?year={{ next_year|add:"1" }}&month=1" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm">
+                Berikutnya &raquo;
+            </a>
+            {% else %}
+            <a href="?year={{ next_year }}&month={{ next_month }}" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm">
+                Berikutnya &raquo;
+            </a>
+            {% endif %}
+            {% endwith %}{% endwith %}
+        </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+        <div class="grid grid-cols-7 gap-px bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden">
+            <!-- Header -->
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Sen</div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Sel</div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Rab</div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Kam</div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Jum</div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Sab</div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-2 text-center text-xs font-medium text-slate-500 dark:text-slate-400">Min</div>
+
+            <!-- Empty cells before first day -->
+            {% for _ in empty_days %}
+            <div class="bg-white dark:bg-slate-800 p-2 min-h-[100px]"></div>
+            {% endfor %}
+
+            <!-- Days -->
+            {% for date, schedules in calendar.items %}
+            <div class="bg-white dark:bg-slate-800 p-2 min-h-[100px] {% if date.day == today_day %}ring-2 ring-inset ring-coffee-500{% endif %}">
+                <p class="text-sm font-medium text-slate-900 dark:text-white mb-1">{{ date.day }}</p>
+                {% for s in schedules|slice:":3" %}
+                <div class="text-xs bg-coffee-50 dark:bg-coffee-900/30 text-coffee-600 dark:text-coffee-300 rounded px-1 py-0.5 mb-0.5 truncate">
+                    {{ s.start_time|time:"H:i" }} {{ s.program.title|truncatewords:3 }}
+                </div>
+                {% endfor %}
+                {% if schedules|length > 3 %}
+                <div class="text-xs text-slate-400 dark:text-slate-500">+{{ schedules|length|add:"-3" }} lagi</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

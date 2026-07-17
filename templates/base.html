@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4E2F1F" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1A0F0B" media="(prefers-color-scheme: dark)">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="color-scheme" content="light dark">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ SITE_DESCRIPTION }}{% endblock %}">
+    {% block og_tags %}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ SITE_NAME }}">
+    <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ SITE_DESCRIPTION }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'img/og-default.png' %}{% endblock %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ SITE_NAME }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ SITE_DESCRIPTION }}{% endblock %}">
+    {% endblock og_tags %}
+    <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-title" content="Kabulhaden">
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192x192.svg' %}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#4E2F1F">
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="icon" type="image/svg+xml" href="{% static 'icons/icon-192x192.svg' %}">
+    <link rel="shortcut icon" href="{% static 'icons/icon-192x192.svg' %}">
+
+    <!-- Google Fonts: Poppins + Inter (preconnect + preload) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Tailwind CSS (compiled styles) -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Tailwind Play CDN as fallback for styling in local dev if not compiled yet -->
+    {% if IS_DEBUG %}
+    <script src="https://cdn.tailwindcss.com" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
+    <script {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        coffee: {
+                            50: '#FAF7F3',
+                            100: '#F5F0EA',
+                            200: '#E7DDD3',
+                            300: '#C89B6D',
+                            400: '#8C5A3C',
+                            500: '#6B4226',
+                            600: '#4E2F1F',
+                            700: '#3A2318',
+                            800: '#2B1A13',
+                            900: '#1A0F0B',
+                        },
+                        brand: {
+                            50: '#f5f7fa',
+                            100: '#e4ebf2',
+                            500: '#1e3a8a',
+                            600: '#172554',
+                        },
+                        live: '#E53935',
+                        success: '#2F9E44',
+                    },
+                    fontFamily: {
+                        heading: ['Poppins', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'card': '20px',
+                        'card-lg': '24px',
+                    },
+                    boxShadow: {
+                        'card': '0 10px 30px rgba(0,0,0,.08)',
+                        'card-hover': '0 20px 40px rgba(0,0,0,.12)',
+                        'hero-card': '0 30px 60px rgba(0,0,0,.20)',
+                        'header': '0 1px 3px rgba(0,0,0,.06)',
+                    },
+                    transitionDuration: {
+                        '250': '250ms',
+                    }
+                }
+            }
+        }
+    </script>
+    {% endif %}
+
+    <!-- HTMX & AlpineJS -->
+    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.0/dist/cdn.min.js" integrity="sha384-9r4u6+P6g9XnF7LwO0oH+L9r4u6+P6g9XnF7LwO0oH+" crossorigin="anonymous" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
+</head>
+<body class="h-full bg-[#FAF7F3] text-[#2D2D2D] font-body flex flex-col transition-colors duration-250 touch-feedback">
+
+    {# Skip to content — accessibility #}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
+              focus:z-[200] focus:px-4 focus:py-2 focus:bg-coffee-400 focus:text-white
+              focus:rounded-lg focus:text-sm focus:font-heading focus:font-semibold focus:shadow-lg">
+        Lewati ke konten utama
+    </a>
+
+    {% block layout %}{% endblock %}
+
+    {# Live region for screen reader announcements #}
+    <div id="sr-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <noscript>
+        <div class="fixed inset-0 z-[300] bg-coffee-50 flex items-center justify-center p-8">
+            <div class="max-w-md text-center">
+                <svg class="w-16 h-16 mx-auto mb-4 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                <h2 class="text-xl font-heading font-bold text-coffee-700 mb-2">JavaScript Diperlukan</h2>
+                <p class="text-coffee-400 font-body">Kabulhaden memerlukan JavaScript untuk pengalaman terbaik. Mohon aktifkan JavaScript di browser Anda.</p>
+            </div>
+        </div>
+    </noscript>
+
+    <!-- HTMX CSRF Configuration script -->
+    <script {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+    </script>
+
+    {# Reduced motion — respect user preference #}
+    <style>
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- Service Worker Registration -->
+    <script {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{% static "sw.js" %}')
+                    .then(reg => {
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+                            if (newWorker) {
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        if (typeof window.showUpdateNotification === 'function') {
+                                            window.showUpdateNotification();
+                                        } else {
+                                            const toast = document.createElement('div');
+                                            toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-2xl bg-coffee-600 text-white text-sm font-medium shadow-lg flex items-center gap-3';
+                                            toast.innerHTML = '<span>Update tersedia!</span><button onclick="window.location.reload()" class="px-3 py-1 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">Muat Ulang</button>';
+                                            document.body.appendChild(toast);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    })
+                    .catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>

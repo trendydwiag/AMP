@@ -1,0 +1,64 @@
+{% extends "amp_studio/base.html" %}
+{% load static %}
+
+{% block title %}Edit Tema - {{ object.partner.name }}{% endblock %}
+
+{% block content %}
+<div class="p-6 max-w-3xl">
+    <div class="mb-6">
+        <a href="{% url 'platform:theme_list' %}" class="text-coffee-500 hover:text-coffee-700 text-sm">&larr; Kembali ke Daftar Tema</a>
+        <h1 class="text-2xl font-bold text-coffee-800 mt-2">Edit Tema: {{ object.partner.name }}</h1>
+    </div>
+
+    <form method="post" class="bg-white rounded-xl border border-coffee-200 p-6">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-4">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-coffee-700 mb-1">{{ field.label }}</label>
+            {% if field.field.widget.input_type == 'checkbox' %}
+                <div class="flex items-center">
+                    {{ field }}
+                    {% if field.help_text %}<span class="ml-2 text-coffee-500 text-xs">{{ field.help_text }}</span>{% endif %}
+                </div>
+            {% elif field.field.widget.input_type == 'select' %}
+                {{ field }}
+            {% elif field.field.widget.input_type == 'textarea' %}
+                <textarea name="{{ field.html_name }}" id="{{ field.id_for_label }}" rows="6" class="w-full rounded-lg border border-coffee-300 px-3 py-2 text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">{{ field.value|default:'' }}</textarea>
+            {% else %}
+                <div class="flex items-center space-x-3">
+                    {% if 'color' in field.name %}
+                        <input type="color" name="{{ field.html_name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'#000000' }}" class="w-10 h-10 rounded border border-coffee-300 cursor-pointer">
+                        <input type="text" value="{{ field.value|default:'' }}" readonly class="w-24 rounded-lg border border-coffee-300 px-3 py-2 text-sm text-coffee-800 bg-coffee-50">
+                    {% else %}
+                        <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}" class="w-full rounded-lg border border-coffee-300 px-3 py-2 text-sm text-coffee-800 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% if field.errors %}<p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="flex justify-end space-x-3 mt-6">
+            <a href="{% url 'platform:theme_list' %}" class="px-4 py-2 border border-coffee-300 text-coffee-600 rounded-lg hover:bg-coffee-50 transition">Batal</a>
+            <button type="submit" class="px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition">Simpan Tema</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    select, textarea, input[type="text"], input[type="email"], input[type="number"], input[type="url"] {
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #d6ccc0;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: #1A0F0B;
+        background-color: white;
+    }
+    select:focus, textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, input[type="url"]:focus {
+        outline: none;
+        border-color: #4E2F1F;
+        box-shadow: 0 0 0 2px rgba(78, 47, 31, 0.2);
+    }
+    select { appearance: auto; }
+</style>
+{% endblock %}

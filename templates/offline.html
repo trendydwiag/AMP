@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4E2F1F">
+    <title>Anda Offline - Kabulhaden Radio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAF7F3;
+            color: #2D2D2D;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .container {
+            max-width: 400px;
+            text-align: center;
+        }
+        .icon-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, #F5F0EA, #E7DDD3);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+        .icon-wrapper svg {
+            width: 56px;
+            height: 56px;
+            color: #8C5A3C;
+        }
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #3A2318;
+            margin-bottom: 12px;
+        }
+        p {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: #8C5A3C;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 10px 30px rgba(140,90,60,0.3);
+        }
+        .retry-btn:hover {
+            background: #6B4226;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(140,90,60,0.4);
+        }
+        .retry-btn:active {
+            transform: translateY(0);
+        }
+        .retry-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .offline-features {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid #E7DDD3;
+        }
+        .offline-features h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #8C5A3C;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E7DDD3;
+            font-size: 14px;
+            color: #666666;
+        }
+        .feature-item svg {
+            width: 20px;
+            height: 20px;
+            color: #2F9E44;
+            flex-shrink: 0;
+        }
+        .wifi-off {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #E53935;
+            color: white;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+        }
+        .wifi-off svg {
+            width: 16px;
+            height: 16px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .retry-btn { transition: none; }
+            .retry-btn:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wifi-off">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a5 5 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3" />
+        </svg>
+        Tidak ada koneksi
+    </div>
+
+    <div class="container">
+        <div class="icon-wrapper">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+        </div>
+
+        <h1>Anda Offline</h1>
+        <p>Sepertinya Anda tidak terhubung ke internet. Periksa koneksi jaringan Anda dan coba lagi.</p>
+
+        <button class="retry-btn" onclick="window.location.reload()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Coba Lagi
+        </button>
+
+        <div class="offline-features">
+            <h2>Yang Bisa Anda Akses</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Halaman yang sudah di-cache
+                </div>
+                <div class="feature-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Info jadwal siaran
+                </div>
+                <div class="feature-item">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Berita terakhir dibaca
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(reg => {
+                if (reg.active) reg.active.postMessage({ type: 'SKIP_WAITING' });
+            });
+        }
+    </script>
+</body>
+</html>

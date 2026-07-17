@@ -1,0 +1,98 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}SEO - CMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">SEO Metadata</h1>
+      <p class="mt-1 text-sm text-coffee-500 dark:text-coffee-400">Kelola metadata SEO untuk konten</p>
+    </div>
+    <a href="{% url 'content:seo_create' %}" class="inline-flex items-center px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors text-sm font-medium">
+      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Tambah SEO
+    </a>
+  </div>
+
+  {% if low_score_count > 0 %}
+  <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 flex items-center gap-3">
+    <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+    <span class="text-sm text-yellow-800 dark:text-yellow-300"><strong>{{ low_score_count }}</strong> entri SEO memiliki skor di bawah 50. Pertimbakan untuk memperbaikinya.</span>
+  </div>
+  {% endif %}
+
+  <!-- Search -->
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-4">
+    <form method="get" class="flex gap-3">
+      <input type="text" name="q" value="{{ q }}" placeholder="Cari entri SEO..."
+        class="flex-1 px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 text-sm focus:ring-2 focus:ring-coffee-400 focus:border-transparent">
+      <button type="submit" class="px-4 py-2 bg-coffee-100 dark:bg-coffee-700 text-coffee-700 dark:text-coffee-200 rounded-lg hover:bg-coffee-200 dark:hover:bg-coffee-600 text-sm transition-colors">Cari</button>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-coffee-50 dark:bg-coffee-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase tracking-wider">Judul</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase tracking-wider">Deskripsi</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase tracking-wider">Skor</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase tracking-wider">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-coffee-100 dark:divide-coffee-700">
+          {% for seo in seo_entries %}
+          <tr class="hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="text-sm font-medium text-coffee-800 dark:text-coffee-100">{{ seo.title|default:"-"|truncatechars:40 }}</div>
+              <div class="text-xs text-coffee-400 mt-0.5">{{ seo.content_type }}</div>
+            </td>
+            <td class="px-6 py-4 text-sm text-coffee-600 dark:text-coffee-300">{{ seo.description|default:"-"|truncatechars:50 }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <div class="w-12 h-2 bg-coffee-100 dark:bg-coffee-700 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full {% if seo.seo_score >= 70 %}bg-green-500{% elif seo.seo_score >= 50 %}bg-yellow-500{% else %}bg-red-500{% endif %}" style="width: {{ seo.seo_score }}%"></div>
+                </div>
+                <span class="text-sm font-medium text-coffee-700 dark:text-coffee-200">{{ seo.seo_score }}</span>
+                <span class="text-xs font-bold {% if seo.seo_grade == 'A' or seo.seo_grade == 'B' %}text-green-600{% elif seo.seo_grade == 'C' %}text-yellow-600{% else %}text-red-600{% endif %}">({{ seo.seo_grade }})</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <a href="{% url 'content:seo_edit' seo.pk %}" class="p-2 text-coffee-400 hover:text-coffee-600 dark:hover:text-coffee-300 rounded-lg hover:bg-coffee-100 dark:hover:bg-coffee-700 inline-block" title="Edit">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="px-6 py-12 text-center text-coffee-500 dark:text-coffee-400">
+              <svg class="w-12 h-12 mx-auto mb-4 text-coffee-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              Belum ada entri SEO
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="px-6 py-4 border-t border-coffee-100 dark:border-coffee-700">
+      <nav class="flex items-center justify-between">
+        <div class="text-sm text-coffee-500 dark:text-coffee-400">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</div>
+        <div class="flex gap-1">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}" class="px-3 py-1 rounded-lg border border-coffee-200 dark:border-coffee-600 text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 text-sm">Sebelumnya</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}&q={{ q }}" class="px-3 py-1 rounded-lg border border-coffee-200 dark:border-coffee-600 text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 text-sm">Berikutnya</a>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

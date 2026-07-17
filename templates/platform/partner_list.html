@@ -1,0 +1,95 @@
+{% extends "amp_studio/base.html" %}
+{% load static %}
+
+{% block title %}Daftar Partner{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-coffee-800">Daftar Partner</h1>
+            <p class="text-coffee-600 mt-1">Kelola partner media yang terdaftar di platform</p>
+        </div>
+        <a href="{% url 'platform:partner_create' %}" class="inline-flex items-center px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Tambah Partner
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl border border-coffee-200 overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-coffee-50 border-b border-coffee-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Nama</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Slug</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Tier</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Status</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Domain</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold text-coffee-700">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-coffee-100">
+                {% for partner in partners %}
+                <tr class="hover:bg-coffee-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            {% if partner.logo %}
+                                <img src="{{ partner.logo.url }}" class="w-8 h-8 rounded-full mr-3" alt="">
+                            {% else %}
+                                <div class="w-8 h-8 rounded-full bg-coffee-200 flex items-center justify-center mr-3 text-sm font-bold text-coffee-600">{{ partner.name.0 }}</div>
+                            {% endif %}
+                            <span class="font-medium text-coffee-800">{{ partner.name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-coffee-600">{{ partner.slug }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full
+                            {% if partner.tier == 'ENTERPRISE' %}bg-purple-100 text-purple-700
+                            {% elif partner.tier == 'PROFESSIONAL' %}bg-blue-100 text-blue-700
+                            {% elif partner.tier == 'STARTER' %}bg-green-100 text-green-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ partner.get_tier_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full
+                            {% if partner.status == 'ACTIVE' %}bg-green-100 text-green-700
+                            {% elif partner.status == 'PENDING' %}bg-yellow-100 text-yellow-700
+                            {% elif partner.status == 'SUSPENDED' %}bg-red-100 text-red-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ partner.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-coffee-600">{{ partner.primary_domain|default:"-" }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'platform:partner_detail' partner.pk %}" class="text-coffee-600 hover:text-coffee-800 text-sm font-medium">Detail</a>
+                        <span class="text-coffee-300 mx-1">|</span>
+                        <a href="{% url 'platform:partner_edit' partner.pk %}" class="text-coffee-600 hover:text-coffee-800 text-sm font-medium">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-coffee-500">
+                        Belum ada partner terdaftar.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-4 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded border border-coffee-300 text-coffee-600 hover:bg-coffee-50">Sebelumnya</a>
+            {% endif %}
+            <span class="px-3 py-1 text-sm text-coffee-600">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded border border-coffee-300 text-coffee-600 hover:bg-coffee-50">Selanjutnya</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

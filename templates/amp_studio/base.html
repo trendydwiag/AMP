@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AMP Studio{% endblock %} — Aradhana Media Platform</title>
+  <meta name="description" content="AMP Studio - Content Management Interface">
+  
+  {# Fonts #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  {# AMP Studio Styles #}
+  <link rel="stylesheet" href="{% static 'css/amp-studio/amp-studio.css' %}">
+  
+  {# Alpine.js #}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  {# HTMX #}
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="amp-studio" x-data="ampStudio()" x-init="init()">
+
+  {# ── App Shell ── #}
+  <div class="amp-app" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+
+    {# ── Sidebar ── #}
+    {% include 'amp_studio/components/sidebar.html' %}
+
+    {# ── Main Area ── #}
+    <div class="amp-main" :class="{ 'expanded': sidebarCollapsed }">
+
+      {# ── Header ── #}
+      {% include 'amp_studio/components/header.html' %}
+
+      {# ── Content ── #}
+      <main class="amp-content" id="main-content" role="main">
+        {% block content %}{% endblock %}
+      </main>
+
+      {# ── Player Bar ── #}
+      {% include 'amp_studio/components/player_bar.html' %}
+    </div>
+  </div>
+
+  {# ── Command Palette ── #}
+  {% include 'amp_studio/components/command_palette.html' %}
+
+  {# ── Notification Panel ── #}
+  {% include 'amp_studio/components/notifications.html' %}
+
+  {# ── Toast Container ── #}
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[1100] flex flex-col gap-3"></div>
+
+  {# ── AMP Studio JS ── #}
+  <script src="{% static 'js/amp-studio/amp-studio.js' %}"></script>
+  
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

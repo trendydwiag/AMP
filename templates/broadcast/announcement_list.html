@@ -1,0 +1,73 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Pengumuman - Broadcast Management{% endblock %}
+
+{% block breadcrumbs %}
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <a href="{% url 'broadcast:dashboard' %}" class="hover:text-coffee-500">Broadcast</a>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <span class="text-slate-700 dark:text-slate-300">Pengumuman</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Pengumuman</h1>
+        <a href="{% url 'broadcast:announcement_create' %}" class="px-4 py-2 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 text-sm font-medium">
+            + Tambah Pengumuman
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Judul</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Periode</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                {% for ann in announcements %}
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+                    <td class="px-4 py-3">
+                        <div>
+                            <p class="font-medium text-slate-900 dark:text-white">{{ ann.title }}</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">{{ ann.content|truncatewords:10 }}</p>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        {{ ann.publish_start|date:"d M Y" }} - {{ ann.publish_end|date:"d M Y"|default:"Tidak ditentukan" }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {% if ann.is_current %}
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">Aktif</span>
+                        {% elif ann.active %}
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">Terjadwal</span>
+                        {% else %}
+                        <span class="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300">Nonaktif</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 flex gap-2">
+                        <a href="{% url 'broadcast:announcement_edit' ann.pk %}" class="text-coffee-500 hover:text-coffee-600 dark:text-coffee-400 text-sm">Edit</a>
+                        <form method="post" action="{% url 'broadcast:announcement_delete' ann.pk %}" onsubmit="return confirm('Nonaktifkan pengumuman ini?')">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-600 hover:text-red-700 dark:text-red-400 text-sm">Nonaktifkan</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">Belum ada pengumuman</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

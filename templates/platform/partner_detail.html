@@ -1,0 +1,87 @@
+{% extends "amp_studio/base.html" %}
+{% load static %}
+
+{% block title %}{{ partner.name }} - Detail Partner{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-6">
+        <a href="{% url 'platform:partner_list' %}" class="text-coffee-500 hover:text-coffee-700 text-sm">&larr; Kembali ke Daftar Partner</a>
+    </div>
+
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center">
+            {% if partner.logo %}
+                <img src="{{ partner.logo.url }}" class="w-12 h-12 rounded-full mr-4" alt="">
+            {% else %}
+                <div class="w-12 h-12 rounded-full bg-coffee-200 flex items-center justify-center mr-4 text-xl font-bold text-coffee-600">{{ partner.name.0 }}</div>
+            {% endif %}
+            <div>
+                <h1 class="text-2xl font-bold text-coffee-800">{{ partner.name }}</h1>
+                <p class="text-coffee-600">{{ partner.slug }} | {{ partner.get_tier_display }} | {{ partner.get_status_display }}</p>
+            </div>
+        </div>
+        <a href="{% url 'platform:partner_edit' partner.pk %}" class="px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition">Edit Partner</a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Informasi Dasar</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between"><dt class="text-coffee-500">Domain Utama</dt><dd class="text-coffee-800">{{ partner.primary_domain|default:"-" }}</dd></div>
+                <div class="flex justify-between"><dt class="text-coffee-500">Tagline</dt><dd class="text-coffee-800">{{ partner.tagline|default:"-" }}</dd></div>
+                <div class="flex justify-between"><dt class="text-coffee-500">Kontak Email</dt><dd class="text-coffee-800">{{ partner.contact_email|default:"-" }}</dd></div>
+                <div class="flex justify-between"><dt class="text-coffee-500">Timezone</dt><dd class="text-coffee-800">{{ partner.timezone }}</dd></div>
+                <div class="flex justify-between"><dt class="text-coffee-500">Max Users</dt><dd class="text-coffee-800">{{ partner.max_users }}</dd></div>
+                <div class="flex justify-between"><dt class="text-coffee-500">Max Storage</dt><dd class="text-coffee-800">{{ partner.max_storage_mb }} MB</dd></div>
+            </dl>
+        </div>
+
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Branding</h2>
+            <div class="flex items-center space-x-4 mb-4">
+                <div>
+                    <div class="text-xs text-coffee-500 mb-1">Primary</div>
+                    <div class="w-8 h-8 rounded" style="background-color: {{ partner.primary_color }}"></div>
+                </div>
+                <div>
+                    <div class="text-xs text-coffee-500 mb-1">Secondary</div>
+                    <div class="w-8 h-8 rounded" style="background-color: {{ partner.secondary_color }}"></div>
+                </div>
+            </div>
+            <p class="text-sm text-coffee-600">{{ partner.description|default:"Tidak ada deskripsi"|truncatewords:30 }}</p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Keanggotaan ({{ memberships|length }})</h2>
+            <div class="space-y-2 max-h-48 overflow-y-auto">
+                {% for m in memberships %}
+                <div class="flex items-center justify-between text-sm py-1 border-b border-coffee-100 last:border-0">
+                    <span class="text-coffee-800">{{ m.user.username }}</span>
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-coffee-100 text-coffee-600">{{ m.get_role_display }}</span>
+                </div>
+                {% empty %}
+                <p class="text-coffee-500 text-sm">Belum ada anggota.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Domain</h2>
+            <div class="space-y-2">
+                {% for d in domains %}
+                <div class="flex items-center justify-between text-sm py-1 border-b border-coffee-100 last:border-0">
+                    <span class="text-coffee-800">{{ d.domain }}</span>
+                    <div class="flex items-center space-x-2">
+                        {% if d.is_primary %}<span class="text-xs text-green-600">Utama</span>{% endif %}
+                        {% if d.is_verified %}<span class="text-xs text-green-600">Terverifikasi</span>{% else %}<span class="text-xs text-yellow-600">Belum Verifikasi</span>{% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-coffee-500 text-sm">Belum ada domain kustom.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

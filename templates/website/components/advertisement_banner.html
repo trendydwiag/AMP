@@ -1,0 +1,33 @@
+{% if ad %}
+<aside class="w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 transition-colors" role="complementary" aria-label="Iklan">
+    <a href="{{ ad.link|default:'#' }}" target="_blank" rel="noopener noreferrer" class="block relative group" aria-label="{{ ad.title|default:'Iklan' }}">
+        {% if ad.image %}
+        <div class="relative aspect-[12/3] sm:aspect-[4/1] overflow-hidden">
+            <img src="{{ ad.image.url }}" alt="{{ ad.title|default:'Iklan' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/20 to-transparent flex items-center">
+                <div class="px-6 sm:px-10">
+                    {% if ad.title %}
+                    <h3 class="text-lg sm:text-xl font-bold text-white mb-1 drop-shadow-md">{{ ad.title }}</h3>
+                    {% endif %}
+                    {% if ad.description %}
+                    <p class="text-sm text-white/80 drop-shadow-sm hidden sm:block">{{ ad.description|truncatewords:12 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="aspect-[12/3] sm:aspect-[4/1] bg-gradient-to-r from-coffee-500 to-coffee-600 dark:from-coffee-600 dark:to-coffee-700 flex items-center justify-center px-6">
+            <div class="text-center">
+                {% if ad.title %}
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-1">{{ ad.title }}</h3>
+                {% endif %}
+                {% if ad.description %}
+                <p class="text-sm text-white/80">{{ ad.description|truncatewords:12 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        <span class="absolute top-2 right-2 text-[10px] text-white/50 uppercase tracking-wider font-medium">Iklan</span>
+    </a>
+</aside>
+{% endif %}

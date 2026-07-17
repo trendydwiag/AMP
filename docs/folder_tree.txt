@@ -1,0 +1,147 @@
+kabulhaden/
+├── apps/
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── apps.py
+│   │   ├── context_processors.py
+│   │   ├── middleware.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── media_manager/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── forms.py
+│   │   ├── management/
+│   │   │   ├── __init__.py
+│   │   │   └── commands/
+│   │   │       ├── __init__.py
+│   │   │       ├── cleanup_media.py
+│   │   │       ├── compress_media.py
+│   │   │       └── generate_thumbnails.py
+│   │   ├── models.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   ├── validators.py
+│   │   └── views.py
+│   ├── radio/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── adapters/
+│   │   │   ├── __init__.py
+│   │   │   ├── azuracast.py
+│   │   │   ├── base.py
+│   │   │   ├── icecast.py
+│   │   │   ├── radioboss.py
+│   │   │   └── shoutcast.py
+│   │   ├── apps.py
+│   │   ├── forms.py
+│   │   ├── management/
+│   │   │   ├── __init__.py
+│   │   │   └── commands/
+│   │   │       ├── __init__.py
+│   │   │       ├── check_stream_health.py
+│   │   │       ├── cleanup_cache.py
+│   │   │       ├── refresh_listener.py
+│   │   │       ├── refresh_now_playing.py
+│   │   │       └── refresh_radio_all.py
+│   │   ├── models.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── forms.py
+│   │   ├── management/
+│   │   │   ├── __init__.py
+│   │   │   └── commands/
+│   │   │       ├── __init__.py
+│   │   │       └── init_settings.py
+│   │   ├── models.py
+│   │   ├── repositories.py
+│   │   ├── services.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   └── users/
+│       ├── __init__.py
+│       ├── admin.py
+│       ├── apps.py
+│       ├── decorators.py
+│       ├── forms.py
+│       ├── management/
+│       │   └── commands/
+│       ├── middleware.py
+│       ├── models.py
+│       ├── repositories.py
+│       ├── services.py
+│       ├── templates/
+│       │   └── users/
+│       ├── tests.py
+│       ├── totp.py
+│       ├── urls.py
+│       └── views.py
+├── config/
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   └── base.py
+│   ├── urls.py
+│   └── wsgi.py
+├── docs/
+├── media/
+├── static/
+├── static_root/
+├── templates/
+│   ├── base.html
+│   ├── dashboard_base.html
+│   ├── media_manager/
+│   │   ├── base.html
+│   │   ├── dashboard.html
+│   │   ├── delete_confirm.html
+│   │   ├── detail.html
+│   │   ├── folders.html
+│   │   ├── list.html
+│   │   ├── tags.html
+│   │   └── upload.html
+│   ├── radio/
+│   │   ├── analytics.html
+│   │   ├── dashboard.html
+│   │   ├── player.html
+│   │   ├── provider_form.html
+│   │   ├── provider_list.html
+│   │   ├── station_form.html
+│   │   ├── station_list.html
+│   │   └── sticky_player.html
+│   └── settings/
+│       ├── appearance.html
+│       ├── base.html
+│       ├── content.html
+│       ├── email.html
+│       ├── language.html
+│       ├── media.html
+│       ├── notification.html
+│       ├── security.html
+│       ├── seo.html
+│       ├── site.html
+│       └── social_media.html
+├── utils/
+│   ├── __init__.py
+│   ├── choices.py
+│   ├── mixins.py
+│   ├── repositories.py
+│   ├── services.py
+│   ├── storage.py
+│   └── validators.py
+├── docker-compose.yml
+├── Dockerfile
+├── manage.py
+└── requirements.txt

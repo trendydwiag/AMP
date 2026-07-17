@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Permintaan Buruk (400) | {{ SITE_NAME }}{% endblock %}
+
+{% block layout %}
+<div class="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-900 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div class="max-w-md w-full text-center space-y-6">
+        <h1 class="text-7xl font-extrabold text-coffee-500 dark:text-blue-400">400</h1>
+        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Permintaan Tidak Valid</h2>
+        <p class="text-slate-500 dark:text-slate-400">Server tidak dapat memproses permintaan Anda karena format yang salah atau tidak valid.</p>
+        <div class="pt-4">
+            <a href="{% url 'core:home' %}" class="inline-flex items-center px-4 py-2 bg-coffee-500 hover:bg-coffee-600 text-white text-sm font-semibold rounded-lg shadow-sm transition">
+                Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

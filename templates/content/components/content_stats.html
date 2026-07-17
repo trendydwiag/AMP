@@ -1,0 +1,51 @@
+{# Content Statistics Panel #}
+<div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+  <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4 flex items-center gap-2">
+    <svg class="w-5 h-5 text-coffee-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    Statistik Konten
+  </h3>
+  <dl class="space-y-3 text-sm">
+    {% if word_count is not None %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Jumlah Kata</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ word_count }}</dd>
+    </div>
+    {% endif %}
+    {% if reading_time is not None %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Waktu Baca</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ reading_time }} menit</dd>
+    </div>
+    {% endif %}
+    {% if view_count is not None %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Dilihat</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ view_count }}</dd>
+    </div>
+    {% endif %}
+    {% if version is not None %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Versi</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">v{{ version }}</dd>
+    </div>
+    {% endif %}
+    {% if created_at %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Dibuat</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ created_at|date:"d M Y" }}</dd>
+    </div>
+    {% endif %}
+    {% if updated_at %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Diperbarui</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ updated_at|date:"d M Y H:i" }}</dd>
+    </div>
+    {% endif %}
+    {% if last_published_at %}
+    <div class="flex justify-between">
+      <dt class="text-coffee-500 dark:text-coffee-400">Terbit Terakhir</dt>
+      <dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ last_published_at|date:"d M Y H:i" }}</dd>
+    </div>
+    {% endif %}
+  </dl>
+</div>

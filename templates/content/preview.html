@@ -1,0 +1,52 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Preview: {{ title }} - CMS{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <a href="javascript:history.back()" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali ke Editor</a>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">Preview: {{ title }}</h1>
+    </div>
+    <div class="flex gap-3">
+      <a href="javascript:history.back()" class="px-4 py-2 border border-coffee-200 dark:border-coffee-600 rounded-xl text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700">Edit</a>
+    </div>
+  </div>
+
+  <article class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-8">
+    {% if featured_image %}
+    <img src="{{ featured_image.url }}" class="w-full rounded-xl mb-6 max-h-96 object-cover" alt="{{ title }}">
+    {% endif %}
+
+    <div class="mb-6">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-coffee-100 text-coffee-700 dark:bg-coffee-700 dark:text-coffee-200">
+        {{ status_display }}
+      </span>
+      {% if category %}
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-coffee-50 text-coffee-600 dark:bg-coffee-700/50 dark:text-coffee-300 ml-2">
+        {{ category }}
+      </span>
+      {% endif %}
+    </div>
+
+    <h1 class="text-3xl font-heading font-bold text-coffee-900 dark:text-coffee-50 mb-4">{{ title }}</h1>
+
+    <div class="flex items-center gap-4 text-sm text-coffee-500 dark:text-coffee-400 mb-8">
+      <span>{{ author_name }}</span>
+      <span>&middot;</span>
+      <span>{{ publish_date|date:"d M Y" }}</span>
+      <span>&middot;</span>
+      <span>{{ word_count }} kata</span>
+      <span>&middot;</span>
+      <span>{{ reading_time }} menit baca</span>
+    </div>
+
+    {% if excerpt %}
+    <p class="text-lg text-coffee-600 dark:text-coffee-300 mb-8 font-medium leading-relaxed">{{ excerpt }}</p>
+    {% endif %}
+
+    <div class="prose prose-lg prose-coffee max-w-none dark:prose-invert">
+      {{ content|linebreaks }}
+    </div>
+  </article>
+</div>
+{% endblock %}

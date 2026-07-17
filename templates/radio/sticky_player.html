@@ -1,0 +1,101 @@
+<div x-data="stickyRadioPlayer()" x-init="init()" x-show="isVisible" x-transition class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-lg z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+        <!-- Status Indicator -->
+        <div class="flex-shrink-0">
+            <span class="w-2 h-2 rounded-full" :class="streamStatus === 'ONLINE' ? 'bg-green-500' : 'bg-red-500'"></span>
+        </div>
+
+        <!-- Artwork (small) -->
+        <div class="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 flex-shrink-0">
+            <img x-show="artwork" :src="artwork" class="w-full h-full object-cover" alt="">
+            <div x-show="!artwork" class="w-full h-full flex items-center justify-center">
+                <svg class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Song Info -->
+        <div class="flex-1 min-w-0">
+            <p class="font-medium text-slate-900 dark:text-white truncate text-sm" x-text="songTitle || 'No Track'"></p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 truncate" x-text="artist || '-'"></p>
+        </div>
+
+        <!-- Play Button -->
+        <button @click="togglePlay()" class="w-10 h-10 rounded-full bg-coffee-500 hover:bg-coffee-600 text-white flex items-center justify-center flex-shrink-0">
+            <svg x-show="!isPlaying" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            </svg>
+            <svg x-show="isPlaying" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display: none;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6" />
+            </svg>
+        </button>
+
+        <!-- Volume -->
+        <div class="hidden sm:flex items-center gap-2 flex-shrink-0">
+            <input type="range" min="0" max="100" x-model="volume" @input="setVolume()" class="w-20 h-1 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <!-- Close -->
+        <button @click="isVisible = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex-shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+function stickyRadioPlayer() {
+    return {
+        streamUrl: '',
+        streamStatus: 'UNKNOWN',
+        songTitle: '',
+        artist: '',
+        artwork: '',
+        volume: 80,
+        isPlaying: false,
+        audio: null,
+        isVisible: true,
+
+        init() {
+            this.fetchStatus();
+            setInterval(() => this.fetchStatus(), 10000);
+        },
+
+        async fetchStatus() {
+            try {
+                const response = await fetch('/radio/api/status/');
+                const data = await response.json();
+                this.streamUrl = data.stream_url || '';
+                this.streamStatus = data.stream_status || 'UNKNOWN';
+                this.songTitle = data.song_title || '';
+                this.artist = data.artist || '';
+                this.artwork = data.artwork || '';
+            } catch (e) {
+                console.error('Failed to fetch radio status:', e);
+            }
+        },
+
+        togglePlay() {
+            if (this.isPlaying) {
+                this.audio.pause();
+                this.isPlaying = false;
+            } else {
+                if (!this.audio) {
+                    this.audio = new Audio(this.streamUrl);
+                    this.audio.volume = this.volume / 100;
+                }
+                this.audio.play();
+                this.isPlaying = true;
+            }
+        },
+
+        setVolume() {
+            if (this.audio) {
+                this.audio.volume = this.volume / 100;
+            }
+        }
+    }
+}
+</script>

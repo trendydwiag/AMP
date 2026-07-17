@@ -1,0 +1,47 @@
+{% extends "media_manager/base.html" %}
+{% block media_content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-coffee-900 dark:text-coffee-100">Tag</h1>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-6">
+      <h2 class="font-semibold text-coffee-900 dark:text-coffee-100 mb-3">Buat Tag Baru</h2>
+      <form method="post" action="{% url 'media_manager:tag_create' %}" class="space-y-3">
+        {% csrf_token %}
+        {% for field in form %}
+        <div>
+          <label class="block text-sm font-medium text-coffee-700 dark:text-coffee-300 mb-1">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<p class="text-sm text-red-600 dark:text-red-400">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="w-full px-4 py-2 bg-coffee-500 dark:bg-coffee-400 text-white rounded-lg hover:bg-coffee-600 dark:hover:bg-coffee-300 font-medium text-sm">
+          Buat Tag
+        </button>
+      </form>
+    </div>
+
+    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-6">
+      <h2 class="font-semibold text-coffee-900 dark:text-coffee-100 mb-3">Daftar Tag</h2>
+      <div class="space-y-2">
+        {% for tag in tags %}
+        <div class="flex items-center justify-between p-2 hover:bg-coffee-50 dark:hover:bg-coffee-700 rounded">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full" style="background-color: {{ tag.color }}"></span>
+            <span class="text-sm font-medium text-coffee-900 dark:text-coffee-100">{{ tag.name }}</span>
+          </div>
+          <form method="post" action="{% url 'media_manager:tag_delete' pk=tag.pk %}" onsubmit="return confirm('Hapus tag ini?')">
+            {% csrf_token %}
+            <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm">Hapus</button>
+          </form>
+        </div>
+        {% empty %}
+        <p class="text-sm text-coffee-500 dark:text-coffee-300">Belum ada tag.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

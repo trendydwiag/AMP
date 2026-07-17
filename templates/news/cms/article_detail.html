@@ -1,0 +1,102 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} - CMS{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <a href="{% url 'news:cms_article_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali</a>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">{{ article.title }}</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+        {% if article.status == 'PUBLISHED' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
+        {% elif article.status == 'DRAFT' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400
+        {% elif article.status == 'PENDING_REVIEW' %}bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400
+        {% else %}bg-coffee-100 text-coffee-800 dark:bg-coffee-700 dark:text-coffee-200{% endif %}">
+        {{ article.get_status_display }}
+      </span>
+      <a href="{% url 'news:cms_article_edit' article.pk %}" class="px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors">Edit</a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      {% if article.featured_image %}
+      <img src="{{ article.featured_image.url }}" class="w-full rounded-xl object-cover max-h-80" alt="">
+      {% endif %}
+
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <div class="prose prose-coffee max-w-none dark:prose-invert">
+          {{ article.content|linebreaks }}
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Info</h3>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Penulis</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.author_name }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Kategori</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.category.name|default:"-" }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Dilihat</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.view_count }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Kata</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.word_count }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Waktu Baca</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.reading_time_minutes }} mnt</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Versi</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">v{{ article.version }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Dibuat</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.created_at|date:"d M Y H:i" }}</dd></div>
+          {% if article.last_published_at %}
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Diterbitkan</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ article.last_published_at|date:"d M Y H:i" }}</dd></div>
+          {% endif %}
+        </dl>
+      </div>
+
+      <!-- Workflow Actions -->
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Workflow</h3>
+        <div class="space-y-2">
+          {% if article.status == 'DRAFT' %}
+          <form method="post" action="{% url 'news:cms_article_workflow' article.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="PENDING_REVIEW">
+            <button type="submit" class="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm">Kirim ke Review</button>
+          </form>
+          {% elif article.status == 'PENDING_REVIEW' %}
+          <form method="post" action="{% url 'news:cms_article_workflow' article.pk %}" class="flex gap-2">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="APPROVED">
+            <button type="submit" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm">Setujui</button>
+          </form>
+          <form method="post" action="{% url 'news:cms_article_workflow' article.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="REJECTED">
+            <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm">Tolak</button>
+          </form>
+          {% elif article.status == 'APPROVED' or article.status == 'SCHEDULED' %}
+          <form method="post" action="{% url 'news:cms_article_publish' article.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition-colors text-sm">Terbitkan Sekarang</button>
+          </form>
+          {% elif article.status == 'PUBLISHED' %}
+          <form method="post" action="{% url 'news:cms_article_unpublish' article.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">Cabut Publikasi</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- SEO Score -->
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">SEO</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Title</span><span class="text-coffee-800 dark:text-coffee-100">{{ article.seo_title|default:"-"|truncatechars:30 }}</span></div>
+          <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Description</span><span class="text-coffee-800 dark:text-coffee-100">{{ article.seo_description|default:"-"|truncatechars:30 }}</span></div>
+          <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Robots</span><span class="text-coffee-800 dark:text-coffee-100">{{ article.robots }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% load static %}
+<div class="grid grid-cols-3 gap-3 p-4">
+  <a href="{% url 'broadcast:program_list' %}"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Buat Program</span>
+  </a>
+
+  <a href="{% url 'broadcast:schedule_list' %}"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Buat Jadwal</span>
+  </a>
+
+  <a href="#"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Buat Podcast</span>
+  </a>
+
+  <a href="#"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Tulis Artikel</span>
+  </a>
+
+  <a href="{% url 'media_manager:upload' %}"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Upload Media</span>
+  </a>
+
+  <a href="#"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Mulai Siaran</span>
+  </a>
+
+  <a href="#"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Hentikan Siaran</span>
+  </a>
+
+  <a href="#"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Refresh Stream</span>
+  </a>
+
+  <a href="#"
+     class="flex flex-col items-center gap-2 rounded-2xl bg-coffee-50 dark:bg-coffee-700 p-4 transition-colors hover:bg-coffee-100 dark:hover:bg-coffee-600 active:scale-95">
+    <div class="w-12 h-12 rounded-xl bg-coffee-200 dark:bg-coffee-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-coffee-600 dark:text-coffee-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </div>
+    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center leading-tight">Kirim Notifikasi</span>
+  </a>
+</div>

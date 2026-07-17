@@ -1,0 +1,183 @@
+/* ========================================
+   Kabulhaden Homepage Styles — Coffee Palette
+   ======================================== */
+
+/* --- Wave Animation --- */
+@keyframes wave-1 {
+  0%, 100% { d: path("M0,160 C320,220 640,100 960,160 C1280,220 1600,100 1920,160 L1920,320 L0,320 Z"); }
+  50% { d: path("M0,180 C320,120 640,240 960,180 C1280,120 1600,240 1920,180 L1920,320 L0,320 Z"); }
+}
+@keyframes wave-2 {
+  0%, 100% { d: path("M0,200 C320,140 640,260 960,200 C1280,140 1600,260 1920,200 L1920,320 L0,320 Z"); }
+  50% { d: path("M0,220 C320,280 640,160 960,220 C1280,280 1600,160 1920,220 L1920,320 L0,320 Z"); }
+}
+@keyframes wave-3 {
+  0%, 100% { d: path("M0,240 C320,280 640,200 960,240 C1280,280 1600,200 1920,240 L1920,320 L0,320 Z"); }
+  50% { d: path("M0,260 C320,220 640,300 960,260 C1280,220 1600,300 1920,260 L1920,320 L0,320 Z"); }
+}
+.wave-path-1 { animation: wave-1 4s ease-in-out infinite; }
+.wave-path-2 { animation: wave-2 5s ease-in-out infinite 0.5s; }
+.wave-path-3 { animation: wave-3 6s ease-in-out infinite 1s; }
+
+/* --- Audio Visualizer Bars --- */
+@keyframes bar-pulse {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.audio-bar {
+  transform-origin: bottom;
+  animation: bar-pulse 0.8s ease-in-out infinite;
+}
+.audio-bar:nth-child(1) { animation-delay: 0s; }
+.audio-bar:nth-child(2) { animation-delay: 0.1s; }
+.audio-bar:nth-child(3) { animation-delay: 0.2s; }
+.audio-bar:nth-child(4) { animation-delay: 0.3s; }
+.audio-bar:nth-child(5) { animation-delay: 0.15s; }
+.audio-bar-paused { animation-play-state: paused; }
+
+/* --- Fade-In Animations --- */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in-up { animation: fade-in-up 0.25s ease-out both; }
+.animate-fade-in { animation: fade-in 0.25s ease-out both; }
+.animate-slide-left { animation: slide-in-left 0.25s ease-out both; }
+.animate-slide-right { animation: slide-in-right 0.25s ease-out both; }
+.animate-scale-in { animation: scale-in 0.25s ease-out both; }
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+
+/* Scroll-triggered animation */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.25s ease, transform 0.25s ease; }
+.reveal.revealed { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-24px); transition: opacity 0.25s ease, transform 0.25s ease; }
+.reveal-left.revealed { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(24px); transition: opacity 0.25s ease, transform 0.25s ease; }
+.reveal-right.revealed { opacity: 1; transform: translateX(0); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up, .animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-scale-in,
+  .wave-path-1, .wave-path-2, .wave-path-3, .audio-bar {
+    animation: none !important;
+  }
+  .reveal, .reveal-left, .reveal-right { transition: none; opacity: 1; transform: none; }
+}
+
+/* --- Horizontal Scroll Snap (Mobile) --- */
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-snap-x::-webkit-scrollbar { display: none; }
+.scroll-snap-item { scroll-snap-align: start; flex-shrink: 0; }
+
+/* --- Infinite Logo Slider --- */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.logo-slider { animation: scroll-left 30s linear infinite; }
+.logo-slider:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .logo-slider { animation: none; }
+}
+
+/* --- Skeleton Loading --- */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+.skeleton { animation: skeleton-pulse 1.5s ease-in-out infinite; background: linear-gradient(90deg, #E7DDD3 25%, #F5F0EA 50%, #E7DDD3 75%); background-size: 200% 100%; }
+
+/* --- Pulse Ring (Live indicator) --- */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* --- Hover Lift --- */
+.hover-lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,.12); }
+
+/* --- Schedule Day Tabs --- */
+.schedule-tab { transition: all 0.25s ease; }
+.schedule-tab.active {
+  background-color: #8C5A3C;
+  color: white;
+}
+.schedule-tab.today:not(.active) {
+  border-color: #8C5A3C;
+  color: #8C5A3C;
+  font-weight: 600;
+}
+
+/* --- Counter Animation --- */
+.counter-value { font-variant-numeric: tabular-nums; }
+
+/* --- Custom Scrollbar --- */
+.hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+
+/* --- Search Modal --- */
+.search-backdrop { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+/* --- Sticky Player Mobile Fullscreen --- */
+.player-fullscreen {
+  position: fixed; inset: 0; z-index: 100;
+  background: linear-gradient(to bottom, #4E2F1F, #2B1A13);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.player-fullscreen[style*="display: none"] { transform: translateY(100%); }
+
+/* --- Community Card Gradient Overlay --- */
+.community-card-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+}
+
+/* --- Hero Section --- */
+.hero-bg {
+  background-color: #2B1A13;
+}
+.hero-overlay {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+/* --- Focus Visible --- */
+*:focus-visible {
+  outline: 2px solid #8C5A3C;
+  outline-offset: 2px;
+  border-radius: 4px;
+}

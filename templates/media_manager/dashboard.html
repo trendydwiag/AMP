@@ -1,0 +1,55 @@
+{% extends "media_manager/base.html" %}
+{% block media_content %}
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-coffee-900 dark:text-coffee-100">Dashboard Media</h1>
+    <a href="{% url 'media_manager:upload' %}" class="px-4 py-2 bg-coffee-500 dark:bg-coffee-400 text-white rounded-lg hover:bg-coffee-600 dark:hover:bg-coffee-300 font-medium">
+      Upload File
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-4">
+      <p class="text-sm text-coffee-500 dark:text-coffee-300">Total File</p>
+      <p class="text-2xl font-bold text-coffee-900 dark:text-coffee-100">{{ stats.total_files }}</p>
+    </div>
+    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-4">
+      <p class="text-sm text-coffee-500 dark:text-coffee-300">Gambar</p>
+      <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ stats.by_type.IMAGE|default:"0" }}</p>
+    </div>
+    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-4">
+      <p class="text-sm text-coffee-500 dark:text-coffee-300">Video</p>
+      <p class="text-2xl font-bold text-coffee-500">{{ stats.by_type.VIDEO|default:"0" }}</p>
+    </div>
+    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-4">
+      <p class="text-sm text-coffee-500 dark:text-coffee-300">Dokumen</p>
+      <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{{ stats.by_type.DOCUMENT|default:"0" }}</p>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="text-lg font-semibold text-coffee-900 dark:text-coffee-100 mb-3">File Terbaru</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {% for file in recent_files %}
+      <a href="{% url 'media_manager:detail' pk=file.pk %}" class="bg-white dark:bg-coffee-800 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+        {% if file.is_image and file.file %}
+        <div class="aspect-square bg-coffee-100 dark:bg-coffee-700">
+          <img src="{{ file.file.url }}" alt="{{ file.title }}" class="w-full h-full object-cover">
+        </div>
+        {% else %}
+        <div class="aspect-square bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
+          <span class="text-3xl">{{ file.file_type|truncatechars:1 }}</span>
+        </div>
+        {% endif %}
+        <div class="p-2">
+          <p class="text-xs font-medium text-coffee-900 dark:text-coffee-100 truncate">{{ file.title }}</p>
+          <p class="text-xs text-coffee-500 dark:text-coffee-300">{{ file.formatted_size }}</p>
+        </div>
+      </a>
+      {% empty %}
+      <p class="col-span-full text-coffee-500 dark:text-coffee-300 text-sm">Belum ada file media.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

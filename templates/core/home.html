@@ -1,0 +1,99 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Dashboard | {{ SITE_NAME }}{% endblock %}
+
+{% block breadcrumbs %}
+<li class="inline-flex items-center">
+    <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+    </svg>
+    <span class="ml-1 text-sm font-medium text-slate-400 md:ml-2">Dashboard</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Welcome Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Selamat Datang di Kabulhaden CMS</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Sistem manajemen konten modular, aman, dan berkinerja tinggi.</p>
+        </div>
+        <div class="flex gap-2">
+            <!-- HTMX-driven status check button -->
+            <button hx-get="{% url 'core:health_check' %}" 
+                    hx-target="#health-status" 
+                    hx-swap="innerHTML"
+                    class="px-4 py-2 bg-coffee-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-lg shadow transition duration-150 flex items-center gap-2">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Periksa Kesehatan Server
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Grid Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Database Card -->
+        <div class="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-start gap-4">
+            <div class="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Database Utama</h3>
+                <p class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">PostgreSQL</p>
+                <span class="inline-flex items-center gap-1.5 text-xs text-green-500 font-medium mt-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Terhubung
+                </span>
+            </div>
+        </div>
+
+        <!-- Localization Card -->
+        <div class="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-start gap-4">
+            <div class="p-3 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 11.37 7.37 16.5 3 16.5" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Zona Waktu / Bahasa</h3>
+                <p class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">Asia/Jakarta</p>
+                <span class="text-xs text-slate-500 dark:text-slate-400 mt-2 block">Bahasa: Indonesia (id)</span>
+            </div>
+        </div>
+
+        <!-- User Role Card -->
+        <div class="p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex items-start gap-4">
+            <div class="p-3 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Identitas User</h3>
+                <p class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">
+                    {{ user.username|default:"Pengunjung Anonim" }}
+                </p>
+                <span class="text-xs text-slate-500 mt-2 block">Peran: {{ user.get_role_display|default:"Tamu" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Check Status Container (HTMX Target) -->
+    <div id="health-status" class="transition-all duration-300"></div>
+
+    <!-- Alpine.js Demonstration Area -->
+    <div class="border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center" x-data="{ count: 0 }">
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Interaktivitas AlpineJS</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Komponen frontend dimuat dengan AlpineJS untuk memastikan interaksi cepat tanpa reload.</p>
+        <div class="mt-4 flex items-center justify-center gap-4">
+            <button @click="count--" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-md text-sm transition">- Kurangi</button>
+            <span class="text-2xl font-black text-coffee-500 dark:text-blue-400" x-text="count"></span>
+            <button @click="count++" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-md text-sm transition">+ Tambah</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

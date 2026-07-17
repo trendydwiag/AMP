@@ -1,0 +1,424 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block dashboard_title %}Dashboard{% endblock %}
+{% block breadcrumb_current %}Dashboard{% endblock %}
+
+{% block content %}
+<div x-data="{ loaded: false }" x-init="$nextTick(() => loaded = true)" class="space-y-6">
+
+    {# ============================================ #}
+    {# Row 1: Welcome + Quick Stats                 #}
+    {# ============================================ #}
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="animate-fade-in">
+            <h1 class="font-heading font-bold text-2xl sm:text-3xl text-coffee-700 dark:text-coffee-200">
+                {% now "H" as current_hour %}
+                {% if current_hour < 11 %}
+                    Selamat pagi, {{ user.get_full_name|default:user.username }}
+                {% elif current_hour < 15 %}
+                    Selamat siang, {{ user.get_full_name|default:user.username }}
+                {% elif current_hour < 18 %}
+                    Selamat sore, {{ user.get_full_name|default:user.username }}
+                {% else %}
+                    Selamat malam, {{ user.get_full_name|default:user.username }}
+                {% endif %}
+            </h1>
+            <p class="text-coffee-400 dark:text-coffee-500 mt-1 flex items-center gap-2">
+                <span>{{ user.get_role_display }}</span>
+                <span class="w-1 h-1 rounded-full bg-coffee-300"></span>
+                <span>{{ SITE_NAME }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {# Total Program #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-100">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-coffee-400 dark:text-coffee-500">Total Program</p>
+                    <p class="text-3xl font-heading font-bold text-coffee-700 dark:text-coffee-200 mt-1 counter-value">{{ total_programs|default:"0" }}</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                </div>
+            </div>
+            <p class="text-xs text-success mt-2 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                <span>Program aktif</span>
+            </p>
+        </div>
+
+        {# Total Episode #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-200">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-coffee-400 dark:text-coffee-500">Total Episode</p>
+                    <p class="text-3xl font-heading font-bold text-coffee-700 dark:text-coffee-200 mt-1 counter-value">{{ total_episodes|default:"0" }}</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                </div>
+            </div>
+            <p class="text-xs text-success mt-2 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                <span>Episode tersedia</span>
+            </p>
+        </div>
+
+        {# Total Artikel #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-300">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-coffee-400 dark:text-coffee-500">Total Artikel</p>
+                    <p class="text-3xl font-heading font-bold text-coffee-700 dark:text-coffee-200 mt-1 counter-value">{{ total_articles|default:"0" }}</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                </div>
+            </div>
+            <p class="text-xs text-success mt-2 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                <span>Artikel dipublikasikan</span>
+            </p>
+        </div>
+
+        {# Total Media #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-coffee-400 dark:text-coffee-500">Total Media</p>
+                    <p class="text-3xl font-heading font-bold text-coffee-700 dark:text-coffee-200 mt-1 counter-value">{{ total_media|default:"0" }}</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+                </div>
+            </div>
+            <p class="text-xs text-success mt-2 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                <span>File tersedia</span>
+            </p>
+        </div>
+    </div>
+
+    {# ============================================ #}
+    {# Row 2: Live Status + Today's Schedule        #}
+    {# ============================================ #}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {# Live Status Card (2/3) #}
+        <div class="lg:col-span-2 bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-200">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-heading font-bold text-coffee-700 dark:text-coffee-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Status Siaran
+                </h2>
+                {% if current_broadcast %}
+                <span class="badge-live inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-live/10 text-live">
+                    <span class="w-2 h-2 rounded-full bg-live animate-pulse"></span>
+                    LIVE
+                </span>
+                {% else %}
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-coffee-100 dark:bg-coffee-700 text-coffee-400">
+                    <span class="w-2 h-2 rounded-full bg-coffee-300"></span>
+                    OFFLINE
+                </span>
+                {% endif %}
+            </div>
+
+            {% if current_broadcast %}
+            <div class="bg-coffee-50 dark:bg-coffee-900 rounded-xl p-5 border border-coffee-200 dark:border-coffee-700">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-coffee-200 dark:bg-coffee-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {% if current_broadcast.program.image %}
+                        <img src="{{ current_broadcast.program.image.url }}" alt="{{ current_broadcast.program.title }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <svg class="w-8 h-8 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-heading font-semibold text-coffee-700 dark:text-coffee-200 truncate">{{ current_broadcast.program.title }}</p>
+                        <p class="text-sm text-coffee-400 mt-0.5">{{ current_broadcast.program.host|default:"Radio Kabulhaden" }}</p>
+                        {% if now_playing %}
+                        <p class="text-xs text-coffee-300 mt-1 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                            {{ now_playing }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-2xl font-heading font-bold text-coffee-700 dark:text-coffee-200 counter-value">{{ listener_count|default:"0" }}</p>
+                        <p class="text-xs text-coffee-400">pendengar</p>
+                    </div>
+                </div>
+                {% if now_playing %}
+                <div class="mt-4 pt-4 border-t border-coffee-200 dark:border-coffee-700 flex items-center gap-2">
+                    <div class="flex items-end gap-0.5 h-4">
+                        <span class="audio-bar w-1 bg-coffee-400 rounded-full" style="height:100%"></span>
+                        <span class="audio-bar w-1 bg-coffee-400 rounded-full" style="height:80%"></span>
+                        <span class="audio-bar w-1 bg-coffee-400 rounded-full" style="height:60%"></span>
+                        <span class="audio-bar w-1 bg-coffee-400 rounded-full" style="height:90%"></span>
+                        <span class="audio-bar w-1 bg-coffee-400 rounded-full" style="height:70%"></span>
+                    </div>
+                    <span class="text-xs text-coffee-300">Now Playing</span>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="bg-coffee-50 dark:bg-coffee-900 rounded-xl p-8 border border-coffee-200 dark:border-coffee-700 text-center">
+                <svg class="w-12 h-12 mx-auto mb-3 text-coffee-200 dark:text-coffee-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728M5.636 18.364a9 9 0 010-12.728m12.728 0A9 9 0 015.636 18.364m12.728-12.728L5.636 18.364"/></svg>
+                <p class="text-sm text-coffee-400 font-medium">Tidak ada siaran aktif</p>
+                {% if next_broadcast %}
+                <p class="text-xs text-coffee-300 mt-1">Berikutnya: {{ next_broadcast.program.title }} pukul {{ next_broadcast.start_datetime|date:"H:i" }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        {# Today's Schedule (1/3) #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-300">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-heading font-bold text-coffee-700 dark:text-coffee-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Jadwal Hari Ini
+                </h2>
+                <span class="text-xs text-coffee-400">{{ CURRENT_YEAR }}</span>
+            </div>
+
+            <div class="space-y-2 max-h-80 overflow-y-auto sidebar-scroll">
+                {% for item in today_schedule %}
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700 hover:bg-coffee-100 dark:hover:bg-coffee-700 transition-colors">
+                    <div class="w-10 text-center flex-shrink-0">
+                        <p class="text-xs font-semibold text-coffee-600 dark:text-coffee-300">{{ item.start_datetime|date:"H:i" }}</p>
+                    </div>
+                    <div class="w-px h-8 bg-coffee-200 dark:bg-coffee-700 flex-shrink-0"></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-coffee-700 dark:text-coffee-200 truncate">{{ item.program.title }}</p>
+                        <p class="text-xs text-coffee-400">{{ item.start_datetime|date:"H:i" }} – {{ item.end_datetime|date:"H:i" }}</p>
+                    </div>
+                    <span class="flex-shrink-0 px-2 py-0.5 text-[10px] font-semibold rounded-full
+                        {% if item.status == 'live' %}bg-live/10 text-live
+                        {% elif item.status == 'done' %}bg-success/10 text-success
+                        {% elif item.status == 'upcoming' %}bg-coffee-100 dark:bg-coffee-700 text-coffee-400
+                        {% else %}bg-coffee-100 dark:bg-coffee-700 text-coffee-400{% endif %}">
+                        {{ item.status|upper }}
+                    </span>
+                </div>
+                {% empty %}
+                <div class="text-center py-8">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-coffee-200 dark:text-coffee-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <p class="text-sm text-coffee-400">Belum ada jadwal</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# ============================================ #}
+    {# Row 3: Quick Actions + Recent Activity       #}
+    {# ============================================ #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {# Quick Actions #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-200">
+            <h2 class="font-heading font-bold text-coffee-700 dark:text-coffee-200 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Aksi Cepat
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {# New Program #}
+                <a href="{% url 'programs:create' %}" class="group flex flex-col items-center gap-2 p-4 rounded-xl border border-coffee-200 dark:border-coffee-700 hover:border-coffee-300 dark:hover:border-coffee-600 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center group-hover:bg-coffee-200 dark:group-hover:bg-coffee-600 transition-colors">
+                        <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center">Program Baru</span>
+                </a>
+
+                {# New Article #}
+                <a href="{% url 'articles:create' %}" class="group flex flex-col items-center gap-2 p-4 rounded-xl border border-coffee-200 dark:border-coffee-700 hover:border-coffee-300 dark:hover:border-coffee-600 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center group-hover:bg-coffee-200 dark:group-hover:bg-coffee-600 transition-colors">
+                        <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </div>
+                    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center">Artikel Baru</span>
+                </a>
+
+                {# Upload Media #}
+                <a href="{% url 'media:upload' %}" class="group flex flex-col items-center gap-2 p-4 rounded-xl border border-coffee-200 dark:border-coffee-700 hover:border-coffee-300 dark:hover:border-coffee-600 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center group-hover:bg-coffee-200 dark:group-hover:bg-coffee-600 transition-colors">
+                        <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    </div>
+                    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center">Upload Media</span>
+                </a>
+
+                {# Live Broadcast #}
+                <a href="{% url 'broadcast:dashboard' %}" class="group flex flex-col items-center gap-2 p-4 rounded-xl border border-coffee-200 dark:border-coffee-700 hover:border-coffee-300 dark:hover:border-coffee-600 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center group-hover:bg-coffee-200 dark:group-hover:bg-coffee-600 transition-colors">
+                        <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    </div>
+                    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center">Siaran Langsung</span>
+                </a>
+
+                {# Manage Users #}
+                <a href="{% url 'users:list' %}" class="group flex flex-col items-center gap-2 p-4 rounded-xl border border-coffee-200 dark:border-coffee-700 hover:border-coffee-300 dark:hover:border-coffee-600 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center group-hover:bg-coffee-200 dark:group-hover:bg-coffee-600 transition-colors">
+                        <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </div>
+                    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center">Kelola User</span>
+                </a>
+
+                {# Settings #}
+                <a href="{% url 'settings:general' %}" class="group flex flex-col items-center gap-2 p-4 rounded-xl border border-coffee-200 dark:border-coffee-700 hover:border-coffee-300 dark:hover:border-coffee-600 hover:bg-coffee-50 dark:hover:bg-coffee-700/50 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center group-hover:bg-coffee-200 dark:group-hover:bg-coffee-600 transition-colors">
+                        <svg class="w-5 h-5 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <span class="text-xs font-medium text-coffee-600 dark:text-coffee-300 text-center">Pengaturan</span>
+                </a>
+            </div>
+        </div>
+
+        {# Recent Activity #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-300">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-heading font-bold text-coffee-700 dark:text-coffee-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Aktivitas Terkini
+                </h2>
+            </div>
+            <div class="space-y-3 max-h-80 overflow-y-auto sidebar-scroll">
+                {% for activity in recent_activities %}
+                <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-coffee-50 dark:hover:bg-coffee-900 transition-colors">
+                    <div class="activity-dot w-2 h-2 rounded-full bg-coffee-400 mt-2 flex-shrink-0"></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-coffee-600 dark:text-coffee-300">{{ activity }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-coffee-200 dark:text-coffee-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="text-sm text-coffee-400">Belum ada aktivitas</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# ============================================ #}
+    {# Row 4: System Health + Storage               #}
+    {# ============================================ #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {# System Health #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-200">
+            <h2 class="font-heading font-bold text-coffee-700 dark:text-coffee-200 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                Kesehatan Sistem
+            </h2>
+            {% if health_status %}
+            <div class="space-y-3">
+                {# Database Status #}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                        </div>
+                        <span class="text-sm font-medium text-coffee-600 dark:text-coffee-300">Database</span>
+                    </div>
+                    <span class="flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold rounded-full
+                        {% if health_status.database == 'ok' %}bg-success/10 text-success
+                        {% else %}bg-live/10 text-live{% endif %}">
+                        <span class="w-1.5 h-1.5 rounded-full {% if health_status.database == 'ok' %}bg-success{% else %}bg-live{% endif %}"></span>
+                        {{ health_status.database|default:"OK"|upper }}
+                    </span>
+                </div>
+
+                {# Radio Server Status #}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+                        </div>
+                        <span class="text-sm font-medium text-coffee-600 dark:text-coffee-300">Radio Server</span>
+                    </div>
+                    <span class="flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold rounded-full
+                        {% if health_status.radio == 'ok' %}bg-success/10 text-success
+                        {% else %}bg-live/10 text-live{% endif %}">
+                        <span class="w-1.5 h-1.5 rounded-full {% if health_status.radio == 'ok' %}bg-success{% else %}bg-live{% endif %}"></span>
+                        {{ health_status.radio|default:"OK"|upper }}
+                    </span>
+                </div>
+
+                {# Disk Usage #}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                        </div>
+                        <span class="text-sm font-medium text-coffee-600 dark:text-coffee-300">Disk Usage</span>
+                    </div>
+                    <span class="text-sm font-medium text-coffee-600 dark:text-coffee-300">{{ health_status.disk|default:"OK"|upper }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-6">
+                <svg class="w-8 h-8 mx-auto mb-2 text-coffee-200 dark:text-coffee-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <p class="text-sm text-coffee-400">Data kesehatan tidak tersedia</p>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Storage Usage #}
+        <div class="bg-white dark:bg-coffee-800 rounded-2xl border border-coffee-200 dark:border-coffee-700 p-6 shadow-sm hover:shadow-card transition-shadow animate-fade-in delay-300">
+            <h2 class="font-heading font-bold text-coffee-700 dark:text-coffee-200 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                Penggunaan Penyimpanan
+            </h2>
+
+            {% with used_pct=storage_used|default:0 total=storage_total|default:1 %}
+            <div x-data="{ used: {{ used_pct }}, total: {{ total }} }">
+                <div class="flex items-end justify-between mb-2">
+                    <div>
+                        <p class="text-2xl font-heading font-bold text-coffee-700 dark:text-coffee-200">
+                            <span x-text="(used / 1024 / 1024 / 1024).toFixed(1)"></span> GB
+                        </p>
+                        <p class="text-xs text-coffee-400">
+                            dari <span x-text="(total / 1024 / 1024 / 1024).toFixed(0)"></span> GB
+                        </p>
+                    </div>
+                    <p class="text-lg font-heading font-bold text-coffee-600 dark:text-coffee-300">
+                        <span x-text="total > 0 ? ((used / total) * 100).toFixed(1) : 0"></span>%
+                    </p>
+                </div>
+
+                <div class="w-full h-3 bg-coffee-100 dark:bg-coffee-700 rounded-full overflow-hidden">
+                    <div class="progress-bar h-full bg-gradient-to-r from-coffee-400 to-coffee-300 rounded-full transition-all duration-500" :style="'width: ' + (total > 0 ? (used / total) * 100 : 0) + '%'"></div>
+                </div>
+
+                <div class="flex items-center justify-between mt-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-coffee-400"></span>
+                        <span class="text-xs text-coffee-400">Terpakai</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-coffee-100 dark:bg-coffee-700"></span>
+                        <span class="text-xs text-coffee-400">Tersedia</span>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+
+            {% if storage_used and storage_total %}
+            {% with used_pct=storage_used|default:0 total=storage_total|default:1 %}
+            <div class="mt-4 p-3 rounded-xl bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700">
+                <div class="flex items-center gap-2 text-xs text-coffee-400">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>{% widthratio used_pct total 100 %}% terpakai — bersihkan file yang tidak diperlukan untuk menambah ruang</span>
+                </div>
+            </div>
+            {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

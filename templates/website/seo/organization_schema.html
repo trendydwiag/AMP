@@ -1,0 +1,27 @@
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "RadioStation",
+    "name": "{{ SITE_NAME }}",
+    "url": "{{ SITE_URL|default:'https://kabulhaden.id' }}",
+    {% if SITE_LOGO %}"logo": "{{ SITE_LOGO }}",{% endif %}
+    "description": "{{ SITE_DESCRIPTION }}",
+    "broadcastFrequency": "FM",
+    "areaServed": {
+        "@type": "Country",
+        "name": "Indonesia"
+    },
+    "sameAs": [
+        {% if social_media %}
+        {% if social_media.facebook_url %}"{{ social_media.facebook_url }}",{% endif %}
+        {% if social_media.instagram_url %}"{{ social_media.instagram_url }}",{% endif %}
+        {% if social_media.youtube_url %}"{{ social_media.youtube_url }}",{% endif %}
+        {% if social_media.twitter_url %}"{{ social_media.twitter_url }}",{% endif %}
+        {% if social_media.tiktok_url %}"{{ social_media.tiktok_url }}",{% endif %}
+        {% if social_media.linkedin_url %}"{{ social_media.linkedin_url }}",{% endif %}
+        {% if social_media.telegram_username %}"https://t.me/{{ social_media.telegram_username }}",{% endif %}
+        {% endif %}
+        ""
+    ]
+}
+</script>

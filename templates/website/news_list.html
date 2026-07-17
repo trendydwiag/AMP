@@ -1,0 +1,90 @@
+{% extends 'website/main.html' %}
+{% load static %}
+
+{% block page_title %}Berita - {{ SITE_NAME }}{% endblock %}
+{% block page_description %}Baca berita dan informasi terkini dari Kabulhaden{% endblock %}
+
+{% block content %}
+
+<section class="bg-gradient-to-br from-coffee-600 via-coffee-700 to-coffee-900 dark:from-coffee-600 dark:via-coffee-700 dark:to-slate-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        {% include 'website/components/breadcrumb.html' with breadcrumbs=breadcrumbs %}
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Berita</h1>
+        <p class="text-lg text-white/80 max-w-2xl">Baca berita dan informasi terkini dari Kabulhaden dan sekitarnya.</p>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <div class="lg:col-span-3">
+            {% if articles %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for article in articles %}
+                {% include 'website/components/article_card.html' with article=article %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-20 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                <svg class="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Belum Ada Berita</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Berita terbaru akan segera tersedia. Nantikan terus!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <aside class="space-y-6">
+            {% if categories %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Kategori</h3>
+                <ul class="space-y-2">
+                    {% for category in categories %}
+                    <li>
+                        <span class="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors cursor-default py-1">
+                            <span>{{ category.name }}</span>
+                            {% if category.articles.count %}
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">{{ category.articles.count }}</span>
+                            {% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Tautan Cepat</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="{% url 'website:radio_live' %}" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors py-1">
+                            <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
+                            Dengarkan Live
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'website:program_list' %}" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors py-1">
+                            <svg class="w-4 h-4 text-coffee-500 dark:text-coffee-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /></svg>
+                            Program
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'website:podcast_list' %}" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors py-1">
+                            <svg class="w-4 h-4 text-purple-500 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            Podcast
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'website:schedule' %}" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors py-1">
+                            <svg class="w-4 h-4 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            Jadwal
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,185 @@
+{# AMP Studio — Sidebar Navigation #}
+{% load role_tags %}
+<aside class="amp-sidebar" :class="{ 'collapsed': sidebarCollapsed, 'open': sidebarMobileOpen }" @click.outside="sidebarMobileOpen = false">
+  
+  {# ── Logo ── #}
+  <div class="amp-sidebar-logo">
+    <div class="amp-sidebar-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+    </div>
+    <div x-show="!sidebarCollapsed" x-transition class="amp-sidebar-logo-text">
+      <span class="block text-sm font-bold leading-tight">AMP Studio</span>
+      <span class="block text-[10px] font-normal text-[var(--amp-text-tertiary)]">{{ partner_name|default:"Kabulhaden Online" }}</span>
+    </div>
+  </div>
+
+  {# ── Partner Switcher (SUPERUSER / ADMINISTRATOR only) ── #}
+  {% if user.role == 'SUPERUSER' or user.role == 'ADMINISTRATOR' %}
+  <div x-show="!sidebarCollapsed" x-transition class="px-3 mb-3" x-data="partnerSwitcher()" x-init="init()">
+    <div class="relative">
+      <button @click="open = !open" class="w-full flex items-center gap-2 p-2 rounded-lg bg-[var(--amp-surface-tertiary)] hover:bg-[var(--amp-surface-hover)] transition-colors text-left">
+        <div class="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold text-white" :style="`background-color: ${currentPartner?.primary_color || '#4E2F1F'}`">
+          <span x-text="currentPartner?.name?.charAt(0) || 'K'"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-[var(--amp-text-primary)] truncate" x-text="currentPartner?.name || 'Pilih Partner'"></p>
+          <p class="text-[10px] text-[var(--amp-text-tertiary)]" x-text="currentPartner?.tier || ''"></p>
+        </div>
+        <svg class="w-3.5 h-3.5 text-[var(--amp-text-tertiary)] transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div x-show="open" x-transition @click.outside="open = false"
+           class="absolute left-0 right-0 mt-1 bg-[var(--amp-surface)] border border-[var(--amp-border-light)] rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+        <template x-for="partner in partners" :key="partner.pk">
+          <button @click="switchPartner(partner)" class="w-full flex items-center gap-2 p-2 hover:bg-[var(--amp-surface-tertiary)] transition-colors text-left"
+                  :class="{ 'bg-[var(--amp-surface-tertiary)]': partner.pk === currentPartner?.pk }">
+            <div class="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold text-white" :style="`background-color: ${partner.primary_color}`">
+              <span x-text="partner.name.charAt(0)"></span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-[var(--amp-text-primary)] truncate" x-text="partner.name"></p>
+            </div>
+            <svg x-show="partner.pk === currentPartner?.pk" class="w-3.5 h-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </template>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── Navigation ── #}
+  <nav class="amp-sidebar-nav" aria-label="Main Navigation">
+    
+    {# Dashboard #}
+    <a href="{% url 'studio:dashboard' %}" class="amp-nav-item {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'studio' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span x-show="!sidebarCollapsed">Beranda</span>
+    </a>
+
+    {# Siaran #}
+    <div class="amp-nav-section" x-data="{ open: false }">
+      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'broadcast' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+        <span x-show="!sidebarCollapsed">Siaran</span>
+        <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
+        <a href="{% url 'broadcast:cms_program_list' %}" class="amp-nav-item">Program</a>
+        <a href="{% url 'broadcast:cms_episode_list' %}" class="amp-nav-item">Episode</a>
+        <a href="{% url 'broadcast:schedule_list' %}" class="amp-nav-item">Jadwal</a>
+        <a href="{% url 'broadcast:host_list' %}" class="amp-nav-item">Host</a>
+        <a href="{% url 'broadcast:announcement_list' %}" class="amp-nav-item">Pengumuman</a>
+      </div>
+    </div>
+
+    {# Konten #}
+    <div class="amp-nav-section" x-data="{ open: false }">
+      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'news' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span x-show="!sidebarCollapsed">Konten</span>
+        <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
+        <a href="{% url 'news:cms_article_list' %}" class="amp-nav-item">Artikel</a>
+        <a href="{% url 'content:category_list' %}" class="amp-nav-item">Kategori</a>
+        <a href="{% url 'content:tag_list' %}" class="amp-nav-item">Tag</a>
+        <a href="{% url 'content:author_list' %}" class="amp-nav-item">Penulis</a>
+        <a href="{% url 'content:seo_list' %}" class="amp-nav-item">SEO</a>
+      </div>
+    </div>
+
+    {# Podcast #}
+    <div class="amp-nav-section" x-data="{ open: false }">
+      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'podcast' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        <span x-show="!sidebarCollapsed">Podcast</span>
+        <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
+        <a href="{% url 'podcast:cms_podcast_list' %}" class="amp-nav-item">Program</a>
+        <a href="{% url 'podcast:cms_episode_list' %}" class="amp-nav-item">Episode</a>
+      </div>
+    </div>
+
+    {# Komunitas #}
+    <a href="#" class="amp-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      <span x-show="!sidebarCollapsed">Komunitas</span>
+    </a>
+
+    {# Iklan #}
+    <a href="#" class="amp-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span x-show="!sidebarCollapsed">Iklan</span>
+    </a>
+
+    {# Media #}
+    <div class="amp-nav-section" x-data="{ open: false }">
+      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'media_manager' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span x-show="!sidebarCollapsed">Media</span>
+        <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
+        <a href="{% url 'media_manager:list' %}" class="amp-nav-item">Semua File</a>
+        <a href="{% url 'media_manager:upload' %}" class="amp-nav-item">Upload</a>
+        <a href="{% url 'media_manager:folders' %}" class="amp-nav-item">Folder</a>
+        <a href="{% url 'media_manager:tags' %}" class="amp-nav-item">Tag</a>
+      </div>
+    </div>
+
+    {# Analytics #}
+    <a href="{% url 'radio:analytics' %}" class="amp-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span x-show="!sidebarCollapsed">Analytics</span>
+    </a>
+
+    {# Partner #}
+    {% if user.role == 'SUPERUSER' or user.role == 'ADMINISTRATOR' %}
+    <a href="{% url 'platform:partner_list' %}" class="amp-nav-item {% if request.resolver_match.app_name == 'platform' %}active{% endif %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      <span x-show="!sidebarCollapsed">Partner</span>
+    </a>
+    {% endif %}
+
+    <div class="amp-separator my-3"></div>
+
+    {# Radio Status #}
+    <a href="{% url 'radio:dashboard' %}" class="amp-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+      <span x-show="!sidebarCollapsed">Radio</span>
+    </a>
+
+    {# Pengaturan #}
+    <div class="amp-nav-section" x-data="{ open: false }">
+      <button @click="open = !open" class="amp-nav-item w-full {% if request.resolver_match.app_name == 'settings' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span x-show="!sidebarCollapsed">Pengaturan</span>
+        <svg x-show="!sidebarCollapsed" class="ml-auto w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div x-show="open && !sidebarCollapsed" x-collapse class="mt-1 ml-9 space-y-0.5">
+        <a href="{% url 'settings:site' %}" class="amp-nav-item">Situs</a>
+        <a href="{% url 'settings:appearance' %}" class="amp-nav-item">Tampilan</a>
+        <a href="{% url 'settings:email' %}" class="amp-nav-item">Email</a>
+        <a href="{% url 'settings:language' %}" class="amp-nav-item">Bahasa</a>
+        <a href="{% url 'settings:security' %}" class="amp-nav-item">Keamanan</a>
+        <a href="{% url 'users:admin_user_list' %}" class="amp-nav-item">Pengguna</a>
+      </div>
+    </div>
+
+  </nav>
+
+  {# ── Sidebar Footer ── #}
+  <div class="border-t border-[var(--amp-border-light)] p-3">
+    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--amp-surface-tertiary)] transition-colors cursor-pointer">
+      <div class="amp-avatar amp-avatar-sm">
+        {{ user.get_initials|default:"A" }}
+      </div>
+      <div x-show="!sidebarCollapsed" class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-[var(--amp-text-primary)] truncate">{{ user.get_full_name|default:user.username }}</p>
+        <p class="text-[11px] text-[var(--amp-text-tertiary)] truncate">{{ user.email }}</p>
+      </div>
+    </div>
+  </div>
+</aside>

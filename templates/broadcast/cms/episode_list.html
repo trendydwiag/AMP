@@ -1,0 +1,63 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Kelola Episode - CMS{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">Episode Siaran</h1>
+      <p class="mt-1 text-sm text-coffee-500 dark:text-coffee-400">Kelola episode siaran</p>
+    </div>
+    <a href="{% url 'broadcast:cms_episode_create' %}" class="inline-flex items-center px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Episode Baru
+    </a>
+  </div>
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-4 mb-6">
+    <form method="get" class="flex flex-wrap gap-3">
+      <input type="text" name="q" value="{{ q }}" placeholder="Cari episode..." class="flex-1 min-w-[200px] px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+      <select name="status" class="px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100">
+        <option value="">Semua Status</option>
+        <option value="DRAFT" {% if status_filter == 'DRAFT' %}selected{% endif %}>Draft</option>
+        <option value="PUBLISHED" {% if status_filter == 'PUBLISHED' %}selected{% endif %}>Published</option>
+      </select>
+      <button type="submit" class="px-4 py-2 bg-coffee-100 dark:bg-coffee-700 text-coffee-700 dark:text-coffee-200 rounded-lg hover:bg-coffee-200 dark:hover:bg-coffee-600">Filter</button>
+    </form>
+  </div>
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-coffee-50 dark:bg-coffee-700">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase">Episode</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase">Program</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase">Tanggal</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-coffee-500 dark:text-coffee-400 uppercase">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-coffee-100 dark:divide-coffee-700">
+        {% for ep in episodes %}
+        <tr class="hover:bg-coffee-50 dark:hover:bg-coffee-700/50">
+          <td class="px-6 py-4">
+            <div class="font-medium text-coffee-800 dark:text-coffee-100">E{{ ep.episode_number }}: {{ ep.title|truncatechars:40 }}</div>
+          </td>
+          <td class="px-6 py-4 text-sm text-coffee-600 dark:text-coffee-300">{{ ep.program.title|truncatechars:25 }}</td>
+          <td class="px-6 py-4">
+            {% if ep.status == 'PUBLISHED' %}<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Published</span>
+            {% else %}<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Draft</span>{% endif %}
+          </td>
+          <td class="px-6 py-4 text-sm text-coffee-600 dark:text-coffee-300">{{ ep.publish_date|date:"d M Y"|default:"-" }}</td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <a href="{% url 'broadcast:cms_episode_detail' ep.pk %}" class="p-2 text-coffee-400 hover:text-coffee-600 dark:hover:text-coffee-300 rounded-lg hover:bg-coffee-100 dark:hover:bg-coffee-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></a>
+              <a href="{% url 'broadcast:cms_episode_edit' ep.pk %}" class="p-2 text-coffee-400 hover:text-coffee-600 dark:hover:text-coffee-300 rounded-lg hover:bg-coffee-100 dark:hover:bg-coffee-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="px-6 py-12 text-center text-coffee-500 dark:text-coffee-400">Belum ada episode</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

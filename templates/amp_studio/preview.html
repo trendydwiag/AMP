@@ -1,0 +1,27 @@
+{% extends 'amp_studio/base.html' %}
+{% load static %}
+
+{% block title %}Pratinjau Konten{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="amp-page-header">
+    <div>
+      <h1 class="amp-page-title">Pratinjau Konten</h1>
+      <p class="amp-page-subtitle">Tampilan konten sebelum diterbitkan.</p>
+    </div>
+    <a href="javascript:history.back()" class="amp-btn amp-btn-secondary gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Kembali
+    </a>
+  </div>
+
+  <div class="amp-card amp-card-elevated p-8">
+    <div class="prose prose-coffee max-w-none">
+      <p class="text-[var(--amp-text-tertiary)] text-center py-12">
+        Konten akan dimuat di sini. Implementasi preview tergantung pada tipe konten.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

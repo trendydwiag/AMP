@@ -1,0 +1,84 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit Penulis{% else %}Tambah Penulis{% endif %} - CMS{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+  <div>
+    <a href="{% url 'content:author_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali ke Daftar</a>
+    <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">
+      {% if form.instance.pk %}Edit Penulis{% else %}Tambah Penulis{% endif %}
+    </h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6 space-y-5">
+      <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100">Informasi Dasar</h3>
+
+      <div>
+        <label for="id_user" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">User Terkait</label>
+        {{ form.user }}
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="id_name" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Nama <span class="text-red-500">*</span></label>
+          {{ form.name }}
+          {% if form.name.errors %}<p class="text-xs text-red-500 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label for="id_slug" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Slug</label>
+          {{ form.slug }}
+        </div>
+      </div>
+
+      <div>
+        <label for="id_bio" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Bio</label>
+        {{ form.bio }}
+      </div>
+
+      <div>
+        <label for="id_avatar" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Avatar</label>
+        {% if form.instance.avatar %}
+        <img src="{{ form.instance.avatar.url }}" class="w-16 h-16 rounded-full object-cover mb-2" alt="">
+        {% endif %}
+        {{ form.avatar }}
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6 space-y-5">
+      <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100">Kontak & Tautan</h3>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="id_email" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Email</label>
+          {{ form.email }}
+        </div>
+        <div>
+          <label for="id_website" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Website</label>
+          {{ form.website }}
+        </div>
+      </div>
+
+      <div>
+        <label for="id_social_links" class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Tautan Sosial Media (JSON)</label>
+        {{ form.social_links }}
+        <p class="text-xs text-coffee-400 mt-1">Format: {"twitter": "...", "instagram": "...", "linkedin": "..."}</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input type="checkbox" name="active" id="id_active" {% if form.instance.active or not form.instance.pk %}checked{% endif %}
+          class="w-4 h-4 text-coffee-600 border-coffee-300 rounded focus:ring-coffee-500">
+        <label for="id_active" class="text-sm text-coffee-600 dark:text-coffee-300">Aktif</label>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3">
+      <a href="{% url 'content:author_list' %}" class="px-4 py-2 border border-coffee-200 dark:border-coffee-600 rounded-xl text-coffee-600 dark:text-coffee-300 hover:bg-coffee-50 dark:hover:bg-coffee-700 text-sm">Batal</a>
+      <button type="submit" class="px-6 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors text-sm font-medium">Simpan</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

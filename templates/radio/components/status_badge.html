@@ -1,0 +1,39 @@
+<span x-data="statusBadge()" x-init="init()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+      :class="{
+          'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300': status === 'ONLINE',
+          'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300': status === 'OFFLINE',
+          'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300': status === 'DEGRADED',
+          'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300': status === 'UNKNOWN'
+      }">
+    <span class="w-1.5 h-1.5 rounded-full" :class="{
+        'bg-green-500': status === 'ONLINE',
+        'bg-red-500': status === 'OFFLINE',
+        'bg-yellow-500': status === 'DEGRADED',
+        'bg-slate-400': status === 'UNKNOWN'
+    }"></span>
+    <span x-text="status"></span>
+</span>
+
+<script>
+function statusBadge() {
+    return {
+        status: 'UNKNOWN',
+        refreshInterval: null,
+
+        init() {
+            this.fetchStatus();
+            this.refreshInterval = setInterval(() => this.fetchStatus(), 30000);
+        },
+
+        async fetchStatus() {
+            try {
+                const response = await fetch('/radio/api/health/');
+                const data = await response.json();
+                this.status = data.status || 'UNKNOWN';
+            } catch (e) {
+                this.status = 'UNKNOWN';
+            }
+        }
+    }
+}
+</script>

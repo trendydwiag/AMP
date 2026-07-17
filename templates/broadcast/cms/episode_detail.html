@@ -1,0 +1,50 @@
+{% extends "dashboard_base.html" %}
+{% block title %}{{ episode.title }} - CMS{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <a href="{% url 'broadcast:cms_episode_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali</a>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">E{{ episode.episode_number }}: {{ episode.title }}</h1>
+      <p class="text-sm text-coffee-500 dark:text-coffee-400 mt-1">{{ episode.program.title }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if episode.status == 'PUBLISHED' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400{% else %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400{% endif %}">
+        {{ episode.get_status_display }}
+      </span>
+      <a href="{% url 'broadcast:cms_episode_edit' episode.pk %}" class="px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors">Edit</a>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <div class="prose prose-coffee max-w-none dark:prose-invert">{{ episode.description|linebreaks }}</div>
+      </div>
+      {% if episode.transcript %}
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Transkrip</h3>
+        <div class="prose prose-coffee max-w-none dark:prose-invert text-sm">{{ episode.transcript|linebreaks }}</div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="space-y-6">
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Info</h3>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Program</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ episode.program.title }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Episode</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ episode.episode_number }}</dd></div>
+          <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Diterbitkan</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ episode.publish_date|date:"d M Y H:i"|default:"-" }}</dd></div>
+        </dl>
+      </div>
+      <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+        <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Workflow</h3>
+        {% if episode.status == 'DRAFT' %}
+        <form method="post" action="{% url 'broadcast:cms_episode_workflow' episode.pk %}">{% csrf_token %}<input type="hidden" name="action" value="PUBLISHED"><button type="submit" class="w-full px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition-colors text-sm">Terbitkan</button></form>
+        {% elif episode.status == 'PUBLISHED' %}
+        <form method="post" action="{% url 'broadcast:cms_episode_workflow' episode.pk %}">{% csrf_token %}<input type="hidden" name="action" value="DRAFT"><button type="submit" class="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm">Cabut Publikasi</button></form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

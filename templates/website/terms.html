@@ -1,0 +1,137 @@
+{% extends 'website/main.html' %}
+{% load static %}
+
+{% block page_title %}Syarat & Ketentuan - {{ SITE_NAME }}{% endblock %}
+{% block page_description %}Syarat dan ketentuan penggunaan situs web dan layanan Kabulhaden{% endblock %}
+
+{% block content %}
+
+<section class="bg-gradient-to-br from-coffee-600 via-coffee-700 to-coffee-900 dark:from-coffee-600 dark:via-coffee-700 dark:to-slate-900 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        {% include 'website/components/breadcrumb.html' with breadcrumbs=breadcrumbs %}
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Syarat &amp; Ketentuan</h1>
+        <p class="text-lg text-white/80">Terakhir diperbarui: 1 Januari 2025</p>
+    </div>
+</section>
+
+<article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="prose prose-slate dark:prose-invert max-w-none">
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 mb-8">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Ringkasan</h2>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                Dengan mengakses dan menggunakan situs web Kabulhaden, Anda menyetujui syarat dan ketentuan yang berlaku. Harap baca ketentuan ini dengan saksama sebelum menggunakan layanan kami.
+            </p>
+        </div>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">1. Penerimaan Syarat</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Dengan mengakses atau menggunakan situs web kami (kabulhaden.id), Anda menyetujui untuk terikat oleh Syarat dan Ketentuan ini. Jika Anda tidak setuju dengan ketentuan ini, mohon untuk tidak menggunakan situs kami.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">2. Penggunaan Situs</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed space-y-3">
+                <p>Anda setuju untuk:</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Menggunakan situs hanya untuk tujuan yang sah dan sesuai hukum</li>
+                    <li>Tidak menggunakan situs dengan cara yang dapat merusak, menonaktifkan, atau mengganggu situs</li>
+                    <li>Tidak mencoba mengakses sistem atau data yang tidak diizinkan</li>
+                    <li>Tidak menggunakan situs untuk menyebarkan konten yang menyinggung, spam, atau ilegal</li>
+                    <li>Mematuhi semua hukum dan peraturan yang berlaku</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">3. Hak Kekayaan Intelektual</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Seluruh konten di situs ini, termasuk teks, gambar, logo, audio, video, dan desain, adalah milik Kabulhaden atau pemberi lisensinya dan dilindungi oleh hukum kekayaan intelektual. Anda tidak diperkenankan memperbanyak, mendistribusikan, atau memodifikasi konten tanpa izin tertulis dari kami.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">4. Akun Pengguna</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed space-y-3">
+                <p>Jika Anda membuat akun di situs kami:</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Anda bertanggung jawab atas keamanan akun Anda</li>
+                    <li>Anda harus memberikan informasi yang akurat dan terkini</li>
+                    <li>Anda harus segera memberi tahu kami jika ada penggunaan akun yang tidak sah</li>
+                    <li>Kami berhak menangguhkan atau menghapus akun yang melanggar ketentuan ini</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-5">5. Konten Pengguna</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed space-y-3">
+                <p>Ketika Anda mengirim konten ke situs kami (seperti diskusi atau komentar):</p>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Anda mempertahankan hak atas konten Anda</li>
+                    <li>Anda memberi kami lisensi untuk menampilkan dan mendistribusikan konten tersebut</li>
+                    <li>Anda menjamin bahwa konten tidak melanggar hak pihak ketiga</li>
+                    <li>Kami berhapus konten yang melanggar ketentuan tanpa pemberitahuan</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">6. Layanan Siaran</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Layanan siaran radio dan podcast kami disediakan "sebagaimana adanya". Kami tidak menjamin ketersediaan layanan 24/7 dan dapat melakukan pemeliharaan tanpa pemberitahuan sebelumnya. Kualitas layanan dapat bervariasi tergantung pada koneksi internet Anda.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">7. Tautan ke Pihak Ketiga</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Situs kami mungkin berisi tautan ke situs pihak ketiga. Kami tidak bertanggung jawab atas konten, kebijakan privasi, atau praktik situs pihak ketiga mana pun. Tautan disediakan untuk kenyamanan Anda.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">8. Penafian Jaminan</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Situs dan layanan kami disediakan "sebagaimana adanya" dan "sebagaimana tersedia" tanpa jaminan apa pun, baik tersurat maupun tersirat. Kami tidak menjamin bahwa situs akan selalu tersedia, amun, atau bebas dari kesalahan.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">9. Batasan Tanggung Jawab</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Dalam keadaan apa pun Kabulhaden tidak akan bertanggung jawab atas kerugian tidak langsung, insidental, khusus, konsekuensial, atau hukuman yang timbul dari penggunaan atau ketidakmampuan menggunakan situs atau layanan kami.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">10. Perubahan Ketentuan</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Kami berhak mengubah Syarat dan Ketentuan ini kapan saja. Perubahan akan berlaku segera setelah dipublikasikan di situs. Penggunaan situs yang berkelanjutan setelah perubahan berarti Anda menerima ketentuan yang diperbarui.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">11. Hukum yang Berlaku</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Syarat dan Ketentuan ini tunduk pada dan ditafsirkan sesuai dengan hukum Republik Indonesia. Setiap sengketa akan diselesaikan melalui pengadilan yang berwenang di Jakarta, Indonesia.</p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">12. Hubungi Kami</h2>
+            <div class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>Jika Anda memiliki pertanyaan tentang Syarat dan Ketentuan ini, silakan hubungi kami melalui:</p>
+                <ul class="list-disc pl-6 mt-3 space-y-2">
+                    <li>Email: <a href="mailto:info@kabulhaden.id" class="text-coffee-500 dark:text-coffee-400 hover:underline">info@kabulhaden.id</a></li>
+                    <li>Halaman kontak kami: <a href="{% url 'website:contact' %}" class="text-coffee-500 dark:text-coffee-400 hover:underline">Kontak</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+</article>
+
+{% endblock %}

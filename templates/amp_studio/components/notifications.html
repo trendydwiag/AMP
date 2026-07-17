@@ -1,0 +1,63 @@
+{# AMP Studio — Notification Panel #}
+<div x-show="notificationPanelOpen" x-transition class="fixed inset-0 z-[1090]" @keydown.escape.window="notificationPanelOpen = false">
+  <div class="absolute inset-0" @click="notificationPanelOpen = false"></div>
+  <div class="absolute top-16 right-6 w-96 max-w-[calc(100vw-3rem)]" @click.stop>
+    <div class="bg-[var(--amp-surface-primary)] rounded-2xl shadow-[var(--amp-shadow-dropdown)] border border-[var(--amp-border-light)] overflow-hidden">
+      
+      {# Header #}
+      <div class="px-5 py-4 border-b border-[var(--amp-border-light)] flex items-center justify-between">
+        <h3 class="font-semibold text-[var(--amp-text-primary)]">Notifikasi</h3>
+        <button class="text-xs text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)] font-medium">Tandai semua dibaca</button>
+      </div>
+
+      {# Notification List #}
+      <div class="max-h-96 overflow-y-auto">
+        {# Sample notifications #}
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)] hover:bg-[var(--amp-surface-tertiary)] transition-colors cursor-pointer">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-[var(--amp-warning-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[var(--amp-text-primary)]">Menunggu review</p>
+              <p class="text-xs text-[var(--amp-text-secondary)] mt-0.5">Artikel "Perkembangan Terkini" membutuhkan persetujuan Anda</p>
+              <p class="text-[11px] text-[var(--amp-text-tertiary)] mt-1">5 menit yang lalu</p>
+            </div>
+            <span class="w-2 h-2 bg-[var(--amp-coffee-600)] rounded-full flex-shrink-0 mt-2"></span>
+          </div>
+        </div>
+
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)] hover:bg-[var(--amp-surface-tertiary)] transition-colors cursor-pointer">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-[var(--amp-success-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[var(--amp-text-primary)]">Artikel diterbitkan</p>
+              <p class="text-xs text-[var(--amp-text-secondary)] mt-0.5">"Tips Produktivitas untuk Pekerja Remote" berhasil diterbitkan</p>
+              <p class="text-[11px] text-[var(--amp-text-tertiary)] mt-1">1 jam yang lalu</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-5 py-4 border-b border-[var(--amp-border-light)] hover:bg-[var(--amp-surface-tertiary)] transition-colors cursor-pointer">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-[var(--amp-danger-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-danger)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[var(--amp-text-primary)]">Stream terputus</p>
+              <p class="text-xs text-[var(--amp-text-secondary)] mt-0.5">Siaran langsung terputus selama 5 menit</p>
+              <p class="text-[11px] text-[var(--amp-text-tertiary)] mt-1">3 jam yang lalu</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Footer #}
+      <div class="px-5 py-3 border-t border-[var(--amp-border-light)] text-center">
+        <button class="text-sm font-medium text-[var(--amp-coffee-600)] hover:text-[var(--amp-coffee-700)]">Lihat Semua Notifikasi</button>
+      </div>
+    </div>
+  </div>
+</div>

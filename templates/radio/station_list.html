@@ -1,0 +1,81 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Radio Stations - Kabulhaden CMS{% endblock %}
+
+{% block breadcrumbs %}
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <a href="{% url 'radio:dashboard' %}" class="hover:text-coffee-500">Radio</a>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <span class="text-slate-700 dark:text-slate-300">Stations</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Radio Stations</h1>
+        <a href="{% url 'radio:station_create' %}" class="px-4 py-2 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 text-sm font-medium">
+            + Tambah Station
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <thead class="bg-slate-50 dark:bg-slate-700/50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Station</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Genre</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Volume</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                {% for s in stations %}
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            {% if s.logo %}
+                            <img src="{{ s.logo.url }}" class="w-10 h-10 rounded-lg object-cover">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-600 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">{{ s.station_name }}</p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">{{ s.timezone }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{{ s.genre|default:"-" }}</td>
+                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{{ s.default_volume }}%</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded-full {% if s.is_active %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
+                            {% if s.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            <a href="{% url 'radio:station_edit' s.pk %}" class="text-coffee-500 hover:text-coffee-600 dark:text-coffee-400 text-sm">Edit</a>
+                            <a href="{% url 'radio:station_delete' s.pk %}" class="{% if s.is_active %}text-yellow-600 hover:text-yellow-700 dark:text-yellow-400{% else %}text-green-600 hover:text-green-700 dark:text-green-400{% endif %} text-sm">
+                                {% if s.is_active %}Nonaktifkan{% else %}Aktifkan{% endif %}
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">Belum ada station</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

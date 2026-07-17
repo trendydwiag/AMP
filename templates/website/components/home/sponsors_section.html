@@ -1,0 +1,70 @@
+{% load static %}
+{% if sponsors %}
+<section class="bg-coffee-100 overflow-hidden py-section">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+        <div class="reveal text-center">
+            <p class="text-sm font-heading font-bold text-coffee-400 uppercase tracking-wider mb-2">Mitra</p>
+            <h2 class="text-3xl md:text-4xl font-heading font-bold text-[#2D2D2D]">Mitra & Sponsor Kami</h2>
+            <p class="font-body text-[#666666] mt-2">Didukung oleh mitra terpercaya</p>
+        </div>
+    </div>
+
+    <div class="relative">
+        <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-coffee-100 to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-coffee-100 to-transparent z-10 pointer-events-none"></div>
+
+        <div class="flex logo-slider" style="width: max-content;">
+            {% for partner in sponsors %}
+            <div class="flex-shrink-0 mx-4 md:mx-6">
+                {% if partner.website %}
+                <a href="{{ partner.website }}" target="_blank" rel="noopener noreferrer" class="block group" aria-label="Kunjungi situs {{ partner.name }}">
+                {% else %}
+                <div class="block group">
+                {% endif %}
+                    <div class="w-40 h-20 md:w-48 md:h-24 flex items-center justify-center bg-white rounded-card border border-coffee-200 px-6 shadow-card">
+                        {% if partner.logo %}
+                        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 md:max-h-12 max-w-full object-contain grayscale group-hover:grayscale-0 transition-all duration-250" loading="lazy">
+                        {% else %}
+                        <span class="text-sm font-heading font-bold text-coffee-300">{{ partner.name }}</span>
+                        {% endif %}
+                    </div>
+                {% if partner.website %}
+                </a>
+                {% else %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            {% for partner in sponsors %}
+            <div class="flex-shrink-0 mx-4 md:mx-6">
+                {% if partner.website %}
+                <a href="{{ partner.website }}" target="_blank" rel="noopener noreferrer" class="block group" aria-label="Kunjungi situs {{ partner.name }}">
+                {% else %}
+                <div class="block group">
+                {% endif %}
+                    <div class="w-40 h-20 md:w-48 md:h-24 flex items-center justify-center bg-white rounded-card border border-coffee-200 px-6 shadow-card">
+                        {% if partner.logo %}
+                        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 md:max-h-12 max-w-full object-contain grayscale group-hover:grayscale-0 transition-all duration-250" loading="lazy">
+                        {% else %}
+                        <span class="text-sm font-heading font-bold text-coffee-300">{{ partner.name }}</span>
+                        {% endif %}
+                    </div>
+                {% if partner.website %}
+                </a>
+                {% else %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="reveal text-center mt-10">
+        <a href="{% url 'website:partner_list' %}" class="inline-flex items-center gap-1.5 text-sm font-body font-medium text-coffee-400 hover:text-coffee-500 hover:underline">
+            Lihat Semua Mitra
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+        </a>
+    </div>
+</section>
+{% endif %}

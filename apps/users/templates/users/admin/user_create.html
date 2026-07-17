@@ -1,0 +1,96 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Buat Pengguna | {{ SITE_NAME }}{% endblock %}
+
+{% block breadcrumbs %}
+<li class="inline-flex items-center">
+    <a href="{% url 'users:admin_user_list' %}" class="hover:text-brand-500">Pengguna</a>
+</li>
+<li class="inline-flex items-center">
+    <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+    </svg>
+    <span class="ml-1 text-sm font-medium text-slate-400 md:ml-2">Buat Pengguna</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
+        <h1 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Buat Pengguna Baru</h1>
+
+        {% if messages %}
+        <div class="mb-4 space-y-2">
+            {% for message in messages %}
+            <div class="p-3 rounded-lg text-sm {% if message.tags == 'error' %}bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300 border border-red-200 dark:border-red-800{% else %}bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300 border border-green-200 dark:border-green-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        <div class="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300 border border-red-200 dark:border-red-800">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Depan</label>
+                    {{ form.first_name }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Belakang</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Username <span class="text-red-500">*</span></label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email <span class="text-red-500">*</span></label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password <span class="text-red-500">*</span></label>
+                {{ form.password }}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Peran <span class="text-red-500">*</span></label>
+                {{ form.role }}
+            </div>
+
+            <div class="flex items-center gap-2">
+                {{ form.is_staff }}
+                <label class="text-sm text-slate-700 dark:text-slate-300">Staff (akses admin panel)</label>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <a href="{% url 'users:admin_user_list' %}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition">
+                    Batal
+                </a>
+                <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-lg transition">
+                    Buat Pengguna
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

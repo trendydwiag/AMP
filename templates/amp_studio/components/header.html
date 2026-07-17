@@ -1,0 +1,71 @@
+{# AMP Studio — Header #}
+<header class="amp-header">
+  {# ── Mobile Menu Toggle ── #}
+  <button @click="sidebarMobileOpen = !sidebarMobileOpen" class="amp-btn amp-btn-ghost amp-btn-icon lg:hidden">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+
+  {# ── Sidebar Toggle ── #}
+  <button @click="sidebarCollapsed = !sidebarCollapsed" class="amp-btn amp-btn-ghost amp-btn-icon hidden lg:flex" data-amp-tooltip="Toggle Sidebar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+  </button>
+
+  {# ── Stream Status Widget ── #}
+  <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--amp-surface-tertiary)]" x-data="streamStatus()">
+    <span class="amp-status-dot" :class="isLive ? 'live' : 'offline'"></span>
+    <span class="text-xs font-medium" :class="isLive ? 'text-[var(--amp-danger)]' : 'text-[var(--amp-text-tertiary)]'" x-text="isLive ? 'LIVE' : 'OFFLINE'"></span>
+    <span class="text-xs text-[var(--amp-text-tertiary)]" x-show="listenerCount > 0" x-text="listenerCount + ' pendengar'"></span>
+    <span class="text-xs text-[var(--amp-text-tertiary)]" x-show="currentProgram" x-text="'· ' + currentProgram"></span>
+  </div>
+
+  <div class="flex-1"></div>
+
+  {# ── Search Trigger (Ctrl+K) ── #}
+  <button @click="commandPaletteOpen = true" class="amp-btn amp-btn-secondary gap-2 px-3 py-1.5 text-[var(--amp-text-tertiary)]">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span class="hidden sm:inline text-sm">Cari...</span>
+    <kbd class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono bg-[var(--amp-surface-tertiary)] border border-[var(--amp-border-light)] rounded">⌘K</kbd>
+  </button>
+
+  {# ── Notifications ── #}
+  <button @click="notificationPanelOpen = !notificationPanelOpen" class="amp-btn amp-btn-ghost amp-btn-icon relative">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <span class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[var(--amp-danger)] text-white text-[9px] font-bold rounded-full flex items-center justify-center">3</span>
+  </button>
+
+  {# ── Theme Toggle ── #}
+  <button @click="toggleTheme()" class="amp-btn amp-btn-ghost amp-btn-icon">
+    <svg x-show="theme === 'light'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    <svg x-show="theme === 'dark'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+
+  {# ── User Menu ── #}
+  <div class="relative" x-data="{ open: false }">
+    <button @click="open = !open" class="amp-btn amp-btn-ghost gap-2">
+      <div class="amp-avatar amp-avatar-sm">{{ user.get_initials|default:"A" }}</div>
+      <span class="hidden sm:inline text-sm font-medium">{{ user.get_full_name|default:user.username }}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div x-show="open" @click.outside="open = false" x-transition class="amp-dropdown right-0 mt-2 w-56">
+      <div class="px-3 py-2 border-b border-[var(--amp-border-light)]">
+        <p class="text-sm font-medium text-[var(--amp-text-primary)]">{{ user.get_full_name|default:user.username }}</p>
+        <p class="text-xs text-[var(--amp-text-tertiary)]">{{ user.email }}</p>
+      </div>
+      <div class="py-1">
+        <a href="#" class="amp-dropdown-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profil Saya
+        </a>
+        <a href="{% url 'settings:site' %}" class="amp-dropdown-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4"/></svg>
+          Pengaturan
+        </a>
+        <div class="amp-dropdown-divider"></div>
+        <a href="{% url 'users:logout' %}" class="amp-dropdown-item text-[var(--amp-danger)]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

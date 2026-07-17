@@ -1,0 +1,75 @@
+<div x-data="nowPlaying()" x-init="init()" class="flex items-center gap-4">
+    <!-- Artwork -->
+    <div class="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700 flex-shrink-0">
+        <img x-show="artwork" :src="artwork" class="w-full h-full object-cover" alt="">
+        <div x-show="!artwork" class="w-full h-full flex items-center justify-center">
+            <svg class="w-7 h-7 text-slate-300 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Track info -->
+    <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-slate-900 dark:text-white truncate" x-text="songTitle || 'Tidak Ada Lagu'"></p>
+        <p class="text-sm text-slate-500 dark:text-slate-400 truncate" x-text="artist || '-'"></p>
+        <div class="flex items-center gap-2 mt-1">
+            <span class="w-2 h-2 rounded-full" :class="streamStatus === 'ONLINE' ? 'bg-green-500' : 'bg-red-500'"></span>
+            <span class="text-xs" :class="streamStatus === 'ONLINE' ? 'text-green-600' : 'text-red-600'" x-text="streamStatus === 'ONLINE' ? 'LIVE' : 'OFFLINE'"></span>
+        </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="hidden md:block w-32">
+        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1">
+            <div class="bg-coffee-500 h-1 rounded-full transition-all duration-1000" :style="'width: ' + progressPercent + '%'"></div>
+        </div>
+        <div class="flex justify-between text-xs text-slate-400 mt-1">
+            <span x-text="formatTime(elapsed)"></span>
+            <span x-text="formatTime(duration)"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+function nowPlaying() {
+    return {
+        streamStatus: 'UNKNOWN',
+        songTitle: '',
+        artist: '',
+        artwork: '',
+        duration: 0,
+        elapsed: 0,
+        progressPercent: 0,
+        refreshInterval: null,
+
+        init() {
+            this.fetchNowPlaying();
+            this.refreshInterval = setInterval(() => this.fetchNowPlaying(), 10000);
+        },
+
+        async fetchNowPlaying() {
+            try {
+                const response = await fetch('/radio/api/now-playing/');
+                const data = await response.json();
+                this.streamStatus = data.stream_status || 'UNKNOWN';
+                this.songTitle = data.song_title || '';
+                this.artist = data.artist || '';
+                this.artwork = data.artwork || '';
+                this.duration = data.duration || 0;
+                this.elapsed = data.elapsed || 0;
+                this.progressPercent = data.progress_percent || 0;
+            } catch (e) {
+                console.error('Now playing fetch error:', e);
+            }
+        },
+
+        formatTime(seconds) {
+            if (!seconds) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+    }
+}
+</script>

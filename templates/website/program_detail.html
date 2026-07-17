@@ -1,0 +1,201 @@
+{% extends 'website/main.html' %}
+{% load static %}
+
+{% block page_title %}{% if program %}{{ program.title }} - {% endif %}Program - {{ SITE_NAME }}{% endblock %}
+{% block page_description %}{% if program %}{{ program.seo_description|default:program.short_description }}{% endif %}{% endblock %}
+
+{% block content %}
+
+{% if program %}
+
+<section class="relative overflow-hidden bg-gradient-to-br from-coffee-600 via-coffee-700 to-coffee-900 dark:from-coffee-600 dark:via-coffee-700 dark:to-slate-900 text-white">
+    {% if program.banner %}
+    <div class="absolute inset-0">
+        <img src="{{ program.banner.url }}" alt="" class="w-full h-full object-cover" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-r from-coffee-600/90 to-coffee-500/70 dark:from-coffee-700/90 dark:to-coffee-600/70"></div>
+    </div>
+    {% else %}
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50"></div>
+    {% endif %}
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        {% include 'website/components/breadcrumb.html' with breadcrumbs=breadcrumbs %}
+        <div class="flex flex-col md:flex-row items-start gap-8">
+            <div class="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm flex-shrink-0 shadow-xl ring-2 ring-white/20">
+                {% if program.thumbnail %}
+                <img src="{{ program.thumbnail.url }}" alt="{{ program.title }}" class="w-full h-full object-cover" loading="lazy">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center">
+                    <svg class="w-16 h-16 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    {% if program.category %}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm text-white">{{ program.category }}</span>
+                    {% endif %}
+                    {% if program.genre %}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm text-white">{{ program.genre }}</span>
+                    {% endif %}
+                    {% if program.content_rating %}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm text-white">{{ program.get_content_rating_display }}</span>
+                    {% endif %}
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold mb-3">{{ program.title }}</h1>
+                {% if program.short_description %}
+                <p class="text-lg text-white/80 mb-4">{{ program.short_description }}</p>
+                {% endif %}
+                {% with program.hosts.all as hosts %}
+                {% if hosts %}
+                <div class="flex items-center gap-3 flex-wrap">
+                    {% for hm in hosts %}
+                    <div class="flex items-center gap-2">
+                        {% if hm.host.avatar %}
+                        <img src="{{ hm.host.avatar.url }}" alt="{{ hm.host.display_name }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-white/30" loading="lazy">
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                            <span class="text-xs font-bold">{{ hm.host.display_name|slice:":1"|upper }}</span>
+                        </div>
+                        {% endif %}
+                        <span class="text-sm font-medium text-white/90">{{ hm.host.display_name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+            {% if program.full_description %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 md:p-8">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Tentang Program Ini</h2>
+                <div class="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 leading-relaxed">
+                    {{ program.full_description|linebreaksbr }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if episodes %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 md:p-8">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Episode</h2>
+                <div class="space-y-4">
+                    {% for episode in episodes %}
+                    <div class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600 hover:border-coffee-200 dark:hover:border-coffee-500/30 transition-colors">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-coffee-50 dark:bg-coffee-500/10 flex items-center justify-center">
+                            <span class="text-sm font-bold text-coffee-600 dark:text-coffee-400">#{{ episode.episode_number }}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{ episode.title }}</h3>
+                            {% if episode.description %}
+                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">{{ episode.description|truncatewords:15 }}</p>
+                            {% endif %}
+                            <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                                {% if episode.publish_date %}
+                                <span>{{ episode.publish_date|date:"d M Y" }}</span>
+                                {% endif %}
+                                {% if episode.recording_audio %}
+                                <a href="{{ episode.recording_audio.url }}" class="inline-flex items-center gap-1 text-coffee-500 dark:text-coffee-400 hover:underline" target="_blank" rel="noopener">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    Putar
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="space-y-6">
+            {% if program.category or program.genre or program.language or program.content_rating %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Informasi Program</h3>
+                <dl class="space-y-3">
+                    {% if program.category %}
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-slate-500 dark:text-slate-400">Kategori</dt>
+                        <dd class="text-sm font-medium text-slate-900 dark:text-white">{{ program.category }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if program.genre %}
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-slate-500 dark:text-slate-400">Genre</dt>
+                        <dd class="text-sm font-medium text-slate-900 dark:text-white">{{ program.genre }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if program.language %}
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-slate-500 dark:text-slate-400">Bahasa</dt>
+                        <dd class="text-sm font-medium text-slate-900 dark:text-white">{{ program.get_language_display|default:program.language }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if program.content_rating %}
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-slate-500 dark:text-slate-400">Rating</dt>
+                        <dd class="text-sm font-medium text-slate-900 dark:text-white">{{ program.get_content_rating_display }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if program.target_audience %}
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-slate-500 dark:text-slate-400">Target Audiens</dt>
+                        <dd class="text-sm font-medium text-slate-900 dark:text-white">{{ program.target_audience }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+            </div>
+            {% endif %}
+
+            {% if schedules %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Jadwal Siaran</h3>
+                <div class="space-y-3">
+                    {% for schedule in schedules %}
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0 w-10 text-center">
+                            <span class="text-xs font-bold text-coffee-500 dark:text-coffee-400">{{ schedule.get_day_of_week_display|truncatechars:3 }}</span>
+                        </div>
+                        <div class="flex-1 h-px bg-slate-200 dark:bg-slate-700"></div>
+                        <div class="flex-shrink-0">
+                            <span class="text-xs font-medium text-slate-600 dark:text-slate-400 tabular-nums">{{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4">Dengarkan Sekarang</h3>
+                <a href="{% url 'website:radio_live' %}" class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-coffee-500 dark:bg-coffee-500 text-white font-bold text-sm hover:bg-coffee-600 dark:hover:bg-coffee-600 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    Dengarkan Live
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% else %}
+
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+    <svg class="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Program Tidak Ditemukan</h1>
+    <p class="text-slate-500 dark:text-slate-400 mb-6">Program yang Anda cari tidak tersedia atau telah dihapus.</p>
+    <a href="{% url 'website:program_list' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-coffee-500 dark:bg-coffee-500 text-white font-bold text-sm hover:bg-coffee-600 dark:hover:bg-coffee-600 transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+        Kembali ke Daftar Program
+    </a>
+</section>
+
+{% endif %}
+
+{% endblock %}

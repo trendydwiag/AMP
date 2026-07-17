@@ -1,0 +1,69 @@
+{# AMP Studio — Command Palette (Ctrl+K) #}
+<div x-show="commandPaletteOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-[1080]" @keydown.escape.window="commandPaletteOpen = false">
+  
+  {# Backdrop #}
+  <div class="absolute inset-0 bg-black/50" @click="commandPaletteOpen = false"></div>
+  
+  {# Palette #}
+  <div class="relative top-[20%] left-1/2 -translate-x-1/2 w-full max-w-xl" @click.stop>
+    <div class="bg-[var(--amp-surface-primary)] rounded-2xl shadow-[var(--amp-shadow-modal)] overflow-hidden">
+      
+      {# Search Input #}
+      <div class="flex items-center gap-3 px-5 border-b border-[var(--amp-border-light)]">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input x-ref="commandInput" x-model="commandQuery" @input="searchCommands()" type="text" placeholder="Cari program, artikel, host, atau perintah..." class="flex-1 py-4 bg-transparent text-[var(--amp-text-primary)] placeholder-[var(--amp-text-tertiary)] outline-none text-sm">
+        <kbd class="px-2 py-0.5 text-[10px] font-mono bg-[var(--amp-surface-tertiary)] border border-[var(--amp-border-light)] rounded text-[var(--amp-text-tertiary)]">ESC</kbd>
+      </div>
+
+      {# Results #}
+      <div class="max-h-80 overflow-y-auto p-2">
+        <template x-if="commandResults.length > 0">
+          <div>
+            <template x-for="(group, gi) in commandResults" :key="gi">
+              <div>
+                <p class="px-3 py-1.5 text-[11px] font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wider" x-text="group.label"></p>
+                <template x-for="(item, ii) in group.items" :key="ii">
+                  <button @click="executeCommand(item)" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm hover:bg-[var(--amp-surface-tertiary)] transition-colors text-left">
+                    <span class="w-8 h-8 rounded-lg bg-[var(--amp-surface-tertiary)] flex items-center justify-center flex-shrink-0" x-html="item.icon"></span>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-medium text-[var(--amp-text-primary)]" x-text="item.title"></p>
+                      <p class="text-xs text-[var(--amp-text-tertiary)] truncate" x-text="item.description"></p>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2" class="flex-shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+        <template x-if="commandResults.length === 0 && commandQuery.length > 0">
+          <div class="py-8 text-center text-sm text-[var(--amp-text-tertiary)]">
+            Tidak ada hasil untuk "<span x-text="commandQuery"></span>"
+          </div>
+        </template>
+        <template x-if="commandQuery.length === 0">
+          <div>
+            <p class="px-3 py-1.5 text-[11px] font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wider">Aksi Cepat</p>
+            <template x-for="(item, ii) in defaultCommands" :key="ii">
+              <button @click="executeCommand(item)" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm hover:bg-[var(--amp-surface-tertiary)] transition-colors text-left">
+                <span class="w-8 h-8 rounded-lg bg-[var(--amp-surface-tertiary)] flex items-center justify-center flex-shrink-0" x-html="item.icon"></span>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-[var(--amp-text-primary)]" x-text="item.title"></p>
+                  <p class="text-xs text-[var(--amp-text-tertiary)] truncate" x-text="item.description"></p>
+                </div>
+                <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-[var(--amp-surface-tertiary)] border border-[var(--amp-border-light)] rounded text-[var(--amp-text-tertiary)]" x-text="item.shortcut"></kbd>
+              </button>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      {# Footer #}
+      <div class="px-5 py-3 border-t border-[var(--amp-border-light)] flex items-center gap-4 text-[11px] text-[var(--amp-text-tertiary)]">
+        <span class="flex items-center gap-1"><kbd class="px-1 py-0.5 bg-[var(--amp-surface-tertiary)] rounded font-mono">↑↓</kbd> Navigasi</span>
+        <span class="flex items-center gap-1"><kbd class="px-1 py-0.5 bg-[var(--amp-surface-tertiary)] rounded font-mono">↵</kbd> Pilih</span>
+        <span class="flex items-center gap-1"><kbd class="px-1 py-0.5 bg-[var(--amp-surface-tertiary)] rounded font-mono">ESC</kbd> Tutup</span>
+      </div>
+    </div>
+  </div>
+</div>

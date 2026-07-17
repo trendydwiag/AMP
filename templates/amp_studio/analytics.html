@@ -1,0 +1,67 @@
+{% extends 'amp_studio/base.html' %}
+{% load static %}
+
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<div>
+  <div class="amp-page-header">
+    <div>
+      <h1 class="amp-page-title">Analytics</h1>
+      <p class="amp-page-subtitle">Pantau performa konten dan pendengar radio Anda.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <select class="amp-input w-auto">
+        <option>7 Hari Terakhir</option>
+        <option>30 Hari Terakhir</option>
+        <option>90 Hari Terakhir</option>
+        <option>Tahun Ini</option>
+      </select>
+      <button class="amp-btn amp-btn-secondary gap-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+    </div>
+  </div>
+
+  {# ── Metrics Row ── #}
+  <div class="amp-grid amp-grid-4 mb-8">
+    <div class="amp-card amp-card-elevated p-5">
+      <p class="amp-metric-label">Total Pendengar</p>
+      <p class="amp-metric-value">—</p>
+      <p class="text-xs text-[var(--amp-success)] mt-1">↑ —</p>
+    </div>
+    <div class="amp-card amp-card-elevated p-5">
+      <p class="amp-metric-label">Artikel Dibaca</p>
+      <p class="amp-metric-value">—</p>
+      <p class="text-xs text-[var(--amp-success)] mt-1">↑ —</p>
+    </div>
+    <div class="amp-card amp-card-elevated p-5">
+      <p class="amp-metric-label">Podcast Diplay</p>
+      <p class="amp-metric-value">—</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">—</p>
+    </div>
+    <div class="amp-card amp-card-elevated p-5">
+      <p class="amp-metric-label">Rata-rata Durasi</p>
+      <p class="amp-metric-value">—</p>
+      <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">—</p>
+    </div>
+  </div>
+
+  {# ── Charts Placeholder ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="amp-card amp-card-elevated p-6">
+      <h3 class="font-semibold text-[var(--amp-text-primary)] mb-4">Pendengar per Hari</h3>
+      <div class="h-64 flex items-center justify-center bg-[var(--amp-surface-tertiary)] rounded-xl">
+        <p class="text-sm text-[var(--amp-text-tertiary)]">Grafik akan dimuat di sini</p>
+      </div>
+    </div>
+    <div class="amp-card amp-card-elevated p-6">
+      <h3 class="font-semibold text-[var(--amp-text-primary)] mb-4">Top Program</h3>
+      <div class="h-64 flex items-center justify-center bg-[var(--amp-surface-tertiary)] rounded-xl">
+        <p class="text-sm text-[var(--amp-text-tertiary)]">Grafik akan dimuat di sini</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

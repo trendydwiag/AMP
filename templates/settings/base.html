@@ -1,0 +1,27 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Pengaturan Sistem{% endblock %}
+{% block content %}
+<div class="flex min-h-screen">
+  <aside class="w-64 bg-coffee-50 dark:bg-coffee-700 border-r border-coffee-200 dark:border-coffee-600 p-4">
+    <h2 class="text-lg font-semibold text-coffee-900 dark:text-coffee-100 mb-4">Pengaturan</h2>
+    <nav class="space-y-1">
+      {% for group in settings_groups %}
+      <a href="{{ group.url }}"
+         class="block px-3 py-2 rounded-lg text-sm font-medium {% if request.path == group.url %}bg-coffee-50 dark:bg-coffee-600 text-coffee-700 dark:text-coffee-200{% else %}text-coffee-700 dark:text-coffee-200 hover:bg-coffee-100 dark:hover:bg-coffee-600{% endif %}">
+        {{ group.name }}
+      </a>
+      {% endfor %}
+    </nav>
+  </aside>
+  <main class="flex-1 p-8">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-coffee-50 text-coffee-800 border border-coffee-200{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% block settings_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

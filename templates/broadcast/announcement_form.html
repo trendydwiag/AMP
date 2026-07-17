@@ -1,0 +1,51 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}{% if is_edit %}Edit Pengumuman{% else %}Tambah Pengumuman{% endif %} - Broadcast Management{% endblock %}
+
+{% block breadcrumbs %}
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <a href="{% url 'broadcast:dashboard' %}" class="hover:text-coffee-500">Broadcast</a>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <a href="{% url 'broadcast:announcement_list' %}" class="hover:text-coffee-500">Pengumuman</a>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2">/</span>
+    <span class="text-slate-700 dark:text-slate-300">{% if is_edit %}Edit{% else %}Tambah{% endif %}</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+        {% if is_edit %}Edit Pengumuman: {{ announcement.title }}{% else %}Tambah Pengumuman Baru{% endif %}
+    </h1>
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+            {% for field in form %}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+                {% endif %}
+                {% if field.help_text %}
+                <p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="flex justify-end gap-3">
+            <a href="{% url 'broadcast:announcement_list' %}" class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium">
+                Batal
+            </a>
+            <button type="submit" class="px-6 py-2 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 font-medium">
+                {% if is_edit %}Simpan Perubahan{% else %}Buat Pengumuman{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'website/main.html' %}
+{% load static %}
+
+{% block page_title %}404 - Halaman Tidak Ditemukan - {{ SITE_NAME }}{% endblock %}
+{% block page_description %}Halaman yang Anda cari tidak ditemukan{% endblock %}
+
+{% block content %}
+
+<section class="min-h-[70vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center max-w-lg">
+        <div class="relative mb-8">
+            <span class="text-[120px] md:text-[160px] font-extrabold text-slate-200 dark:text-slate-800 leading-none select-none">404</span>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="w-20 h-20 text-coffee-500/30 dark:text-coffee-400/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">Halaman Tidak Ditemukan</h1>
+        <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">Sepertinya halaman yang Anda cari sudah dipindahkan, dihapus, atau tidak pernah ada.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="{% url 'website:home' %}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-coffee-500 dark:bg-coffee-500 text-white font-bold text-sm hover:bg-coffee-600 dark:hover:bg-coffee-600 transition-colors shadow-md">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                Kembali ke Beranda
+            </a>
+            <a href="{% url 'website:search' %}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                Cari di Situs
+            </a>
+        </div>
+        <div class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-700">
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Atau coba kunjungi halaman populer kami:</p>
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <a href="{% url 'website:program_list' %}" class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-coffee-50 dark:hover:bg-coffee-500/10 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">Program</a>
+                <a href="{% url 'website:podcast_list' %}" class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-coffee-50 dark:hover:bg-coffee-500/10 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">Podcast</a>
+                <a href="{% url 'website:article_list' %}" class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-coffee-50 dark:hover:bg-coffee-500/10 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">Berita</a>
+                <a href="{% url 'website:schedule' %}" class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-coffee-50 dark:hover:bg-coffee-500/10 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">Jadwal</a>
+                <a href="{% url 'website:contact' %}" class="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-coffee-50 dark:hover:bg-coffee-500/10 hover:text-coffee-500 dark:hover:text-coffee-400 transition-colors">Kontak</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

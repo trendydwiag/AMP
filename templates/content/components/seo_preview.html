@@ -1,0 +1,23 @@
+{# SEO Preview Widget - Include in any editor template #}
+<div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+  <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4 flex items-center gap-2">
+    <svg class="w-5 h-5 text-coffee-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    Preview SEO
+  </h3>
+  <div class="border border-coffee-200 dark:border-coffee-600 rounded-lg p-4 bg-coffee-50 dark:bg-coffee-700/50">
+    <div id="seo-preview-url" class="text-xs text-green-700 dark:text-green-400 mb-1">https://kabulhaden.com/berita/</div>
+    <div id="seo-preview-title" class="text-lg font-medium text-blue-700 dark:text-blue-400 hover:underline cursor-pointer mb-1">
+      {{ title|default:"Judul Artikel" }}
+    </div>
+    <div id="seo-preview-description" class="text-sm text-coffee-600 dark:text-coffee-300 line-clamp-2">
+      {{ description|default:"Deskripsi artikel akan muncul di sini..." }}
+    </div>
+  </div>
+  <div class="mt-3 flex items-center gap-2">
+    <span class="text-xs text-coffee-400 dark:text-coffee-500">Skor SEO:</span>
+    <div class="flex-1 bg-coffee-100 dark:bg-coffee-700 rounded-full h-2">
+      <div id="seo-score-bar" class="bg-coffee-500 h-2 rounded-full transition-all" style="width: {{ seo_score|default:0 }}%"></div>
+    </div>
+    <span id="seo-score-text" class="text-xs font-medium text-coffee-600 dark:text-coffee-300">{{ seo_score|default:0 }}%</span>
+  </div>
+</div>

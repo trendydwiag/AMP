@@ -1,0 +1,79 @@
+# ==========================================
+# Kabulhaden CMS — Development Docker Compose
+# ==========================================
+# Usage:
+#   docker compose -f docker-compose.dev.yml up --build
+#   docker compose -f docker-compose.dev.yml exec web python manage.py migrate
+#   docker compose -f docker-compose.dev.yml exec web python manage.py createsuperuser
+#
+# Access:
+#   Django dev server: http://localhost:8000
+#   PostgreSQL:        localhost:5432
+
+version: '3.8'
+
+services:
+  # ── PostgreSQL Database ──────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: kabulhaden_dev_db
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kabulhaden_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kabulhaden_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-kabulhaden_db}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dev_network
+
+  # ── Django Development Server ────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kabulhaden_dev_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - dev_media:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-kabulhaden_user}:${POSTGRES_PASSWORD:-kabulhaden_pass}@db:5432/${POSTGRES_DB:-kabulhaden_db}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - DJANGO_DEBUG=True
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dev_network
+
+  # ── Tailwind CSS Watcher ─────────────────────
+  tailwind:
+    image: node:20-alpine
+    container_name: kabulhaden_dev_tailwind
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sh -c "npm install && npm run watch"
+    networks:
+      - dev_network
+
+volumes:
+  dev_postgres_data:
+  dev_media:
+
+networks:
+  dev_network:
+    driver: bridge

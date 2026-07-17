@@ -1,0 +1,50 @@
+<div id="sponsor-widget">
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    Mitra &amp; Sponsor
+                </h3>
+                <a href="{% url 'website:partner_list' %}" class="text-xs font-medium text-amber-500 dark:text-amber-400 hover:underline">Lihat Semua</a>
+            </div>
+
+            {% if partners %}
+            <div class="grid grid-cols-2 gap-3">
+                {% for partner in partners %}
+                <div class="group text-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    {% if partner.website %}
+                    <a href="{{ partner.website }}" target="_blank" rel="noopener noreferrer" aria-label="Kunjungi situs {{ partner.name }}">
+                    {% endif %}
+                        <div class="flex items-center justify-center h-10 mb-2">
+                            {% if partner.logo %}
+                            <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="max-h-10 max-w-[80px] object-contain grayscale group-hover:grayscale-0 transition-all duration-300" loading="lazy">
+                            {% else %}
+                            <div class="h-10 px-4 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                <span class="text-xs font-bold text-slate-400 dark:text-slate-500">{{ partner.name }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <h4 class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 line-clamp-1">{{ partner.name }}</h4>
+                        {% if partner.get_partner_type_display %}
+                        <span class="text-[10px] text-slate-400 dark:text-slate-500">{{ partner.get_partner_type_display }}</span>
+                        {% endif %}
+                    {% if partner.website %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Belum ada mitra terdaftar.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

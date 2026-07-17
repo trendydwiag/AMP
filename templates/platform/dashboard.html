@@ -1,0 +1,50 @@
+{% extends "amp_studio/base.html" %}
+{% load static %}
+
+{% block title %}Platform Dashboard{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-coffee-800">Platform Dashboard</h1>
+        <p class="text-coffee-600 mt-1">Aradhana Media Platform - Manajemen Partner & Konfigurasi</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <div class="text-sm text-coffee-500 mb-1">Total Partner</div>
+            <div class="text-3xl font-bold text-coffee-800">{{ total_partners }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <div class="text-sm text-coffee-500 mb-1">Partner Aktif</div>
+            <div class="text-3xl font-bold text-green-600">{{ active_partners }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <div class="text-sm text-coffee-500 mb-1">Total User</div>
+            <div class="text-3xl font-bold text-coffee-800">{{ total_users }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <div class="text-sm text-coffee-500 mb-1">Feature Flags</div>
+            <div class="text-3xl font-bold text-coffee-800">{{ feature_flags|length }}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Partner Terdaftar</h2>
+            <a href="{% url 'platform:partner_list' %}" class="inline-flex items-center px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition">
+                Lihat Semua Partner
+            </a>
+        </div>
+        <div class="bg-white rounded-xl border border-coffee-200 p-6">
+            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Provider Aktif</h2>
+            {% for category, providers_list in providers.items %}
+                <div class="mb-2">
+                    <span class="text-sm font-medium text-coffee-600">{{ category }}:</span>
+                    <span class="text-sm text-coffee-500">{{ providers_list|join:", " }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

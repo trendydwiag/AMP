@@ -1,0 +1,59 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Versi {{ version.version_number }} - CMS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+  <div>
+    <a href="{% url 'content:version_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali ke Daftar</a>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">
+          {{ version.get_content_type_display }} - Versi {{ version.version_number }}
+        </h1>
+        {% if version.title %}
+        <p class="text-sm text-coffee-500 dark:text-coffee-400 mt-1">{{ version.title }}</p>
+        {% endif %}
+      </div>
+      {% if version.is_current %}
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Versi Aktif</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Info -->
+    <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+      <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Informasi</h3>
+      <dl class="space-y-3 text-sm">
+        <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Tipe</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ version.get_content_type_display }}</dd></div>
+        <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Content ID</dt><dd class="font-mono text-xs text-coffee-800 dark:text-coffee-100 break-all">{{ version.content_id }}</dd></div>
+        <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Versi</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">v{{ version.version_number }}</dd></div>
+        <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Penulis</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ version.author|default:"-" }}</dd></div>
+        <div class="flex justify-between"><dt class="text-coffee-500 dark:text-coffee-400">Dibuat</dt><dd class="font-medium text-coffee-800 dark:text-coffee-100">{{ version.created_at|date:"d M Y H:i" }}</dd></div>
+      </dl>
+    </div>
+
+    <!-- Change Summary -->
+    <div class="lg:col-span-2 bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+      <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Ringkasan Perubahan</h3>
+      {% if version.change_summary %}
+      <p class="text-sm text-coffee-600 dark:text-coffee-300">{{ version.change_summary }}</p>
+      {% else %}
+      <p class="text-sm text-coffee-400">Tidak ada ringkasan perubahan</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Data Snapshot -->
+  <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+    <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Data Snapshot</h3>
+    {% if version.data_snapshot %}
+    <pre class="bg-coffee-50 dark:bg-coffee-900 border border-coffee-100 dark:border-coffee-700 rounded-lg p-4 overflow-x-auto text-sm font-mono text-coffee-800 dark:text-coffee-200" id="json-display">{{ version.data_snapshot|pprint }}</pre>
+    {% else %}
+    <p class="text-sm text-coffee-400">Tidak ada data snapshot</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Artikel{% else %}Tulis Artikel Baru{% endif %} - CMS{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <a href="{% url 'news:cms_article_list' %}" class="text-sm text-coffee-500 hover:text-coffee-700 dark:text-coffee-400 dark:hover:text-coffee-200 mb-1 inline-block">&larr; Kembali ke Daftar</a>
+      <h1 class="text-2xl font-heading font-bold text-coffee-800 dark:text-coffee-100">
+        {% if form.instance.pk %}Edit Artikel{% else %}Tulis Artikel Baru{% endif %}
+      </h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="autosave-status" class="text-sm text-coffee-400"></span>
+      <button type="button" onclick="document.getElementById('article-form').submit()" class="px-4 py-2 bg-coffee-600 text-white rounded-xl hover:bg-coffee-700 transition-colors">
+        Simpan
+      </button>
+    </div>
+  </div>
+
+  <form id="article-form" method="post" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+          <input type="text" name="title" value="{{ form.instance.title|default:'' }}" placeholder="Judul artikel..."
+            class="w-full text-2xl font-heading font-bold bg-transparent border-none focus:outline-none focus:ring-0 text-coffee-800 dark:text-coffee-100 placeholder-coffee-300 dark:placeholder-coffee-600 mb-4"
+            required>
+
+          <textarea name="content" id="article-content" rows="20" placeholder="Tulis konten artikel di sini..."
+            class="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-coffee-800 dark:text-coffee-100 placeholder-coffee-300 dark:placeholder-coffee-600 resize-none font-body leading-relaxed">{{ form.instance.content|default:'' }}</textarea>
+        </div>
+
+        <!-- SEO Section -->
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6" x-data="{ open: false }">
+          <button type="button" @click="open = !open" class="flex items-center justify-between w-full">
+            <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100">SEO & Metadata</h3>
+            <svg class="w-5 h-5 text-coffee-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div x-show="open" x-transition class="mt-4 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">SEO Title</label>
+              <input type="text" name="seo_title" value="{{ form.instance.seo_title|default:'' }}" maxlength="200"
+                class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+              <p class="text-xs text-coffee-400 mt-1"><span id="seo-title-count">0</span>/200 karakter</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">SEO Description</label>
+              <textarea name="seo_description" rows="3" maxlength="500"
+                class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">{{ form.instance.seo_description|default:'' }}</textarea>
+              <p class="text-xs text-coffee-400 mt-1"><span id="seo-desc-count">0</span>/500 karakter</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Canonical URL</label>
+              <input type="url" name="canonical_url" value="{{ form.instance.canonical_url|default:'' }}"
+                class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Robots</label>
+                <select name="robots" class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+                  <option value="index,follow" {% if form.instance.robots == 'index,follow' %}selected{% endif %}>Index & Follow</option>
+                  <option value="noindex,follow" {% if form.instance.robots == 'noindex,follow' %}selected{% endif %}>No Index, Follow</option>
+                  <option value="index,nofollow" {% if form.instance.robots == 'index,nofollow' %}selected{% endif %}>Index, No Follow</option>
+                  <option value="noindex,nofollow" {% if form.instance.robots == 'noindex,nofollow' %}selected{% endif %}>No Index, No Follow</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Twitter Card</label>
+                <select name="twitter_card" class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+                  <option value="summary" {% if form.instance.twitter_card == 'summary' %}selected{% endif %}>Summary</option>
+                  <option value="summary_large_image" {% if form.instance.twitter_card == 'summary_large_image' %}selected{% endif %}>Summary Large Image</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Status -->
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+          <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Status</h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Status</label>
+              <select name="status" class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+                <option value="DRAFT" {% if form.instance.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                <option value="PENDING_REVIEW" {% if form.instance.status == 'PENDING_REVIEW' %}selected{% endif %}>Menunggu Review</option>
+                <option value="APPROVED" {% if form.instance.status == 'APPROVED' %}selected{% endif %}>Disetujui</option>
+                <option value="SCHEDULED" {% if form.instance.status == 'SCHEDULED' %}selected{% endif %}>Terjadwal</option>
+                <option value="PUBLISHED" {% if form.instance.status == 'PUBLISHED' %}selected{% endif %}>Diterbitkan</option>
+                <option value="ARCHIVED" {% if form.instance.status == 'ARCHIVED' %}selected{% endif %}>Diarsipkan</option>
+                <option value="REJECTED" {% if form.instance.status == 'REJECTED' %}selected{% endif %}>Ditolak</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Prioritas</label>
+              <select name="priority" class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+                <option value="LOW" {% if form.instance.priority == 'LOW' %}selected{% endif %}>Rendah</option>
+                <option value="NORMAL" {% if form.instance.priority == 'NORMAL' or not form.instance.priority %}selected{% endif %}>Normal</option>
+                <option value="HIGH" {% if form.instance.priority == 'HIGH' %}selected{% endif %}>Tinggi</option>
+                <option value="URGENT" {% if form.instance.priority == 'URGENT' %}selected{% endif %}>Mendesak</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" name="featured" id="featured" {% if form.instance.featured %}checked{% endif %}
+                class="w-4 h-4 text-coffee-600 border-coffee-300 rounded focus:ring-coffee-500">
+              <label for="featured" class="text-sm text-coffee-600 dark:text-coffee-300">Unggulan (Featured)</label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" name="allow_comments" id="allow_comments" {% if form.instance.allow_comments or not form.instance.pk %}checked{% endif %}
+                class="w-4 h-4 text-coffee-600 border-coffee-300 rounded focus:ring-coffee-500">
+              <label for="allow_comments" class="text-sm text-coffee-600 dark:text-coffee-300">Izinkan Komentar</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Featured Image -->
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+          <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Gambar Utama</h3>
+          {% if form.instance.featured_image %}
+          <img src="{{ form.instance.featured_image.url }}" class="w-full rounded-lg mb-3" alt="">
+          {% endif %}
+          <input type="file" name="featured_image" accept="image/*"
+            class="w-full text-sm text-coffee-600 dark:text-coffee-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-coffee-100 file:text-coffee-700 hover:file:bg-coffee-200 dark:file:bg-coffee-700 dark:file:text-coffee-200">
+        </div>
+
+        <!-- Category & Tags -->
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+          <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Kategori & Tag</h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Kategori</label>
+              <select name="category" class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+                <option value="">Pilih Kategori</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if form.instance.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Excerpt</label>
+              <textarea name="excerpt" rows="3" maxlength="500"
+                class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">{{ form.instance.excerpt|default:'' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Author -->
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+          <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Penulis</h3>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-coffee-600 dark:text-coffee-300 mb-1">Nama Penulis</label>
+              <input type="text" name="author_name" value="{{ form.instance.author_name|default:'Redaksi' }}"
+                class="w-full px-4 py-2 rounded-lg border border-coffee-200 dark:border-coffee-600 bg-white dark:bg-coffee-700 text-coffee-800 dark:text-coffee-100 focus:ring-2 focus:ring-coffee-400">
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        {% if form.instance.pk %}
+        <div class="bg-white dark:bg-coffee-800 rounded-xl shadow-sm border border-coffee-100 dark:border-coffee-700 p-6">
+          <h3 class="font-heading font-semibold text-coffee-800 dark:text-coffee-100 mb-4">Statistik</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Dilihat</span><span class="font-medium text-coffee-800 dark:text-coffee-100">{{ form.instance.view_count }}</span></div>
+            <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Kata</span><span class="font-medium text-coffee-800 dark:text-coffee-100">{{ form.instance.word_count }}</span></div>
+            <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Waktu Baca</span><span class="font-medium text-coffee-800 dark:text-coffee-100">{{ form.instance.reading_time_minutes }} mnt</span></div>
+            <div class="flex justify-between"><span class="text-coffee-500 dark:text-coffee-400">Versi</span><span class="font-medium text-coffee-800 dark:text-coffee-100">v{{ form.instance.version }}</span></div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const content = document.getElementById('article-content');
+  const seoTitle = document.querySelector('[name="seo_title"]');
+  const seoDesc = document.querySelector('[name="seo_description"]');
+
+  if (content) {
+    content.addEventListener('input', function() {
+      const words = this.value.trim().split(/\s+/).filter(w => w).length;
+      const readTime = Math.max(1, Math.ceil(words / 200));
+      const statsEl = document.getElementById('word-count-display');
+      if (statsEl) {
+        statsEl.textContent = `${words} kata · ${readTime} mnt baca`;
+      }
+    });
+  }
+
+  if (seoTitle) {
+    seoTitle.addEventListener('input', function() {
+      document.getElementById('seo-title-count').textContent = this.value.length;
+    });
+  }
+  if (seoDesc) {
+    seoDesc.addEventListener('input', function() {
+      document.getElementById('seo-desc-count').textContent = this.value.length;
+    });
+  }
+});
+</script>
+{% endblock %}

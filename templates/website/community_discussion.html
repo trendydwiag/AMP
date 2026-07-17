@@ -1,0 +1,28 @@
+{% extends 'website/main.html' %}
+
+{% block page_title %}{{ discussion.title|default:"Diskusi" }} - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+        {% if discussion %}
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">{{ discussion.title }}</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Oleh {{ discussion.author_name }}</p>
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 mb-8">
+            <p class="text-slate-600 dark:text-slate-400">{{ discussion.content }}</p>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Balasan ({{ replies|length }})</h2>
+        <div class="space-y-4">
+            {% for reply in replies %}
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                <p class="text-xs text-slate-400 dark:text-slate-500 mb-2">{{ reply.author_name }}</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400">{{ reply.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-slate-500 dark:text-slate-400">Diskusi tidak ditemukan.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
