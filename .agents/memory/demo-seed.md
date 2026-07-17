@@ -11,20 +11,10 @@ description: demo_seed management command for Kabulhaden Online demo environment
 `apps/core/management/commands/demo_seed.py`
 
 ## Data Source
-All program names, hosts, schedule times, team names, and org details are from the Kabulhaden Online pitch deck (25 Juli 2026, Ade Purnama). NOT placeholder data.
+All program names, hosts, schedule times, team names, and org details are from the Kabulhaden Online pitch deck. NOT placeholder data.
 
 ## What It Creates (~340 records)
-Partner (Enterprise), 4 users (SUPERUSER=Ade Purnama/CEO, ADMINISTRATOR, EDITOR=Arien/GM, VIEWER=Leon/CTO), RadioStation + AzuraCast provider, StreamHealth (31 records), ListenerStatistic (91 records), NowPlayingCache, LiveSession, **14 real programs** + 70 Episodes + 26 Schedules, **8 real hosts**, 12 Articles (Bandung/Kabulhaden-specific), 3 Podcasts (Rumpies Daddies) + 15 Episodes, 5 Sponsors (Kantina Kultura Network, Dispar Bandung) + 5 Ads, 6 MediaFolders, 5 Authors, 3 Announcements, 6 AuditLogEntries
-
-## Real Kabulhaden Org Facts
-- Founded: August 2016, Jl. Multatuli No. 5, Bandung
-- Tagline: "Hear You Here!!!"
-- Website: kabulhaden.online · Email: host@kabulhaden.online · IG: @kabulhaden
-- CEO: Ade Purnama (AdeMuir, Pure Saturday musician)
-- CTO: Leon · GM: Mba Arien
-
-## Credentials
-superadmin / DemoAdmin2024! · admin / DemoAdmin2024! · editor / DemoEditor2024! · viewer / DemoViewer2024!
+Partner (Enterprise), 4 users (superuser/CEO, administrator, editor/GM, viewer/CTO roles), RadioStation + AzuraCast provider, StreamHealth (31 records), ListenerStatistic (91 records), NowPlayingCache, LiveSession, **14 real programs** + 70 Episodes + 26 Schedules, **8 real hosts**, 12 Articles, 3 Podcasts + 15 Episodes, 5 Sponsors + 5 Ads, 6 MediaFolders, 5 Authors, 3 Announcements, 6 AuditLogEntries
 
 ## Model Field Gotchas
 - `User.get_full_name` — property (string), not callable method

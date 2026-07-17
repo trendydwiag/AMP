@@ -101,7 +101,7 @@
 
     <!-- HTMX & AlpineJS -->
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.0/dist/cdn.min.js" integrity="sha384-O8NPfezTLQ/sgLfQYBJEnezJLlum9L6KOqHsfIWauzaFfD1TQSuvA4iUpgWGHeuZ" crossorigin="anonymous" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
+    <script defer src="{% static 'js/alpine.min.js' %}" {% if request.csp_nonce %}nonce="{{ request.csp_nonce }}"{% endif %}></script>
 </head>
 <body class="h-full bg-[#FAF7F3] text-[#2D2D2D] font-body flex flex-col transition-colors duration-250 touch-feedback">
 

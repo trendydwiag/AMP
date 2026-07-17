@@ -23,7 +23,7 @@ description: 7 UX features added to AMP Studio for non-technical radio founders.
 - amp-status-dot modifier classes: `.live` (green pulse), `.online` (green), `.offline` (gray), `.warning` (yellow)
 
 ## Gotchas
-- Alpine.js blocked by browser CSP (Task #3 still open) — guided tour degrades gracefully
+- Alpine.js must be served locally (not from CDN) to avoid CSP/SRI blocks — guided tour degrades gracefully without it
 - `StreamingCenterView` wraps all radio service calls in try/except — no crash if no station
 - `SetupWizardView.get()` builds `steps` context (NOT `get_context_data()`) — must call via `get()`
 - Dashboard context: `SITE_NAME`, `SITE_LOGO`, `system_health` added in `AMPStudioDashboardView.get_context_data()`

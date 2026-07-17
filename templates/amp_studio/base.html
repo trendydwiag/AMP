@@ -15,8 +15,8 @@
   {# AMP Studio Styles #}
   <link rel="stylesheet" href="{% static 'css/amp-studio/amp-studio.css' %}">
   
-  {# Alpine.js #}
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.0/dist/cdn.min.js" integrity="sha384-O8NPfezTLQ/sgLfQYBJEnezJLlum9L6KOqHsfIWauzaFfD1TQSuvA4iUpgWGHeuZ" crossorigin="anonymous"></script>
+  {# Alpine.js — served locally to avoid CDN SRI/CSP issues #}
+  <script defer src="{% static 'js/alpine.min.js' %}"></script>
   
   {# HTMX #}
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
