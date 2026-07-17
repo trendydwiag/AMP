@@ -1,0 +1,413 @@
+# SPRINT 4.0 — KNOWLEDGE BASE REFRESH & PROJECT REINDEX
+
+## OBJECTIVE
+
+Sebelum melanjutkan Sprint 4, lakukan re-index terhadap seluruh project agar seluruh pekerjaan berikutnya menggunakan kondisi project TERKINI.
+
+Ini adalah sprint dokumentasi dan sinkronisasi knowledge.
+
+TIDAK BOLEH mengubah business logic.
+
+TIDAK BOLEH refactor kode.
+
+TIDAK BOLEH membuat fitur baru.
+
+Tujuan sprint ini hanya menyamakan pemahaman AI terhadap project.
+
+--------------------------------------------------
+
+STEP 1
+
+Baca SELURUH folder:
+
+/docs/
+
+termasuk seluruh subfolder.
+
+Pelajari seluruh dokumen.
+
+Jadikan sebagai source of truth.
+
+Jangan berasumsi.
+
+--------------------------------------------------
+
+STEP 2
+
+Scan seluruh project.
+
+Analisis:
+
+apps/
+
+templates/
+
+static/
+
+api/
+
+management/
+
+config/
+
+media/
+
+core/
+
+requirements
+
+settings
+
+urls
+
+models
+
+services
+
+repository
+
+signals
+
+management command
+
+fixtures
+
+Semua harus dipetakan.
+
+--------------------------------------------------
+
+STEP 3
+
+Bandingkan kondisi project saat ini dengan dokumentasi.
+
+Cari:
+
+dokumen usang
+
+arsitektur yang berubah
+
+fitur yang sudah selesai
+
+fitur yang belum selesai
+
+roadmap yang berubah
+
+folder yang berubah
+
+route baru
+
+service baru
+
+API baru
+
+UI baru
+
+--------------------------------------------------
+
+STEP 4
+
+Update seluruh knowledge base.
+
+JANGAN menghapus histori.
+
+Tambahkan informasi terbaru.
+
+Jika ada dokumen lama yang tidak relevan:
+
+beri status
+
+Deprecated
+
+bukan dihapus.
+
+--------------------------------------------------
+
+STEP 5
+
+Buat Architecture Inventory
+
+docs/architecture/current-project-map.md
+
+Minimal berisi:
+
+Project Tree
+
+Apps
+
+Dependencies
+
+Service Layer
+
+Repository Layer
+
+Broadcast Layer
+
+Content Layer
+
+Podcast Layer
+
+Analytics Layer
+
+Authentication Layer
+
+Partner Layer
+
+Public API
+
+Internal API
+
+Data Flow
+
+Routing
+
+Background Jobs
+
+Management Commands
+
+Storage
+
+Media
+
+Caching
+
+External Integrations
+
+--------------------------------------------------
+
+STEP 6
+
+Buat Feature Inventory
+
+docs/architecture/feature-status.md
+
+Kategori:
+
+✅ Complete
+
+🟡 Partial
+
+⚪ Planned
+
+Untuk seluruh modul.
+
+--------------------------------------------------
+
+STEP 7
+
+Buat Route Inventory
+
+docs/architecture/routes.md
+
+Daftar seluruh URL.
+
+Halaman.
+
+Permission.
+
+View.
+
+Status.
+
+--------------------------------------------------
+
+STEP 8
+
+Buat Data Model Inventory
+
+docs/architecture/models.md
+
+Daftar seluruh model.
+
+Relationship.
+
+FK.
+
+OneToOne.
+
+ManyToMany.
+
+--------------------------------------------------
+
+STEP 9
+
+Buat Service Inventory
+
+docs/architecture/services.md
+
+Daftar seluruh:
+
+Service
+
+Repository
+
+Utility
+
+Manager
+
+Provider
+
+Helper
+
+Factory
+
+--------------------------------------------------
+
+STEP 10
+
+Cari DUPLIKASI
+
+Laporkan.
+
+JANGAN diperbaiki.
+
+Contoh:
+
+service yang dobel
+
+repository dobel
+
+template dobel
+
+view dobel
+
+route dobel
+
+css dobel
+
+js dobel
+
+asset dobel
+
+Hanya dilaporkan.
+
+--------------------------------------------------
+
+STEP 11
+
+Cari DEAD CODE
+
+Laporkan.
+
+Jangan dihapus.
+
+--------------------------------------------------
+
+STEP 12
+
+Cari TODO
+
+Cari FIXME
+
+Cari placeholder.
+
+Laporkan.
+
+--------------------------------------------------
+
+STEP 13
+
+Cari Legacy Component
+
+Laporkan halaman yang masih memakai:
+
+layout lama
+
+CSS lama
+
+JS lama
+
+Template lama
+
+--------------------------------------------------
+
+STEP 14
+
+Perbarui ROADMAP
+
+Jika ada sprint yang telah selesai:
+
+beri status
+
+DONE
+
+Jika belum:
+
+NEXT
+
+Jika berubah:
+
+UPDATED
+
+--------------------------------------------------
+
+STEP 15
+
+Buat AI CONTEXT
+
+docs/AI_CONTEXT.md
+
+Dokumen ini akan menjadi dokumen WAJIB dibaca sebelum mengerjakan sprint berikutnya.
+
+Minimal berisi:
+
+Visi Project
+
+Arsitektur
+
+Coding Rules
+
+Design System
+
+Naming Convention
+
+Folder Convention
+
+Layer Architecture
+
+Business Rules
+
+Partner Concept
+
+Broadcast Concept
+
+Podcast Concept
+
+Analytics Concept
+
+Current Sprint
+
+Completed Sprint
+
+Pending Sprint
+
+Known Issues
+
+Technical Debt
+
+DO NOT
+
+Best Practices
+
+--------------------------------------------------
+
+STEP 16
+
+Buat CHANGELOG
+
+docs/changelog/sprint-4.0.md
+
+Isi seluruh perubahan dokumentasi.
+
+--------------------------------------------------
+
+IMPORTANT
+
+Mulai sprint berikutnya, sebelum mengerjakan pekerjaan apa pun:
+
+1. baca AI_CONTEXT.md
+2. baca roadmap
+3. baca changelog terakhir
+
+Jangan membuat asumsi jika informasi sudah tersedia di dokumentasi.
+
+Dokumentasi adalah source of truth.
