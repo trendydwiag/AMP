@@ -20,6 +20,8 @@ document.addEventListener('alpine:init', () => {
 
     applyTheme() {
       document.documentElement.setAttribute('data-theme', this.theme);
+      // Tailwind CDN dark: variants require .dark class on <html>
+      document.documentElement.classList.toggle('dark', this.theme === 'dark');
       localStorage.setItem('amp-theme', this.theme);
     },
 
@@ -45,6 +47,13 @@ function ampStudio() {
 
     // Theme
     theme: localStorage.getItem('amp-theme') || 'light',
+
+    // Sync .dark class on page load (before Alpine hydrates)
+    _syncDarkClass: (() => {
+      const t = localStorage.getItem('amp-theme') || 'light';
+      document.documentElement.classList.toggle('dark', t === 'dark');
+      document.documentElement.setAttribute('data-theme', t);
+    })(),
 
     // Command Palette
     commandPaletteOpen: false,
@@ -107,8 +116,9 @@ function ampStudio() {
     ],
 
     init() {
-      // Theme
+      // Theme — sync both data-theme and .dark class
       document.documentElement.setAttribute('data-theme', this.theme);
+      document.documentElement.classList.toggle('dark', this.theme === 'dark');
 
       // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
@@ -153,6 +163,7 @@ function ampStudio() {
     toggleTheme() {
       this.theme = this.theme === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', this.theme);
+      document.documentElement.classList.toggle('dark', this.theme === 'dark');
       localStorage.setItem('amp-theme', this.theme);
     },
 
