@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/current-host/', views.RadioCurrentHostAPIView.as_view(), name='api_current_host'),
     path('api/providers/', views.RadioProvidersAPIView.as_view(), name='api_providers'),
     path('api/player-config/', views.RadioPlayerConfigAPIView.as_view(), name='api_player_config'),
+    path('stream/', views.RadioStreamProxyView.as_view(), name='stream_proxy'),
 ]

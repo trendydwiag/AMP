@@ -1,6 +1,6 @@
 import csv
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse, HttpRequest
+from django.http import JsonResponse, HttpResponse, HttpRequest, StreamingHttpResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
@@ -546,7 +546,9 @@ class LiveRadioAPIView(View):
                 'cover': np.artwork or '',
                 'listeners': listener_data.current_listeners,
                 'started_at': np.started_at.isoformat() if np.started_at else None,
-                'stream_url': stream_url,
+                # Always use the same-origin proxy URL so the browser plays without
+                # CORS / iframe-sandbox / ngrok interstitial issues.
+                'stream_url': '/radio/stream/',
                 'is_live': is_live,
                 'provider': provider_key.lower(),
             }
@@ -562,10 +564,82 @@ class LiveRadioAPIView(View):
                 'cover': '',
                 'listeners': 0,
                 'started_at': None,
-                'stream_url': listen_url_fallback,
+                'stream_url': '/radio/stream/',
                 'is_live': True,
                 'provider': provider_key.lower(),
             }
 
         cache.set(self.CACHE_KEY, data, cache_ttl)
         return JsonResponse(data)
+
+
+class RadioStreamProxyView(View):
+    """
+    GET /radio/stream/
+
+    Same-origin streaming proxy to the Icecast audio stream configured in the
+    active RadioProvider.  Solves three problems at once:
+
+    1. CORS — browser audio from an external domain is blocked in many contexts.
+    2. iframe sandbox — Replit preview (and similar) restrict cross-origin media.
+    3. ngrok interstitial — ngrok free-tier requires a bypass header that only
+       the server can send; the browser has no way to add it to <audio src="...">.
+
+    The proxy adds all required upstream headers and streams the bytes verbatim
+    back to the browser so the browser sees it as a plain same-origin audio URL.
+    """
+
+    def get(self, request):
+        import requests as req_lib
+        from django.conf import settings
+        from .services import RadioStationService
+
+        # Resolve stream URL from active DB provider, then settings fallback
+        station_svc = RadioStationService()
+        station = station_svc.get_primary_station()
+        provider = station.primary_provider if station else None
+
+        if provider and provider.stream_url:
+            stream_url = provider.stream_url
+        else:
+            stream_url = getattr(settings, 'STREAM_LISTEN_URL', '')
+
+        if not stream_url:
+            return HttpResponse(b'', status=503, content_type='audio/mpeg')
+
+        try:
+            upstream = req_lib.get(
+                stream_url,
+                stream=True,
+                timeout=(8, None),   # 8s connect, unlimited read (it's a live stream)
+                headers={
+                    'User-Agent': 'Mozilla/5.0 Kabulhaden-RadioEngine/1.0',
+                    # Bypass ngrok browser-challenge interstitial
+                    'ngrok-skip-browser-warning': 'true',
+                    # Request ICY metadata from Icecast (title updates)
+                    'Icy-MetaData': '0',
+                }
+            )
+
+            content_type = upstream.headers.get('Content-Type', 'audio/mpeg')
+
+            def audio_generator():
+                try:
+                    for chunk in upstream.iter_content(chunk_size=16384):
+                        if chunk:
+                            yield chunk
+                except Exception:
+                    pass
+                finally:
+                    upstream.close()
+
+            response = StreamingHttpResponse(audio_generator(), content_type=content_type)
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response['Access-Control-Allow-Origin'] = '*'
+            response['X-Accel-Buffering'] = 'no'   # disable nginx buffering if present
+            return response
+
+        except Exception as exc:
+            import logging
+            logging.getLogger('radio').error('RadioStreamProxyView: upstream error — %s', exc)
+            return HttpResponse(b'', status=503, content_type='audio/mpeg')
