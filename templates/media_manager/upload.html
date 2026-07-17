@@ -1,52 +1,69 @@
 {% extends "media_manager/base.html" %}
-{% block media_content %}
-<div class="max-w-2xl">
-  <h1 class="text-2xl font-bold text-coffee-900 dark:text-coffee-100 mb-6">Upload File Media</h1>
+{% block title %}Upload File Media — AMP Studio{% endblock %}
 
-  <form method="post" enctype="multipart/form-data" class="space-y-6">
+{% block media_content %}
+<div class="max-w-2xl space-y-6">
+
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="amp-page-title">Upload File Media</h1>
+      <p class="amp-page-subtitle">Gambar, audio, video, dan dokumen (maks. 100 MB per file).</p>
+    </div>
+    <a href="{% url 'media_manager:list' %}" class="amp-btn amp-btn-ghost text-sm">
+      ← Kembali
+    </a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
     {% csrf_token %}
 
-    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-6">
+    <div class="amp-card p-6">
       <div id="drop-zone"
-           class="border-2 border-dashed border-coffee-300 dark:border-coffee-600 rounded-lg p-8 text-center hover:border-coffee-400 transition-colors cursor-pointer dark:bg-coffee-900"
+           class="border-2 border-dashed border-[var(--amp-border-light)] rounded-xl p-10 text-center hover:border-[var(--amp-coffee-400)] transition-colors cursor-pointer"
            x-data="{ dragover: false }"
            @dragover.prevent="dragover = true"
            @dragleave.prevent="dragover = false"
            @drop.prevent="dragover = false; $refs.fileInput.files = $event.dataTransfer.files; $refs.fileInput.dispatchEvent(new Event('change'))"
-           :class="{ 'border-coffee-400 bg-coffee-50': dragover }">
-        <svg class="mx-auto h-12 w-12 text-coffee-400 dark:text-coffee-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-        </svg>
-        <p class="mt-2 text-sm text-coffee-600 dark:text-coffee-300">Seret file ke sini atau <span class="text-coffee-500 font-medium">klik untuk memilih</span></p>
-        <p class="mt-1 text-xs text-coffee-500 dark:text-coffee-400">Gambar, Video, Audio, Dokumen (maks. 10MB per file)</p>
+           :class="{ 'border-[var(--amp-coffee-400)] bg-[var(--amp-coffee-50)]': dragover }"
+           @click="$refs.fileInput.click()">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[var(--amp-surface-tertiary)] mx-auto mb-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p class="text-sm font-medium text-[var(--amp-text-secondary)]">Seret file ke sini atau klik untuk memilih</p>
+        <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Gambar, Video, Audio, Dokumen</p>
       </div>
       <input type="file" name="files" x-ref="fileInput" multiple
              accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
-             class="mt-4 w-full text-sm text-coffee-500 dark:text-coffee-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-coffee-50 file:text-coffee-600 hover:file:bg-coffee-100">
+             class="mt-4 w-full text-sm text-[var(--amp-text-secondary)] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[var(--amp-surface-tertiary)] file:text-[var(--amp-text-secondary)] hover:file:bg-[var(--amp-surface-hover)] cursor-pointer">
     </div>
 
-    <div class="bg-white dark:bg-coffee-800 shadow rounded-lg p-6 space-y-4">
+    <div class="amp-card p-5 space-y-4">
       <div>
-        <label class="block text-sm font-medium text-coffee-700 dark:text-coffee-300 mb-1">Folder</label>
-        <select name="folder" class="w-full px-3 py-2 border border-coffee-300 dark:border-coffee-600 rounded-lg dark:bg-coffee-900 dark:text-coffee-100">
+        <label class="block text-xs font-semibold text-[var(--amp-text-secondary)] uppercase tracking-wide mb-1.5">Folder</label>
+        <select name="folder" class="amp-input text-sm w-full">
           <option value="">Tanpa Folder</option>
           {% for folder in folders %}
-          <option value="{{ folder.pk }}">{{ folder.name }}</option>
+          <option value="{{ folder.pk }}">{{ folder.full_path }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="flex items-center">
-        <input type="checkbox" name="is_public" checked class="form-checkbox h-4 w-4 text-coffee-500">
-        <label class="ml-2 text-sm text-coffee-700 dark:text-coffee-300">Publik (bisa diakses semua orang)</label>
-      </div>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" name="is_public" checked class="w-4 h-4 rounded accent-[var(--amp-coffee-500)]">
+        <div>
+          <p class="text-sm font-medium text-[var(--amp-text-primary)]">File Publik</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)]">File dapat diakses oleh semua pengguna yang memiliki link.</p>
+        </div>
+      </label>
     </div>
 
     <div class="flex justify-end gap-3">
-      <a href="{% url 'media_manager:list' %}" class="px-4 py-2 text-coffee-700 dark:text-coffee-300 hover:text-coffee-900 dark:hover:text-coffee-100">Batal</a>
-      <button type="submit" class="px-6 py-2 bg-coffee-500 dark:bg-coffee-400 text-white rounded-lg hover:bg-coffee-600 dark:hover:bg-coffee-300 font-medium">
-        Upload
+      <a href="{% url 'media_manager:list' %}" class="amp-btn amp-btn-ghost text-sm">Batal</a>
+      <button type="submit" class="amp-btn amp-btn-primary text-sm flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload File
       </button>
     </div>
   </form>
+
 </div>
 {% endblock %}

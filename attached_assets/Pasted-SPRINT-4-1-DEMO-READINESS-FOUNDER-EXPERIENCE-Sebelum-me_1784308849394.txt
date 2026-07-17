@@ -1,0 +1,171 @@
+SPRINT 4.1 — DEMO READINESS & FOUNDER EXPERIENCE
+
+Sebelum mengerjakan:
+
+1. Baca AI_CONTEXT.md
+2. Baca seluruh docs/
+3. Baca changelog sprint terakhir.
+4. Jangan mengubah arsitektur.
+5. Jangan refactor business logic.
+6. Fokus pada polishing pengalaman pengguna.
+
+====================================================
+OBJECTIVE
+====================================================
+
+Target sprint ini adalah membuat Kabulhaden CMS terasa seperti produk yang siap digunakan oleh pemilik stasiun radio.
+
+Bukan sekadar aplikasi developer.
+
+Setiap halaman harus dapat digunakan untuk demo tanpa kebingungan, error, placeholder, atau UI yang belum selesai.
+
+====================================================
+AUDIT SELURUH CMS
+====================================================
+
+Audit seluruh halaman CMS satu per satu.
+
+Periksa:
+
+• Dashboard
+• Program
+• Jadwal
+• Episode
+• Podcast
+• Berita
+• Media
+• Sponsor
+• Komunitas
+• Streaming
+• Settings
+• Users
+• Platform (khusus superadmin)
+
+Untuk setiap halaman pastikan:
+
+✓ tidak ada template comment yang tampil
+✓ tidak ada placeholder
+✓ tidak ada TODO
+✓ tidak ada Coming Soon
+✓ tidak ada Lorem Ipsum
+✓ tidak ada tombol mati
+✓ tidak ada menu mati
+✓ tidak ada link mati
+✓ tidak ada breadcrumb salah
+✓ tidak ada redirect aneh
+✓ tidak ada UI yang berbeda dari AMP Studio
+✓ tidak ada halaman menggunakan layout lama
+✓ dark mode konsisten
+✓ mobile layout tetap rapi
+
+====================================================
+EMPTY STATES
+====================================================
+
+Semua halaman yang tidak memiliki data harus memiliki Empty State yang baik.
+
+Harus memiliki:
+
+• ilustrasi/icon
+• penjelasan singkat
+• CTA utama
+
+Contoh:
+
+Belum ada Program
+→ Buat Program Pertama
+
+Belum ada Podcast
+→ Buat Podcast Pertama
+
+Belum ada Sponsor
+→ Tambahkan Sponsor
+
+====================================================
+FOUNDER EXPERIENCE
+====================================================
+
+Asumsikan user adalah pemilik radio.
+
+Hilangkan istilah teknis jika memungkinkan.
+
+Gunakan Bahasa Indonesia yang natural.
+
+Pastikan CTA mudah dipahami.
+
+====================================================
+CONSISTENCY
+====================================================
+
+Seluruh halaman harus menggunakan:
+
+templates/amp_studio/base.html
+
+Sidebar
+
+Header
+
+Breadcrumb
+
+Card
+
+Spacing
+
+Typography
+
+Button
+
+Harus identik.
+
+====================================================
+DEMO QUALITY
+====================================================
+
+Target akhirnya adalah:
+
+"Jika seluruh halaman diklik satu per satu saat demo,
+tidak ada satupun yang terasa unfinished."
+
+====================================================
+CHANGELOG
+====================================================
+
+Buat:
+
+docs/changelog/sprint-4.1.md
+
+berisi:
+
+- halaman yang diperbaiki
+- anomaly yang ditemukan
+- anomaly yang diperbaiki
+- technical debt yang masih tersisa
+- screenshot checklist (jika memungkinkan)
+
+Jangan menghapus technical debt.
+
+Dokumentasikan semuanya.
+
+====================================================
+RULES
+====================================================
+
+Jangan mengubah business logic.
+
+Jangan refactor besar.
+
+Jangan mengubah database schema.
+
+Fokus hanya pada:
+
+UX
+
+UI
+
+Consistency
+
+Demo Readiness
+
+Founder Experience
+
+Polishing.

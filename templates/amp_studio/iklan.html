@@ -22,10 +22,9 @@
       <h1 class="amp-page-title">Manajemen Iklan</h1>
       <p class="amp-page-subtitle">Kelola slot iklan, sponsor, dan pendapatan dari mitra.</p>
     </div>
-    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-medium">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Segera Hadir
-    </span>
+    <a href="{% url 'studio:dashboard' %}" class="amp-btn amp-btn-secondary text-sm">
+      Lihat Dashboard
+    </a>
   </div>
 
   {# ── Stats Row ── #}
@@ -95,21 +94,33 @@
     {% endif %}
   </div>
 
-  {# ── Coming Soon Banner ── #}
-  <div class="amp-card p-6 bg-gradient-to-r from-[var(--amp-coffee-50)] to-white border-[var(--amp-coffee-200)]">
-    <div class="flex items-start gap-4">
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--amp-coffee-100)] flex-shrink-0">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-600)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </div>
-      <div>
-        <h3 class="text-sm font-semibold text-[var(--amp-text-primary)]">Modul Iklan Lengkap — Segera Hadir</h3>
-        <p class="text-sm text-[var(--amp-text-secondary)] mt-1">Manajemen slot iklan, penjadwalan otomatis, dan laporan performa iklan radio.</p>
-        <div class="flex flex-wrap gap-2 mt-3">
-          <span class="px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--amp-coffee-100)] text-[var(--amp-coffee-700)]">Slot Iklan</span>
-          <span class="px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--amp-coffee-100)] text-[var(--amp-coffee-700)]">Jadwal Otomatis</span>
-          <span class="px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--amp-coffee-100)] text-[var(--amp-coffee-700)]">Laporan Performa</span>
-          <span class="px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--amp-coffee-100)] text-[var(--amp-coffee-700)]">Integrasi Pembayaran</span>
+  {# ── Fitur Mendatang ── #}
+  <div class="amp-card p-6">
+    <h3 class="text-sm font-semibold text-[var(--amp-text-primary)] mb-4">Fitur yang Sedang Dikembangkan</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-subtle)]">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-blue-50 flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         </div>
+        <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Slot Iklan</span>
+      </div>
+      <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-subtle)]">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-green-50 flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Jadwal Otomatis</span>
+      </div>
+      <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-subtle)]">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-purple-50 flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Laporan Performa</span>
+      </div>
+      <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[var(--amp-surface-secondary)] border border-[var(--amp-border-subtle)]">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-orange-50 flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <span class="text-xs font-medium text-[var(--amp-text-secondary)]">Integrasi Pembayaran</span>
       </div>
     </div>
   </div>

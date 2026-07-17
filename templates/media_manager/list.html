@@ -1,56 +1,92 @@
 {% extends "media_manager/base.html" %}
+{% block title %}Semua File Media — AMP Studio{% endblock %}
+
 {% block media_content %}
 <div class="space-y-6">
+
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold text-coffee-900 dark:text-coffee-100">Semua File Media</h1>
-    <a href="{% url 'media_manager:upload' %}" class="px-4 py-2 bg-coffee-500 dark:bg-coffee-400 text-white rounded-lg hover:bg-coffee-600 dark:hover:bg-coffee-300 font-medium">
+    <div>
+      <h1 class="amp-page-title">Semua File Media</h1>
+      <p class="amp-page-subtitle">Jelajahi dan kelola seluruh aset media.</p>
+    </div>
+    <a href="{% url 'media_manager:upload' %}" class="amp-btn amp-btn-primary text-sm flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Upload
     </a>
   </div>
 
-  <form method="get" class="flex gap-3">
-    <input type="text" name="q" value="{{ search_form.q.value|default:'' }}" placeholder="Cari file..."
-           class="flex-1 px-4 py-2 border border-coffee-300 dark:border-coffee-600 rounded-lg focus:ring-2 focus:ring-coffee-500 dark:bg-coffee-900 dark:text-coffee-100">
-    <select name="type" class="px-4 py-2 border border-coffee-300 dark:border-coffee-600 rounded-lg dark:bg-coffee-900 dark:text-coffee-100">
-      <option value="">Semua Tipe</option>
-      <option value="IMAGE" {% if current_type == 'IMAGE' %}selected{% endif %}>Gambar</option>
-      <option value="VIDEO" {% if current_type == 'VIDEO' %}selected{% endif %}>Video</option>
-      <option value="DOCUMENT" {% if current_type == 'DOCUMENT' %}selected{% endif %}>Dokumen</option>
-      <option value="AUDIO" {% if current_type == 'AUDIO' %}selected{% endif %}>Audio</option>
-    </select>
-    <button type="submit" class="px-4 py-2 bg-coffee-100 dark:bg-coffee-700 text-coffee-700 dark:text-coffee-300 rounded-lg hover:bg-coffee-200 dark:hover:bg-coffee-600">Cari</button>
-  </form>
+  <div class="amp-card p-4">
+    <form method="get" class="flex flex-wrap gap-3">
+      <input type="text" name="q" value="{{ search_form.q.value|default:'' }}" placeholder="Cari file media…"
+             class="amp-input text-sm flex-1 min-w-48">
+      <select name="type" class="amp-input text-sm">
+        <option value="">Semua Tipe</option>
+        <option value="IMAGE" {% if current_type == 'IMAGE' %}selected{% endif %}>Gambar</option>
+        <option value="VIDEO" {% if current_type == 'VIDEO' %}selected{% endif %}>Video</option>
+        <option value="DOCUMENT" {% if current_type == 'DOCUMENT' %}selected{% endif %}>Dokumen</option>
+        <option value="AUDIO" {% if current_type == 'AUDIO' %}selected{% endif %}>Audio</option>
+      </select>
+      <button type="submit" class="amp-btn amp-btn-secondary text-sm">Cari</button>
+      {% if current_type or search_form.q.value %}
+      <a href="{% url 'media_manager:list' %}" class="amp-btn amp-btn-ghost text-sm">Reset</a>
+      {% endif %}
+    </form>
+  </div>
 
   <form method="post" action="{% url 'media_manager:bulk_delete' %}">
     {% csrf_token %}
     <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
       {% for file in files %}
-      <div class="bg-white dark:bg-coffee-800 shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow relative group">
-        <input type="checkbox" name="file_ids" value="{{ file.pk }}" class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-        <a href="{% url 'media_manager:detail' pk=file.pk %}">
+      <div class="amp-card overflow-hidden hover:shadow-md transition-shadow relative group">
+        <input type="checkbox" name="file_ids" value="{{ file.pk }}"
+               class="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity w-4 h-4 accent-[var(--amp-coffee-500)]">
+        <a href="{% url 'media_manager:detail' pk=file.pk %}" class="block">
           {% if file.is_image and file.file %}
-          <div class="aspect-square bg-coffee-100 dark:bg-coffee-700">
-            <img src="{{ file.file.url }}" alt="{{ file.title }}" class="w-full h-full object-cover">
+          <div class="aspect-square bg-[var(--amp-surface-tertiary)]">
+            <img src="{{ file.file.url }}" alt="{{ file.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
           </div>
           {% else %}
-          <div class="aspect-square bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center">
-            <span class="text-4xl text-coffee-400 dark:text-coffee-300">{{ file.file_type|truncatechars:1 }}</span>
+          <div class="aspect-square bg-[var(--amp-surface-tertiary)] flex items-center justify-center">
+            <span class="text-3xl">
+              {% if file.file_type == 'AUDIO' %}🎵
+              {% elif file.file_type == 'VIDEO' %}🎬
+              {% elif file.file_type == 'DOCUMENT' %}📄
+              {% else %}📎{% endif %}
+            </span>
           </div>
           {% endif %}
-          <div class="p-2">
-            <p class="text-xs font-medium text-coffee-900 dark:text-coffee-100 truncate">{{ file.title }}</p>
-            <p class="text-xs text-coffee-500 dark:text-coffee-300">{{ file.formatted_size }}</p>
+          <div class="p-2.5">
+            <p class="text-xs font-medium text-[var(--amp-text-primary)] truncate">{{ file.title }}</p>
+            <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5">{{ file.formatted_size }}</p>
           </div>
         </a>
       </div>
       {% empty %}
-      <p class="col-span-full text-coffee-500 dark:text-coffee-300 text-sm">Tidak ada file ditemukan.</p>
+      <div class="col-span-full amp-card p-20 text-center">
+        <div class="w-14 h-14 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center mx-auto mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p class="text-sm font-semibold text-[var(--amp-text-secondary)]">Tidak ada file ditemukan</p>
+        <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">
+          {% if current_type or search_form.q.value %}
+          Coba ubah filter pencarian Anda.
+          {% else %}
+          Upload file pertama untuk mengisi perpustakaan media.
+          {% endif %}
+        </p>
+        {% if not current_type and not search_form.q.value %}
+        <a href="{% url 'media_manager:upload' %}" class="amp-btn amp-btn-primary text-sm mt-4 inline-flex">
+          Upload File Pertama
+        </a>
+        {% endif %}
+      </div>
       {% endfor %}
     </div>
+
     {% if files %}
     <div class="mt-4 flex justify-end">
-      <button type="submit" onclick="return confirm('Hapus file terpilih?')"
-              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-400 text-sm">
+      <button type="submit" onclick="return confirm('Yakin ingin menghapus file yang dipilih?')"
+              class="amp-btn text-sm bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/40">
         Hapus Terpilih
       </button>
     </div>
@@ -58,15 +94,18 @@
   </form>
 
   {% if is_paginated %}
-  <div class="flex justify-center gap-2">
+  <div class="flex justify-center items-center gap-2">
     {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-coffee-100 dark:bg-coffee-700 rounded">Sebelumnya</a>
+    <a href="?page={{ page_obj.previous_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}" class="amp-btn amp-btn-ghost text-sm">← Sebelumnya</a>
     {% endif %}
-    <span class="px-3 py-1">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</span>
+    <span class="text-xs text-[var(--amp-text-tertiary)] px-3">
+      Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}
+    </span>
     {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-coffee-100 dark:bg-coffee-700 rounded">Selanjutnya</a>
+    <a href="?page={{ page_obj.next_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}" class="amp-btn amp-btn-ghost text-sm">Berikutnya →</a>
     {% endif %}
   </div>
   {% endif %}
+
 </div>
 {% endblock %}

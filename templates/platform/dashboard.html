@@ -1,50 +1,82 @@
 {% extends "amp_studio/base.html" %}
 {% load static %}
 
-{% block title %}Platform Dashboard{% endblock %}
+{% block title %}Platform Dashboard — AMP Studio{% endblock %}
+
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{% url 'studio:dashboard' %}">Studio</a></li>
+    <li><span class="sep">/</span></li>
+    <li>Platform</li>
+  </ol>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="p-6">
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-coffee-800">Platform Dashboard</h1>
-        <p class="text-coffee-600 mt-1">Aradhana Media Platform - Manajemen Partner & Konfigurasi</p>
-    </div>
+<div class="space-y-6">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <div class="text-sm text-coffee-500 mb-1">Total Partner</div>
-            <div class="text-3xl font-bold text-coffee-800">{{ total_partners }}</div>
-        </div>
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <div class="text-sm text-coffee-500 mb-1">Partner Aktif</div>
-            <div class="text-3xl font-bold text-green-600">{{ active_partners }}</div>
-        </div>
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <div class="text-sm text-coffee-500 mb-1">Total User</div>
-            <div class="text-3xl font-bold text-coffee-800">{{ total_users }}</div>
-        </div>
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <div class="text-sm text-coffee-500 mb-1">Feature Flags</div>
-            <div class="text-3xl font-bold text-coffee-800">{{ feature_flags|length }}</div>
-        </div>
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="amp-page-title">Platform Dashboard</h1>
+      <p class="amp-page-subtitle">Aradhana Media Platform — manajemen partner &amp; konfigurasi.</p>
     </div>
+    <a href="{% url 'platform:partner_create' %}" class="amp-btn amp-btn-primary text-sm flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Tambah Partner
+    </a>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Partner Terdaftar</h2>
-            <a href="{% url 'platform:partner_list' %}" class="inline-flex items-center px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition">
-                Lihat Semua Partner
-            </a>
-        </div>
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Provider Aktif</h2>
-            {% for category, providers_list in providers.items %}
-                <div class="mb-2">
-                    <span class="text-sm font-medium text-coffee-600">{{ category }}:</span>
-                    <span class="text-sm text-coffee-500">{{ providers_list|join:", " }}</span>
-                </div>
-            {% endfor %}
-        </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="amp-card p-5">
+      <p class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide mb-1">Total Partner</p>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)]">{{ total_partners }}</p>
     </div>
+    <div class="amp-card p-5">
+      <p class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide mb-1">Partner Aktif</p>
+      <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ active_partners }}</p>
+    </div>
+    <div class="amp-card p-5">
+      <p class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide mb-1">Total Pengguna</p>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)]">{{ total_users }}</p>
+    </div>
+    <div class="amp-card p-5">
+      <p class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide mb-1">Feature Flags</p>
+      <p class="text-3xl font-bold text-[var(--amp-text-primary)]">{{ feature_flags|length }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="amp-card p-6">
+      <h2 class="text-sm font-semibold text-[var(--amp-text-primary)] mb-4">Partner Terdaftar</h2>
+      <p class="text-sm text-[var(--amp-text-secondary)] mb-4">
+        Kelola seluruh partner media yang terhubung ke platform ini.
+      </p>
+      <a href="{% url 'platform:partner_list' %}" class="amp-btn amp-btn-secondary text-sm">
+        Lihat Semua Partner →
+      </a>
+    </div>
+    <div class="amp-card p-6">
+      <h2 class="text-sm font-semibold text-[var(--amp-text-primary)] mb-4">Provider Aktif</h2>
+      {% if providers %}
+      <div class="space-y-2">
+        {% for category, providers_list in providers.items %}
+        <div class="flex items-start gap-2">
+          <span class="text-xs font-medium text-[var(--amp-text-tertiary)] w-28 flex-shrink-0 pt-0.5">{{ category }}</span>
+          <span class="text-xs text-[var(--amp-text-secondary)]">{{ providers_list|join:", " }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-sm text-[var(--amp-text-tertiary)]">Tidak ada provider terdaftar.</p>
+      {% endif %}
+      <div class="mt-4">
+        <a href="{% url 'platform:provider_list' %}" class="amp-btn amp-btn-ghost text-sm">
+          Lihat Provider →
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

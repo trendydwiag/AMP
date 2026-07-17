@@ -67,7 +67,19 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" class="px-6 py-12 text-center text-coffee-500 dark:text-coffee-400">Belum ada episode</td></tr>
+        <tr>
+          <td colspan="6" class="px-6 py-16 text-center">
+            <div class="w-12 h-12 rounded-full bg-coffee-100 dark:bg-coffee-700 flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-coffee-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+            </div>
+            <p class="text-sm font-medium text-coffee-600 dark:text-coffee-300">Belum ada episode podcast</p>
+            <p class="text-xs text-coffee-400 dark:text-coffee-500 mt-1">Tambahkan episode audio pertama ke program podcast Anda.</p>
+            <a href="{% url 'podcast:cms_episode_create' %}" class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-coffee-600 text-white text-sm rounded-xl hover:bg-coffee-700 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Tambah Episode Pertama
+            </a>
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

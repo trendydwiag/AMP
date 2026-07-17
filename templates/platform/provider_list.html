@@ -1,33 +1,59 @@
 {% extends "amp_studio/base.html" %}
 {% load static %}
 
-{% block title %}Provider Platform{% endblock %}
+{% block title %}Provider Platform — AMP Studio{% endblock %}
+
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{% url 'studio:dashboard' %}">Studio</a></li>
+    <li><span class="sep">/</span></li>
+    <li><a href="{% url 'platform:dashboard' %}">Platform</a></li>
+    <li><span class="sep">/</span></li>
+    <li>Provider</li>
+  </ol>
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="p-6">
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-coffee-800">Provider Platform</h1>
-        <p class="text-coffee-600 mt-1">Daftar provider yang terdaftar di platform</p>
-    </div>
+<div class="space-y-6">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for category, providers_list in providers.items %}
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-3">{{ category }}</h2>
-            {% if providers_list %}
-                <ul class="space-y-2">
-                {% for p in providers_list %}
-                    <li class="flex items-center text-sm text-coffee-600">
-                        <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                        {{ p }}
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-coffee-500 text-sm">Tidak ada provider.</p>
-            {% endif %}
-        </div>
+  <div>
+    <h1 class="amp-page-title">Provider Platform</h1>
+    <p class="amp-page-subtitle">Daftar provider aktif yang terintegrasi dengan Aradhana Media Platform.</p>
+  </div>
+
+  {% if providers %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    {% for category, providers_list in providers.items %}
+    <div class="amp-card p-5">
+      <h2 class="text-sm font-semibold text-[var(--amp-text-primary)] mb-3">{{ category }}</h2>
+      {% if providers_list %}
+      <ul class="space-y-2">
+        {% for p in providers_list %}
+        <li class="flex items-center gap-2 text-sm text-[var(--amp-text-secondary)]">
+          <svg class="w-3.5 h-3.5 flex-shrink-0 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          {{ p }}
+        </li>
         {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-sm text-[var(--amp-text-tertiary)]">Tidak ada provider aktif.</p>
+      {% endif %}
     </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="amp-card p-16 text-center">
+    <div class="w-12 h-12 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center mx-auto mb-3">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
+    </div>
+    <p class="text-sm font-medium text-[var(--amp-text-secondary)]">Belum ada provider terdaftar</p>
+    <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Provider akan muncul setelah konfigurasi selesai.</p>
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
