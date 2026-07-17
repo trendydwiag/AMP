@@ -476,6 +476,11 @@ class LiveRadioAPIView(View):
         station_name = getattr(settings, 'STREAM_STATION_NAME', 'Kabulhaden')
         cache_ttl = getattr(settings, 'STREAM_CACHE_TTL', 20)
 
+        # Fallback stream URL — returned to the browser even when the metadata API
+        # is unreachable from the Django server (DNS/firewall restrictions on the
+        # host don't affect the user's browser connecting directly).
+        listen_url_fallback = getattr(settings, 'STREAM_LISTEN_URL', '')
+
         try:
             adapter_class = get_adapter(provider_key)
             adapter = adapter_class(api_url=api_url, timeout=8)
@@ -490,9 +495,22 @@ class LiveRadioAPIView(View):
             if isinstance(raw, dict):
                 station_block = raw.get('station', {})
                 stream_url = station_block.get('listen_url', '')
+            # Fall back to the configured direct listen URL if not in API response
+            if not stream_url:
+                stream_url = listen_url_fallback
 
+            # When the metadata API returns OFFLINE but we have a fallback stream URL,
+            # the player should still be able to connect and play — treat as live.
             is_offline = np.stream_status == 'OFFLINE'
-            status = 'offline' if is_offline else 'live'
+            metadata_available = bool(np.song_title or np.artist)
+
+            if is_offline and stream_url:
+                # API unreachable but stream URL is configured — let the browser try
+                status = 'live'
+                is_live = True
+            else:
+                status = 'offline' if is_offline else 'live'
+                is_live = not is_offline
 
             data = {
                 'status': status,
@@ -504,14 +522,14 @@ class LiveRadioAPIView(View):
                 'listeners': listener_data.current_listeners,
                 'started_at': np.started_at.isoformat() if np.started_at else None,
                 'stream_url': stream_url,
-                'is_live': not is_offline,
+                'is_live': is_live,
                 'provider': provider_key.lower(),
             }
 
         except Exception as exc:
             logger.error('LiveRadioAPIView: failed to fetch live data — %s', exc)
             data = {
-                'status': 'offline',
+                'status': 'live',
                 'station': station_name,
                 'program': None,
                 'title': 'Kabulhaden Radio',
@@ -519,10 +537,9 @@ class LiveRadioAPIView(View):
                 'cover': '',
                 'listeners': 0,
                 'started_at': None,
-                'stream_url': '',
-                'is_live': False,
+                'stream_url': listen_url_fallback,
+                'is_live': True,
                 'provider': provider_key.lower(),
-                'error': 'Unable to retrieve live data',
             }
 
         cache.set(self.CACHE_KEY, data, cache_ttl)

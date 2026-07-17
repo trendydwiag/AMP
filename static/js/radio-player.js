@@ -126,7 +126,11 @@ document.addEventListener('alpine:init', () => {
                             artwork: this.currentTrack.artwork ? [{ src: this.currentTrack.artwork, sizes: '512x512', type: 'image/png' }] : []
                         });
                     }
-                    if (this.isPlaying && this.streamUrl && this.audio.src !== window.location.origin + this.streamUrl) {
+                    // Resolve stream URL to absolute for comparison with audio.src
+                    const resolvedUrl = this.streamUrl.startsWith('http')
+                        ? this.streamUrl
+                        : window.location.origin + this.streamUrl;
+                    if (this.isPlaying && this.streamUrl && this.audio.src !== resolvedUrl) {
                         const wasPlaying = this.isPlaying;
                         this.audio.src = this.streamUrl;
                         if (wasPlaying) this.audio.play().catch(() => {});
@@ -202,7 +206,11 @@ document.addEventListener('alpine:init', () => {
 
         copyStreamLink() {
             if (this.streamUrl) {
-                navigator.clipboard.writeText(window.location.origin + this.streamUrl).catch(() => {});
+                // streamUrl may be an absolute URL or a relative path
+                const url = this.streamUrl.startsWith('http')
+                    ? this.streamUrl
+                    : window.location.origin + this.streamUrl;
+                navigator.clipboard.writeText(url).catch(() => {});
             }
         }
     });

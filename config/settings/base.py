@@ -279,6 +279,9 @@ STREAM_PROVIDER = os.environ.get('STREAM_PROVIDER', 'broadcastindo')
 STREAM_API_URL = os.environ.get('STREAM_API_URL', 'https://a7.siar.us/api/nowplaying/kabulhaden')
 STREAM_STATION_NAME = os.environ.get('STREAM_STATION_NAME', 'Kabulhaden')
 STREAM_CACHE_TTL = int(os.environ.get('STREAM_CACHE_TTL', '20'))
+# Direct audio stream URL for the browser — used as fallback when metadata API is unreachable.
+# The browser connects here directly, so network restrictions on the Django server don't apply.
+STREAM_LISTEN_URL = os.environ.get('STREAM_LISTEN_URL', 'https://stream.kabulhaden.online:8000/radio.mp3')
 
 # Platform Configuration
 PLATFORM_BASE_DOMAIN = env.str('PLATFORM_BASE_DOMAIN', 'kabulhaden.com')
