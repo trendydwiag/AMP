@@ -1,0 +1,170 @@
+# SPRINT 3.5 — Founder Experience & Onboarding (Kabulhaden First)
+
+IMPORTANT
+
+This sprint improves UX only.
+
+DO NOT change backend architecture.
+DO NOT refactor existing services.
+DO NOT modify Partner Engine.
+DO NOT change database schema unless absolutely required.
+
+Focus only on usability for first-time users.
+
+==================================================
+
+GOAL
+
+Transform AMP Studio into a CMS that can be used by non-technical radio owners without reading technical documentation.
+
+Kabulhaden Online is Partner #001 and acts as the design partner for AMP.
+
+Every UX decision must prioritize Kabulhaden while remaining reusable for future AMP partners.
+
+==================================================
+
+IMPLEMENT
+
+1. Create a Welcome Dashboard
+- Friendly greeting
+- Partner logo
+- Current radio status
+- Today's schedule
+- Quick statistics
+- Large action buttons
+
+2. Create "Streaming Center"
+
+New dedicated page containing:
+
+- Stream URL
+- RadioBoss endpoint
+- Copy URL button
+- Test Stream button
+- Current status
+- Bitrate
+- Codec
+- Listener count
+- Last heartbeat
+- Connection status
+
+This page must become the single source of truth for streaming configuration.
+
+3. Create Quick Setup Wizard
+
+Wizard steps:
+
+Step 1 Radio Identity
+
+Step 2 Upload Logo
+
+Step 3 Streaming URL
+
+Step 4 Social Media
+
+Step 5 Finish
+
+Progress indicator required.
+
+4. Improve Empty States
+
+Every module must provide:
+
+Illustration
+Explanation
+Primary CTA
+
+Never display blank tables.
+
+5. Dashboard Action Cards
+
+Show contextual suggestions:
+
+Missing Stream
+Missing Schedule
+Missing Sponsor
+Missing Podcast
+Missing News
+
+Each card links directly to the correct page.
+
+6. Floating Help Button
+
+Bottom-right.
+
+Contains:
+
+Documentation
+
+FAQ
+
+Video Tutorial
+
+Contact Administrator
+
+7. First Login Guided Tour
+
+Interactive onboarding.
+
+Highlight:
+
+Dashboard
+
+Streaming
+
+Programs
+
+News
+
+Sponsors
+
+Settings
+
+Users can skip.
+
+Remember completion status.
+
+==================================================
+
+REQUIREMENTS
+
+Responsive
+
+Mobile friendly
+
+Coffee Theme only
+
+Reuse existing AMP Studio design tokens
+
+Reuse existing components whenever possible
+
+Do not duplicate CSS
+
+No breaking changes
+
+Maintain accessibility
+
+==================================================
+
+DELIVERABLES
+
+1. Updated UI
+
+2. Reusable components
+
+3. Documentation:
+
+docs/ui/FOUNDER_EXPERIENCE.md
+
+4. ADR:
+
+docs/adr/0030-founder-experience.md
+
+5. Sprint Report:
+
+Completed
+Known Issues
+UX Improvements
+Files Modified
+Screenshots (if available)
+Next Recommendations

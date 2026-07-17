@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 
 @method_decorator(login_required, name='dispatch')
@@ -188,6 +189,45 @@ class AMPStudioDashboardView(TemplateView):
         except Exception:
             context['active_sponsors'] = 0
 
+        # ── Action Cards: detect missing content ──
+        try:
+            from apps.radio.models import RadioStation
+            context['has_radio_station'] = RadioStation.objects.filter(is_active=True).exists()
+        except Exception:
+            context['has_radio_station'] = False
+
+        try:
+            from apps.podcast.models import PodcastEpisode
+            context['has_podcast'] = PodcastEpisode.objects.exists()
+        except Exception:
+            context['has_podcast'] = False
+
+        context['has_schedule'] = bool(context.get('today_schedule'))
+        context['has_sponsor'] = context.get('active_sponsors', 0) > 0
+
+        try:
+            from apps.news.models import Article
+            context['has_news'] = Article.objects.filter(status='published').exists()
+        except Exception:
+            context['has_news'] = False
+
+        # ── Setup Wizard: check completion ──
+        context['setup_wizard_done'] = self.request.session.get('setup_wizard_done', False)
+
+        # ── Site Identity for welcome banner ──
+        try:
+            from apps.settings.models import SiteSettings
+            site = SiteSettings.objects.first()
+            if site:
+                context['SITE_NAME'] = site.site_name or 'Kabulhaden Online'
+                context['SITE_LOGO'] = site.site_logo.url if site.site_logo else None
+            else:
+                context['SITE_NAME'] = 'Kabulhaden Online'
+                context['SITE_LOGO'] = None
+        except Exception:
+            context['SITE_NAME'] = 'Kabulhaden Online'
+            context['SITE_LOGO'] = None
+
         return context
 
 
@@ -290,3 +330,102 @@ class PartnerListView(View):
             'partners': partners_data,
             'current': current_id,
         })
+
+
+@method_decorator(login_required, name='dispatch')
+class StreamingCenterView(TemplateView):
+    """Streaming Center — single source of truth for stream configuration and live status."""
+    template_name = 'amp_studio/streaming_center.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            from apps.radio.models import RadioStation, RadioProvider, StreamHealth
+            from apps.radio.services import RadioStationService, StreamHealthService, ListenerService, NowPlayingService
+
+            station_svc = RadioStationService()
+            station = station_svc.get_primary_station()
+            context['station'] = station
+
+            if station:
+                health_svc = StreamHealthService()
+                listener_svc = ListenerService()
+                np_svc = NowPlayingService()
+
+                context['providers'] = station.providers.filter(active=True)
+                context['primary_provider'] = station.primary_provider
+                context['health'] = health_svc.get_latest(station.pk)
+                context['listener_stat'] = listener_svc.get_current(station.pk)
+                context['now_playing'] = np_svc.get_now_playing(station.pk)
+                context['health_history'] = health_svc.get_health_history(station.pk, limit=20)
+            else:
+                context['providers'] = []
+                context['primary_provider'] = None
+                context['health'] = None
+                context['listener_stat'] = None
+                context['now_playing'] = None
+                context['health_history'] = []
+
+        except Exception:
+            context['station'] = None
+            context['providers'] = []
+            context['primary_provider'] = None
+            context['health'] = None
+            context['listener_stat'] = None
+            context['now_playing'] = None
+            context['health_history'] = []
+
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class SetupWizardView(TemplateView):
+    """Quick Setup Wizard — guided 5-step onboarding for first-time founders."""
+    template_name = 'amp_studio/setup_wizard.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        step = int(request.GET.get('step', 1))
+        context['current_step'] = max(1, min(step, 5))
+
+        # Gather completion flags for each step
+        try:
+            from apps.settings.models import SiteSettings
+            site = SiteSettings.objects.first()
+            context['step1_done'] = bool(site and site.site_name)
+            context['step2_done'] = bool(site and site.site_logo)
+        except Exception:
+            context['step1_done'] = False
+            context['step2_done'] = False
+
+        try:
+            from apps.radio.models import RadioProvider
+            context['step3_done'] = RadioProvider.objects.filter(active=True).exists()
+        except Exception:
+            context['step3_done'] = False
+
+        try:
+            from apps.settings.models import SocialMediaSettings
+            sm = SocialMediaSettings.objects.first()
+            context['step4_done'] = bool(sm and (sm.facebook_url or sm.instagram_url or sm.twitter_url))
+        except Exception:
+            context['step4_done'] = False
+
+        context['step5_done'] = request.session.get('setup_wizard_done', False)
+
+        # Build the steps list for the progress indicator
+        # Format: (step_number, label, done)
+        context['steps'] = [
+            (1, 'Identitas Radio', context['step1_done']),
+            (2, 'Upload Logo', context['step2_done']),
+            (3, 'Streaming URL', context['step3_done']),
+            (4, 'Media Sosial', context['step4_done']),
+            (5, 'Selesai', context['step5_done']),
+        ]
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        """Mark wizard as complete."""
+        request.session['setup_wizard_done'] = True
+        messages.success(request, 'Selamat! Setup Kabulhaden Anda sudah selesai.')
+        return redirect('studio:dashboard')

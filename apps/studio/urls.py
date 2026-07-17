@@ -11,4 +11,7 @@ urlpatterns = [
     path('preview/<str:content_type>/<uuid:pk>/', views.AMPStudioPreviewView.as_view(), name='preview'),
     path('partner/switch/<uuid:partner_pk>/', views.PartnerSwitchView.as_view(), name='partner_switch'),
     path('partner/list/', views.PartnerListView.as_view(), name='partner_list'),
+    # Sprint 3.5 — Founder Experience
+    path('streaming/', views.StreamingCenterView.as_view(), name='streaming_center'),
+    path('setup/', views.SetupWizardView.as_view(), name='setup_wizard'),
 ]

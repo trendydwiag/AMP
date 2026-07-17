@@ -1,0 +1,196 @@
+{# ─────────────────────────────────────────────
+   Sprint 3.5: First Login Guided Tour
+   Interactive onboarding using Alpine.js + JS
+   Tracks completion in localStorage
+   ───────────────────────────────────────────── #}
+<div id="amp-guided-tour" style="display:none">
+  {# Backdrop #}
+  <div id="tour-backdrop" class="fixed inset-0 bg-black/60 z-[1200]" style="display:none" @click="skipTour()"></div>
+
+  {# Tour Card #}
+  <div id="tour-card"
+       class="fixed z-[1210] bg-[var(--amp-surface-elevated)] rounded-2xl shadow-[var(--amp-shadow-2xl)] border border-[var(--amp-border-light)] w-72 p-5"
+       style="display:none; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+
+    {# Step indicator #}
+    <div class="flex items-center gap-1 mb-4">
+      <template x-for="i in tourSteps.length">
+        <div class="h-1 rounded-full transition-all"
+             :style="`width: ${tourCurrentStep === i - 1 ? 24 : 8}px; background: ${tourCurrentStep === i - 1 ? 'var(--amp-coffee-500)' : 'var(--amp-border-default)'}`"></div>
+      </template>
+    </div>
+
+    {# Content #}
+    <div x-show="tourCurrentStep < tourSteps.length">
+      <div class="w-10 h-10 rounded-xl bg-[var(--amp-coffee-50)] flex items-center justify-center mb-3">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="'var(--amp-coffee-500)'" stroke-width="2" x-html="tourSteps[tourCurrentStep]?.icon"></svg>
+      </div>
+      <h3 class="font-bold text-[var(--amp-text-primary)] text-sm mb-2" x-text="tourSteps[tourCurrentStep]?.title"></h3>
+      <p class="text-xs text-[var(--amp-text-secondary)] leading-relaxed mb-4" x-text="tourSteps[tourCurrentStep]?.description"></p>
+    </div>
+
+    {# Actions #}
+    <div class="flex items-center justify-between">
+      <button @click="skipTour()" class="text-xs text-[var(--amp-text-tertiary)] hover:text-[var(--amp-text-secondary)] transition-colors">
+        Lewati tur
+      </button>
+      <div class="flex gap-2">
+        <button x-show="tourCurrentStep > 0" @click="prevTourStep()" class="amp-btn amp-btn-ghost amp-btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button @click="nextTourStep()" class="amp-btn amp-btn-primary amp-btn-sm gap-1.5"
+                x-text="tourCurrentStep === tourSteps.length - 1 ? '🎉 Selesai!' : 'Lanjut'"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOUR_KEY = 'amp_tour_completed_v1';
+
+const TOUR_STEPS = [
+  {
+    title: 'Selamat datang di AMP Studio!',
+    description: 'Dashboard ini adalah pusat kendali radio Anda. Pantau siaran, statistik, dan konten dari satu tempat.',
+    icon: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    target: 'nav-dashboard',
+  },
+  {
+    title: 'Streaming Center',
+    description: 'Pantau status siaran langsung, URL stream, dan statistik pendengar secara real-time.',
+    icon: '<path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><circle cx="12" cy="12" r="2"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>',
+    target: 'nav-streaming',
+  },
+  {
+    title: 'Kelola Program & Siaran',
+    description: 'Buat program, atur jadwal siaran mingguan, dan kelola host dari menu Siaran.',
+    icon: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/>',
+    target: 'nav-broadcast',
+  },
+  {
+    title: 'Buat Konten & Berita',
+    description: 'Tulis artikel, kelola kategori, tag, dan penulis untuk website radio Anda.',
+    icon: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    target: 'nav-content',
+  },
+  {
+    title: 'Pengaturan & Konfigurasi',
+    description: 'Atur identitas radio, tampilan, email, keamanan, dan kelola pengguna tim.',
+    icon: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83"/>',
+    target: 'nav-settings',
+  },
+  {
+    title: 'Butuh bantuan?',
+    description: 'Klik tombol tanda tanya di pojok kanan bawah untuk akses dokumentasi, FAQ, dan tutorial video kapan saja.',
+    icon: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    target: 'amp-help-btn',
+  },
+];
+
+function startGuidedTour() {
+  localStorage.removeItem(TOUR_KEY);
+  window._tourData && window._tourData.startTour();
+}
+
+document.addEventListener('alpine:init', () => {
+  Alpine.data('guidedTour', () => ({
+    tourCurrentStep: 0,
+    tourSteps: TOUR_STEPS,
+    tourActive: false,
+
+    init() {
+      window._tourData = this;
+      const completed = localStorage.getItem(TOUR_KEY);
+      if (!completed) {
+        // Small delay so dashboard renders first
+        setTimeout(() => this.startTour(), 1200);
+      }
+    },
+
+    startTour() {
+      this.tourCurrentStep = 0;
+      this.tourActive = true;
+      document.getElementById('tour-backdrop').style.display = 'block';
+      document.getElementById('tour-card').style.display = 'block';
+      document.getElementById('amp-guided-tour').style.display = 'block';
+      this.positionCard();
+    },
+
+    positionCard() {
+      const step = TOUR_STEPS[this.tourCurrentStep];
+      const target = step?.target ? document.getElementById(step.target) : null;
+      const card = document.getElementById('tour-card');
+      if (!card) return;
+
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        const cardW = 288;
+        const cardH = 220;
+        let top = rect.bottom + 12;
+        let left = rect.left;
+
+        // Keep within viewport
+        if (left + cardW > window.innerWidth - 16) left = window.innerWidth - cardW - 16;
+        if (top + cardH > window.innerHeight - 16) top = rect.top - cardH - 12;
+        if (left < 16) left = 16;
+
+        card.style.top = `${top}px`;
+        card.style.left = `${left}px`;
+        card.style.transform = 'none';
+
+        // Highlight target
+        target.style.position = 'relative';
+        target.style.zIndex = '1211';
+        target.style.boxShadow = '0 0 0 4px var(--amp-coffee-400), 0 0 0 8px rgba(142,90,60,0.2)';
+        target.style.borderRadius = '8px';
+        target.style.transition = 'all 0.3s ease';
+      } else {
+        card.style.top = '50%';
+        card.style.left = '50%';
+        card.style.transform = 'translate(-50%, -50%)';
+      }
+    },
+
+    clearHighlight() {
+      const step = TOUR_STEPS[this.tourCurrentStep];
+      const target = step?.target ? document.getElementById(step.target) : null;
+      if (target) {
+        target.style.zIndex = '';
+        target.style.boxShadow = '';
+        target.style.position = '';
+      }
+    },
+
+    nextTourStep() {
+      this.clearHighlight();
+      if (this.tourCurrentStep >= TOUR_STEPS.length - 1) {
+        this.completeTour();
+      } else {
+        this.tourCurrentStep++;
+        this.$nextTick(() => this.positionCard());
+      }
+    },
+
+    prevTourStep() {
+      this.clearHighlight();
+      if (this.tourCurrentStep > 0) {
+        this.tourCurrentStep--;
+        this.$nextTick(() => this.positionCard());
+      }
+    },
+
+    skipTour() {
+      this.clearHighlight();
+      this.completeTour();
+    },
+
+    completeTour() {
+      this.tourActive = false;
+      localStorage.setItem(TOUR_KEY, '1');
+      document.getElementById('tour-backdrop').style.display = 'none';
+      document.getElementById('tour-card').style.display = 'none';
+      document.getElementById('amp-guided-tour').style.display = 'none';
+    }
+  }));
+});
+</script>

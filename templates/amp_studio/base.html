@@ -54,7 +54,15 @@
   {% include 'amp_studio/components/notifications.html' %}
 
   {# ── Toast Container ── #}
-  <div id="toast-container" class="fixed bottom-6 right-6 z-[1100] flex flex-col gap-3"></div>
+  <div id="toast-container" class="fixed bottom-24 right-6 z-[1100] flex flex-col gap-3"></div>
+
+  {# ── Sprint 3.5: Floating Help Button ── #}
+  {% include 'amp_studio/components/help_button.html' %}
+
+  {# ── Sprint 3.5: Guided Tour ── #}
+  <div x-data="guidedTour()" x-init="init()">
+    {% include 'amp_studio/components/guided_tour.html' %}
+  </div>
 
   {# ── AMP Studio JS ── #}
   <script src="{% static 'js/amp-studio/amp-studio.js' %}"></script>

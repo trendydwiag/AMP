@@ -1,0 +1,84 @@
+{# ─────────────────────────────────────────────
+   Sprint 3.5: Floating Help Button
+   Bottom-right persistent help menu
+   ───────────────────────────────────────────── #}
+<div class="fixed bottom-6 right-6 z-[1090]" x-data="{ helpOpen: false }" id="amp-help-btn">
+
+  {# Dropdown Menu #}
+  <div x-show="helpOpen"
+       @click.outside="helpOpen = false"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+       x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+       x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+       class="absolute bottom-16 right-0 w-56 bg-[var(--amp-surface-elevated)] border border-[var(--amp-border-light)] rounded-2xl shadow-[var(--amp-shadow-lg)] overflow-hidden"
+       style="display:none">
+
+    <div class="p-3 border-b border-[var(--amp-border-light)]">
+      <p class="text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Bantuan</p>
+    </div>
+
+    <div class="p-2 space-y-0.5">
+      {# Documentation #}
+      <a href="https://docs.kabulhaden.online" target="_blank" rel="noopener"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--amp-text-primary)] hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+        <div class="w-7 h-7 rounded-lg bg-[var(--amp-info-light)] flex items-center justify-center flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--amp-info)" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
+        Dokumentasi
+        <svg class="ml-auto" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+
+      {# FAQ #}
+      <a href="https://docs.kabulhaden.online/faq" target="_blank" rel="noopener"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--amp-text-primary)] hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+        <div class="w-7 h-7 rounded-lg bg-[var(--amp-warning-light)] flex items-center justify-center flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--amp-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        FAQ
+        <svg class="ml-auto" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+
+      {# Video Tutorial #}
+      <a href="https://docs.kabulhaden.online/video" target="_blank" rel="noopener"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--amp-text-primary)] hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+        <div class="w-7 h-7 rounded-lg bg-[var(--amp-danger-light)] flex items-center justify-center flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--amp-danger)" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        Tutorial Video
+        <svg class="ml-auto" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+
+      <div class="border-t border-[var(--amp-border-light)] my-1"></div>
+
+      {# Restart Tour #}
+      <button onclick="startGuidedTour()" @click="helpOpen = false"
+              class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--amp-text-primary)] hover:bg-[var(--amp-surface-tertiary)] transition-colors text-left">
+        <div class="w-7 h-7 rounded-lg bg-[var(--amp-success-light)] flex items-center justify-center flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        Mulai Tur Panduan
+      </button>
+
+      {# Contact Admin #}
+      <a href="mailto:admin@kabulhaden.online"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--amp-text-primary)] hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+        <div class="w-7 h-7 rounded-lg bg-[var(--amp-coffee-50)] flex items-center justify-center flex-shrink-0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        Hubungi Administrator
+      </a>
+    </div>
+  </div>
+
+  {# FAB Button #}
+  <button @click="helpOpen = !helpOpen"
+          class="w-12 h-12 rounded-full bg-[var(--amp-coffee-500)] hover:bg-[var(--amp-coffee-600)] text-white shadow-[var(--amp-shadow-lg)] hover:shadow-[var(--amp-shadow-xl)] transition-all duration-200 flex items-center justify-center"
+          :class="{ 'rotate-45': helpOpen }"
+          aria-label="Pusat Bantuan">
+    <svg x-show="!helpOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <svg x-show="helpOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>

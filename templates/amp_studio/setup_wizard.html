@@ -1,0 +1,302 @@
+{% extends 'amp_studio/base.html' %}
+{% load static %}
+
+{% block title %}Setup Wizard{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8" x-data="setupWizard({{ current_step }})" x-init="init()">
+
+  {# ── Header ── #}
+  <div class="text-center">
+    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--amp-coffee-400)] to-[var(--amp-coffee-600)] flex items-center justify-center mx-auto mb-4 shadow-lg">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </div>
+    <h1 class="text-2xl font-bold text-[var(--amp-text-primary)] font-heading">Setup Kabulhaden</h1>
+    <p class="text-sm text-[var(--amp-text-secondary)] mt-2">Mari siapkan radio Anda dalam beberapa menit. Anda bisa melanjutkan kapan saja.</p>
+  </div>
+
+  {# ── Progress Indicator ── #}
+  <div class="amp-card p-5">
+    <div class="flex items-center justify-between relative">
+      {# Progress line #}
+      <div class="absolute left-0 right-0 top-5 h-0.5 bg-[var(--amp-border-light)] mx-10"></div>
+      <div class="absolute left-10 top-5 h-0.5 bg-[var(--amp-coffee-400)] transition-all duration-500"
+           :style="`width: calc(${(currentStep - 1) / 4 * 100}% - 0px)`"></div>
+
+      {% for step_num, step_label, step_done in steps %}
+      <div class="flex flex-col items-center gap-2 z-10">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2"
+             :class="{
+               'bg-[var(--amp-coffee-500)] border-[var(--amp-coffee-500)] text-white': currentStep > {{ step_num }} || (currentStep === {{ step_num }} && false),
+               'bg-[var(--amp-coffee-400)] border-[var(--amp-coffee-400)] text-white': currentStep === {{ step_num }},
+               'bg-white border-[var(--amp-border-default)] text-[var(--amp-text-tertiary)]': currentStep < {{ step_num }}
+             }">
+          {% if step_done and current_step > step_num %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          {% else %}
+          {{ step_num }}
+          {% endif %}
+        </div>
+        <span class="text-xs font-medium text-center leading-tight max-w-16 hidden sm:block"
+              :class="currentStep === {{ step_num }} ? 'text-[var(--amp-coffee-600)]' : 'text-[var(--amp-text-tertiary)]'">
+          {{ step_label }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-4 pt-4 border-t border-[var(--amp-border-light)] flex items-center justify-between">
+      <span class="text-xs text-[var(--amp-text-tertiary)]">Langkah <span x-text="currentStep"></span> dari 5</span>
+      <div class="flex gap-1">
+        {% for step_num, step_label, step_done in steps %}
+        <div class="w-2 h-2 rounded-full transition-colors"
+             :class="currentStep === {{ step_num }} ? 'bg-[var(--amp-coffee-400)]' : ({{ step_num }} < currentStep ? 'bg-[var(--amp-success)]' : 'bg-[var(--amp-border-default)]')"></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {# ── Step Cards ── #}
+
+  {# Step 1: Radio Identity #}
+  <div x-show="currentStep === 1" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+    <div class="amp-card amp-card-elevated p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-[var(--amp-coffee-50)] flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+        </div>
+        <div>
+          <h2 class="font-bold text-[var(--amp-text-primary)]">Identitas Radio</h2>
+          <p class="text-sm text-[var(--amp-text-secondary)]">Nama dan deskripsi stasiun radio Anda</p>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)] mb-6">
+        <p class="text-sm text-[var(--amp-text-secondary)] mb-3">Konfigurasi nama dan informasi situs akan diatur di halaman <strong>Pengaturan Situs</strong>.</p>
+        <a href="{% url 'settings:site' %}" class="amp-btn amp-btn-primary gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4"/></svg>
+          Buka Pengaturan Situs
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+
+      {% if step1_done %}<div class="flex items-center gap-2 p-3 rounded-xl bg-[var(--amp-success-light)] mb-4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="text-sm text-[var(--amp-success)] font-medium">Nama situs sudah dikonfigurasi!</span></div>{% endif %}
+
+      <div class="flex gap-3 justify-end">
+        <button @click="nextStep()" class="amp-btn amp-btn-primary gap-2">
+          Lanjut ke Upload Logo
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# Step 2: Upload Logo #}
+  <div x-show="currentStep === 2" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+    <div class="amp-card amp-card-elevated p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-[var(--amp-coffee-50)] flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div>
+          <h2 class="font-bold text-[var(--amp-text-primary)]">Upload Logo</h2>
+          <p class="text-sm text-[var(--amp-text-secondary)]">Logo dan favicon stasiun radio Anda</p>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)] mb-6">
+        <p class="text-sm text-[var(--amp-text-secondary)] mb-3">Upload logo dan favicon di halaman <strong>Pengaturan Situs</strong> pada tab identitas visual.</p>
+        <a href="{% url 'settings:site' %}" class="amp-btn amp-btn-primary gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+          Upload Logo Sekarang
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+
+      {% if step2_done %}<div class="flex items-center gap-2 p-3 rounded-xl bg-[var(--amp-success-light)] mb-4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="text-sm text-[var(--amp-success)] font-medium">Logo sudah diupload!</span></div>{% endif %}
+
+      <div class="flex gap-3 justify-between">
+        <button @click="prevStep()" class="amp-btn amp-btn-secondary gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Kembali
+        </button>
+        <button @click="nextStep()" class="amp-btn amp-btn-primary gap-2">
+          Lanjut ke Streaming URL
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# Step 3: Streaming URL #}
+  <div x-show="currentStep === 3" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+    <div class="amp-card amp-card-elevated p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-[var(--amp-coffee-50)] flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><circle cx="12" cy="12" r="2"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+        </div>
+        <div>
+          <h2 class="font-bold text-[var(--amp-text-primary)]">URL Streaming</h2>
+          <p class="text-sm text-[var(--amp-text-secondary)]">Hubungkan stasiun radio dengan server streaming</p>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl bg-[var(--amp-info-light)] border border-[var(--amp-info)] border-opacity-30 mb-4">
+        <p class="text-sm text-[var(--amp-info)] font-medium mb-1">Provider yang didukung:</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-2 py-0.5 text-xs font-medium rounded-md bg-white text-[var(--amp-info)]">AzuraCast</span>
+          <span class="px-2 py-0.5 text-xs font-medium rounded-md bg-white text-[var(--amp-info)]">Icecast</span>
+          <span class="px-2 py-0.5 text-xs font-medium rounded-md bg-white text-[var(--amp-info)]">RadioBOSS</span>
+          <span class="px-2 py-0.5 text-xs font-medium rounded-md bg-white text-[var(--amp-info)]">Shoutcast</span>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)] mb-6">
+        <p class="text-sm text-[var(--amp-text-secondary)] mb-3">Tambahkan streaming provider di halaman <strong>Manajemen Radio</strong>.</p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <a href="{% url 'radio:station_create' %}" class="amp-btn amp-btn-primary gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Buat Stasiun Radio
+          </a>
+          <a href="{% url 'radio:provider_create' %}" class="amp-btn amp-btn-secondary gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><circle cx="12" cy="12" r="2"/></svg>
+            Tambah Provider
+          </a>
+        </div>
+      </div>
+
+      {% if step3_done %}<div class="flex items-center gap-2 p-3 rounded-xl bg-[var(--amp-success-light)] mb-4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="text-sm text-[var(--amp-success)] font-medium">Provider streaming sudah dikonfigurasi!</span></div>{% endif %}
+
+      <div class="flex gap-3 justify-between">
+        <button @click="prevStep()" class="amp-btn amp-btn-secondary gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Kembali
+        </button>
+        <button @click="nextStep()" class="amp-btn amp-btn-primary gap-2">
+          Lanjut ke Media Sosial
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# Step 4: Social Media #}
+  <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+    <div class="amp-card amp-card-elevated p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-[var(--amp-coffee-50)] flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <div>
+          <h2 class="font-bold text-[var(--amp-text-primary)]">Media Sosial</h2>
+          <p class="text-sm text-[var(--amp-text-secondary)]">Hubungkan akun media sosial Anda</p>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)] mb-6">
+        <p class="text-sm text-[var(--amp-text-secondary)] mb-3">Atur tautan media sosial di halaman <strong>Pengaturan Media Sosial</strong>.</p>
+        <a href="{% url 'settings:social_media' %}" class="amp-btn amp-btn-primary gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Atur Media Sosial
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+
+      {% if step4_done %}<div class="flex items-center gap-2 p-3 rounded-xl bg-[var(--amp-success-light)] mb-4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="text-sm text-[var(--amp-success)] font-medium">Media sosial sudah dikonfigurasi!</span></div>{% endif %}
+
+      <div class="flex gap-3 justify-between">
+        <button @click="prevStep()" class="amp-btn amp-btn-secondary gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Kembali
+        </button>
+        <button @click="nextStep()" class="amp-btn amp-btn-primary gap-2">
+          Selesaikan Setup
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {# Step 5: Finish #}
+  <div x-show="currentStep === 5" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+    <div class="amp-card amp-card-elevated p-10 text-center">
+      <div class="w-20 h-20 rounded-full bg-[var(--amp-success-light)] flex items-center justify-center mx-auto mb-6">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--amp-success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2 class="text-2xl font-bold text-[var(--amp-text-primary)] font-heading mb-3">Selamat! 🎉</h2>
+      <p class="text-[var(--amp-text-secondary)] mb-8 max-w-md mx-auto leading-relaxed">
+        Kabulhaden Anda siap digunakan. Mulai buat konten, jadwal siaran, dan bangun komunitas radio Anda!
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+        <div class="p-4 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)]">
+          <svg class="mb-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p class="text-sm font-medium text-[var(--amp-text-primary)]">Tulis Artikel</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Bagikan berita dan cerita</p>
+        </div>
+        <div class="p-4 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)]">
+          <svg class="mb-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <p class="text-sm font-medium text-[var(--amp-text-primary)]">Atur Jadwal</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Buat jadwal siaran mingguan</p>
+        </div>
+        <div class="p-4 rounded-xl border border-[var(--amp-border-light)] bg-[var(--amp-surface-tertiary)]">
+          <svg class="mb-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-coffee-500)" stroke-width="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+          <p class="text-sm font-medium text-[var(--amp-text-primary)]">Upload Podcast</p>
+          <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Bagikan episode audio</p>
+        </div>
+      </div>
+      <form method="post" action="{% url 'studio:setup_wizard' %}">
+        {% csrf_token %}
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button type="submit" class="amp-btn amp-btn-primary gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Buka Dashboard
+          </button>
+          <button @click="prevStep()" type="button" class="amp-btn amp-btn-secondary gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Kembali
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {# ── Skip Link ── #}
+  <div x-show="currentStep < 5" class="text-center">
+    <a href="{% url 'studio:dashboard' %}" class="text-sm text-[var(--amp-text-tertiary)] hover:text-[var(--amp-text-secondary)] transition-colors">
+      Lewati setup, lanjutkan nanti →
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setupWizard(initialStep) {
+  return {
+    currentStep: initialStep || 1,
+    totalSteps: 5,
+
+    init() {
+      // Restore step from URL param
+    },
+
+    nextStep() {
+      if (this.currentStep < this.totalSteps) {
+        this.currentStep++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        history.pushState({}, '', `?step=${this.currentStep}`);
+      }
+    },
+
+    prevStep() {
+      if (this.currentStep > 1) {
+        this.currentStep--;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        history.pushState({}, '', `?step=${this.currentStep}`);
+      }
+    }
+  };
+}
+</script>
+{% endblock %}

@@ -1,0 +1,2 @@
+- [Sprint 3.5 Founder Experience](sprint-3-5.md) — 7 UX features added to AMP Studio; no schema changes; wizard uses session, tour uses localStorage.
+- [AMP Studio Architecture](amp-studio-arch.md) — Design tokens, component patterns, and Alpine.js conventions for AMP Studio templates.
