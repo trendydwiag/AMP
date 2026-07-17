@@ -20,6 +20,14 @@ CSP_CONNECT_SRC = ("'self'", "ws:", "http:")
 CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
 CSP_OBJECT_SRC = ("'none'",)
 
+# Allow all Replit proxy origins for CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.replit.dev',
+    'https://*.repl.co',
+    'http://localhost:5000',
+    'http://127.0.0.1:5000',
+]
+
 # Dev specific emails
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

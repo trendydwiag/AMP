@@ -1,0 +1,16 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.0.7,<5.1.0",
+    "django-axes>=6.4.0",
+    "django-csp>=3.8",
+    "django-debug-toolbar>=4.4.6",
+    "django-environ>=0.11.2",
+    "gunicorn>=22.0.0",
+    "psycopg[binary]>=3.2.1",
+    "pytest-django>=4.8.0",
+    "whitenoise[brotli]>=6.7.0",
+]
