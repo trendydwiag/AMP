@@ -256,7 +256,7 @@ function streamStatus() {
 
     init() {
       this.fetchStatus();
-      this._interval = setInterval(() => this.fetchStatus(), 15000);
+      this._interval = setInterval(() => this.fetchStatus(), 25000);
     },
 
     destroy() {
@@ -265,13 +265,13 @@ function streamStatus() {
 
     async fetchStatus() {
       try {
-        const res = await fetch('/radio/api/status/');
+        const res = await fetch('/api/v1/radio/live/');
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
-        this.isLive = data.stream_status === 'PLAYING' || data.is_active;
-        this.listenerCount = data.current_listeners || 0;
-        this.currentProgram = data.current_program || '';
-        this.currentHost = data.current_host || '';
+        this.isLive = data.is_live || false;
+        this.listenerCount = data.listeners || 0;
+        this.currentProgram = data.program || '';
+        this.currentHost = '';
         this.streamUrl = data.stream_url || '';
       } catch (e) {
         this.isLive = false;
@@ -324,14 +324,14 @@ function ampPlayer() {
 
     async fetchNowPlaying() {
       try {
-        const res = await fetch('/radio/api/status/');
+        const res = await fetch('/api/v1/radio/live/');
         if (!res.ok) return;
         const data = await res.json();
-        this.currentSong = data.song_title
-          ? `${data.song_title}${data.artist ? ' — ' + data.artist : ''}`
+        this.currentSong = data.title
+          ? `${data.title}${data.artist ? ' — ' + data.artist : ''}`
           : '';
-        this.currentProgram = data.current_program || 'Radio Kabulhaden';
-        this.listeners = data.current_listeners || 0;
+        this.currentProgram = data.program || 'Radio Kabulhaden';
+        this.listeners = data.listeners || 0;
         if (!this.streamUrl && data.stream_url) this.streamUrl = data.stream_url;
       } catch (e) { /* silent */ }
     },

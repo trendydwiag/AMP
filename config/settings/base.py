@@ -272,6 +272,14 @@ RADIO_CACHE_TTL_NOW_PLAYING = env.int('RADIO_CACHE_TTL_NOW_PLAYING', 15)
 RADIO_CACHE_TTL_LISTENER = env.int('RADIO_CACHE_TTL_LISTENER', 30)
 RADIO_CACHE_TTL_HEALTH = env.int('RADIO_CACHE_TTL_HEALTH', 60)
 
+# Live Streaming Configuration (Temporary Broadcastindo Integration)
+# All UI must consume /api/v1/radio/live/ — only this settings block knows the provider URL.
+# To swap providers: change STREAM_PROVIDER + STREAM_API_URL; no template or JS changes needed.
+STREAM_PROVIDER = os.environ.get('STREAM_PROVIDER', 'broadcastindo')
+STREAM_API_URL = os.environ.get('STREAM_API_URL', 'https://a7.siar.us/api/nowplaying/kabulhaden')
+STREAM_STATION_NAME = os.environ.get('STREAM_STATION_NAME', 'Kabulhaden')
+STREAM_CACHE_TTL = int(os.environ.get('STREAM_CACHE_TTL', '20'))
+
 # Platform Configuration
 PLATFORM_BASE_DOMAIN = env.str('PLATFORM_BASE_DOMAIN', 'kabulhaden.com')
 PLATFORM_DEFAULT_PARTNER_SLUG = env.str('PLATFORM_DEFAULT_PARTNER_SLUG', 'kabulhaden-online')

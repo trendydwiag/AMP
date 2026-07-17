@@ -3,12 +3,15 @@ from .radioboss import RadioBossAdapter
 from .icecast import IcecastAdapter
 from .shoutcast import ShoutcastAdapter
 from .azuracast import AzuraCastAdapter
+from .broadcastindo import BroadcastindoAdapter
 
 ADAPTER_MAP = {
     'RADIOBOSS': RadioBossAdapter,
     'ICECAST': IcecastAdapter,
     'SHOUTCAST': ShoutcastAdapter,
     'AZURACAST': AzuraCastAdapter,
+    # Temporary adapter — see broadcastindo.py for replacement instructions
+    'BROADCASTINDO': BroadcastindoAdapter,
 }
 
 

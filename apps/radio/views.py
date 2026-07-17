@@ -432,3 +432,98 @@ class RadioPlayerConfigAPIView(View):
     def get(self, request):
         player_svc = PlayerService()
         return JsonResponse(player_svc.get_player_config())
+
+
+class LiveRadioAPIView(View):
+    """
+    GET /api/v1/radio/live/
+
+    Normalized, provider-agnostic live radio data consumed by all UI components.
+    The provider URL lives only in Django settings — never in templates or JS.
+
+    Response is cached for STREAM_CACHE_TTL seconds (default: 20s).
+    On any upstream failure: returns status=offline with HTTP 200 — never crashes.
+
+    Schema:
+        status      "live" | "offline"
+        station     Station name from settings
+        program     Current program name or null
+        title       Now-playing song title
+        artist      Now-playing artist
+        cover       Artwork URL
+        listeners   Current listener count (int)
+        started_at  ISO datetime or null
+        stream_url  Audio stream URL from provider
+        is_live     Boolean shorthand for status == "live"
+        provider    Provider key (lowercase, e.g. "broadcastindo")
+    """
+    CACHE_KEY = 'amp_v1_live_radio'
+
+    def get(self, request):
+        import logging
+        from django.core.cache import cache
+        from django.conf import settings
+        from .adapters import get_adapter
+
+        logger = logging.getLogger('radio')
+
+        cached = cache.get(self.CACHE_KEY)
+        if cached is not None:
+            return JsonResponse(cached)
+
+        provider_key = getattr(settings, 'STREAM_PROVIDER', 'broadcastindo').upper()
+        api_url = getattr(settings, 'STREAM_API_URL', '')
+        station_name = getattr(settings, 'STREAM_STATION_NAME', 'Kabulhaden')
+        cache_ttl = getattr(settings, 'STREAM_CACHE_TTL', 20)
+
+        try:
+            adapter_class = get_adapter(provider_key)
+            adapter = adapter_class(api_url=api_url, timeout=8)
+
+            np = adapter.get_now_playing()
+            listener_data = adapter.get_listener_count()
+
+            # Extract the audio stream URL from the provider's raw response.
+            # AzuraCast / Siar.us includes station.listen_url in the nowplaying payload.
+            stream_url = ''
+            raw = np.raw_response
+            if isinstance(raw, dict):
+                station_block = raw.get('station', {})
+                stream_url = station_block.get('listen_url', '')
+
+            is_offline = np.stream_status == 'OFFLINE'
+            status = 'offline' if is_offline else 'live'
+
+            data = {
+                'status': status,
+                'station': station_name,
+                'program': None,  # Live schedule wire-up planned for a future sprint
+                'title': np.song_title or 'Kabulhaden Radio',
+                'artist': np.artist or 'Siaran Langsung',
+                'cover': np.artwork or '',
+                'listeners': listener_data.current_listeners,
+                'started_at': np.started_at.isoformat() if np.started_at else None,
+                'stream_url': stream_url,
+                'is_live': not is_offline,
+                'provider': provider_key.lower(),
+            }
+
+        except Exception as exc:
+            logger.error('LiveRadioAPIView: failed to fetch live data — %s', exc)
+            data = {
+                'status': 'offline',
+                'station': station_name,
+                'program': None,
+                'title': 'Kabulhaden Radio',
+                'artist': 'Siaran Langsung',
+                'cover': '',
+                'listeners': 0,
+                'started_at': None,
+                'stream_url': '',
+                'is_live': False,
+                'provider': provider_key.lower(),
+                'error': 'Unable to retrieve live data',
+            }
+
+        cache.set(self.CACHE_KEY, data, cache_ttl)
+        return JsonResponse(data)

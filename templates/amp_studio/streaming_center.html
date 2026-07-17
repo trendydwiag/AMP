@@ -364,6 +364,7 @@
 function streamingCenter() {
   return {
     isLive: false,
+    isOffline: false,
     listenerCount: 0,
     currentProgram: null,
     nowPlaying: null,
@@ -376,16 +377,22 @@ function streamingCenter() {
 
     async fetchStatus() {
       try {
-        const res = await fetch('/radio/api/status/');
+        const res = await fetch('/api/v1/radio/live/');
         if (!res.ok) return;
         const data = await res.json();
         this.isLive = data.is_live || false;
-        this.listenerCount = data.listener_count || 0;
-        this.currentProgram = data.current_program || null;
-        this.nowPlaying = data.now_playing || null;
+        this.isOffline = data.status === 'offline';
+        this.listenerCount = data.listeners || 0;
+        this.currentProgram = data.program || null;
+        // Compose now-playing display string from normalized fields
+        this.nowPlaying = this.isOffline
+          ? null
+          : (data.title ? `${data.title}${data.artist ? ' — ' + data.artist : ''}` : null);
         const now = new Date();
         this.lastUpdated = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       } catch (e) {
+        this.isLive = false;
+        this.isOffline = true;
         console.error('Streaming status fetch error:', e);
       }
     }

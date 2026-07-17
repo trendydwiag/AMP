@@ -21,6 +21,7 @@ document.addEventListener('alpine:init', () => {
         reconnectAttempts: 0,
         maxReconnectAttempts: 10,
         isOffline: false,
+        listeners: 0,
         streamUrl: '',
         currentTrack: { title: '', artist: '', artwork: '' },
 
@@ -72,7 +73,7 @@ document.addEventListener('alpine:init', () => {
 
             this.loadVolumePreference();
             this.fetchStatus();
-            this.pollInterval = setInterval(() => this.fetchStatus(), 10000);
+            this.pollInterval = setInterval(() => this.fetchStatus(), 25000);
             this.setupMediaSession();
         },
 
@@ -105,15 +106,16 @@ document.addEventListener('alpine:init', () => {
         },
 
         fetchStatus() {
-            fetch('/radio/api/status/')
+            fetch('/api/v1/radio/live/')
                 .then(r => r.json())
                 .then(data => {
                     this.streamUrl = data.stream_url || '';
                     this.isLive = data.is_live || false;
+                    this.listeners = data.listeners || 0;
                     const newTrack = {
-                        title: data.title || data.track_title || 'Kabulhaden Radio',
-                        artist: data.artist || data.track_artist || 'Siaran Langsung',
-                        artwork: data.artwork || data.album_art || ''
+                        title: data.title || 'Kabulhaden Radio',
+                        artist: data.artist || 'Siaran Langsung',
+                        artwork: data.cover || ''
                     };
                     const changed = newTrack.title !== this.currentTrack.title || newTrack.artist !== this.currentTrack.artist;
                     this.currentTrack = newTrack;

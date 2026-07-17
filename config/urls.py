@@ -39,6 +39,9 @@ urlpatterns = [
     # Radio Engine
     path('radio/', include('apps.radio.urls')),
 
+    # AMP Internal API v1 — normalized, provider-agnostic endpoints for all UI
+    path('api/v1/', include('apps.radio.api_v1_urls')),
+
     # Broadcast Management
     path('broadcast/', include('apps.broadcast.urls')),
 
