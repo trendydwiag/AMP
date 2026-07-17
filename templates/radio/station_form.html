@@ -1,20 +1,17 @@
-{% extends "dashboard_base.html" %}
+{% extends "amp_studio/base.html" %}
 
 {% block title %}{% if is_edit %}Edit Station{% else %}Tambah Station{% endif %} - Kabulhaden CMS{% endblock %}
 
-{% block breadcrumbs %}
-<li class="inline-flex items-center">
-    <span class="mx-2">/</span>
-    <a href="{% url 'radio:dashboard' %}" class="hover:text-coffee-500">Radio</a>
-</li>
-<li class="inline-flex items-center">
-    <span class="mx-2">/</span>
-    <a href="{% url 'radio:station_list' %}" class="hover:text-coffee-500">Stations</a>
-</li>
-<li class="inline-flex items-center">
-    <span class="mx-2">/</span>
-    <span class="text-slate-700 dark:text-slate-300">{% if is_edit %}Edit{% else %}Tambah{% endif %}</span>
-</li>
+{% block breadcrumb %}
+<nav class="amp-breadcrumb" aria-label="Breadcrumb">
+  <a href="{% url 'studio:dashboard' %}"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
+  <span>›</span>
+  <span>Radio</span>
+  <span>›</span>
+  <a href="{% url 'radio:station_list' %}">Stasiun</a>
+  <span>›</span>
+  <span>Form Stasiun</span>
+</nav>
 {% endblock %}
 
 {% block content %}
