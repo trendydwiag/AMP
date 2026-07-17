@@ -312,3 +312,67 @@ input[type="radio"] {
   width: 1rem;
   height: 1rem;
 }
+
+/* ── Settings form widgets ──────────────────────────────────────────────── */
+/* These class names come from forms.py widget attrs */
+.form-input,
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background-color: #ffffff;
+  color: #1A0F0B;
+  border: 1px solid #C89B6D;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #6B4226;
+  box-shadow: 0 0 0 3px rgba(107, 66, 38, 0.15);
+}
+.form-input::placeholder {
+  color: #a0836a;
+}
+.form-input.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+}
+.form-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #6B4226;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+.dark .form-input,
+.dark .form-select {
+  background-color: #3A2318;
+  color: #F5F0EA;
+  border-color: #4E2F1F;
+}
+.dark .form-input:focus,
+.dark .form-select:focus {
+  border-color: #8C5A3C;
+  box-shadow: 0 0 0 3px rgba(140, 90, 60, 0.2);
+}
+
+/* File input wrapper — strips Django ClearableFileInput ugly text */
+.settings-file-input a {
+  font-size: 0.75rem;
+  color: #6B4226;
+  text-decoration: underline;
+}
+.settings-file-input br {
+  display: none;
+}
+.settings-file-input label {
+  font-size: 0.75rem;
+  color: #8C5A3C;
+  cursor: pointer;
+}
