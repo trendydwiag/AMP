@@ -71,9 +71,8 @@ class IcecastAdapter(RadioProviderAdapter):
         data = self._get_status()
         if not data:
             return ListenerData()
-        mount = self._find_mount(data)
-        listeners = mount.get('listeners', ice.get('listener_peak', 0))
         ice = data.get('icestats', {})
+        mount = self._find_mount(data)
         return ListenerData(
             current_listeners=int(mount.get('listeners', 0)),
             peak_listeners=int(ice.get('listener_peak', 0)),

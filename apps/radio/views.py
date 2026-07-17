@@ -464,6 +464,7 @@ class LiveRadioAPIView(View):
         from django.core.cache import cache
         from django.conf import settings
         from .adapters import get_adapter
+        from .services import RadioStationService
 
         logger = logging.getLogger('radio')
 
@@ -471,19 +472,43 @@ class LiveRadioAPIView(View):
         if cached is not None:
             return JsonResponse(cached)
 
-        provider_key = getattr(settings, 'STREAM_PROVIDER', 'broadcastindo').upper()
-        api_url = getattr(settings, 'STREAM_API_URL', '')
-        station_name = getattr(settings, 'STREAM_STATION_NAME', 'Kabulhaden')
         cache_ttl = getattr(settings, 'STREAM_CACHE_TTL', 20)
 
-        # Fallback stream URL — returned to the browser even when the metadata API
-        # is unreachable from the Django server (DNS/firewall restrictions on the
-        # host don't affect the user's browser connecting directly).
-        listen_url_fallback = getattr(settings, 'STREAM_LISTEN_URL', '')
+        # ── Resolve provider: DB-first, settings as fallback ──────────────────
+        # The DB provider (saved via /radio/provider/) always takes precedence.
+        # Settings act as a fallback when no active provider is configured in DB.
+        station_svc = RadioStationService()
+        station = station_svc.get_primary_station()
+        station_name = (
+            station.station_name if station
+            else getattr(settings, 'STREAM_STATION_NAME', 'Kabulhaden')
+        )
+        db_provider = station.primary_provider if station else None
+
+        if db_provider:
+            provider_key = db_provider.provider_type
+            api_url = db_provider.api_url
+            listen_url_fallback = db_provider.stream_url
+            _username = db_provider.username
+            _password = db_provider.password
+            _timeout = db_provider.timeout
+        else:
+            provider_key = getattr(settings, 'STREAM_PROVIDER', 'broadcastindo').upper()
+            api_url = getattr(settings, 'STREAM_API_URL', '')
+            listen_url_fallback = getattr(settings, 'STREAM_LISTEN_URL', '')
+            _username = ''
+            _password = ''
+            _timeout = 8
 
         try:
             adapter_class = get_adapter(provider_key)
-            adapter = adapter_class(api_url=api_url, timeout=8)
+            adapter = adapter_class(
+                api_url=api_url,
+                stream_url=listen_url_fallback,
+                username=_username,
+                password=_password,
+                timeout=_timeout,
+            )
 
             np = adapter.get_now_playing()
             listener_data = adapter.get_listener_count()

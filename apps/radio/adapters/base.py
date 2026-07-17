@@ -83,7 +83,11 @@ class RadioProviderAdapter(ABC):
             start = time.monotonic()
             response = requests.get(
                 url, timeout=timeout, auth=auth,
-                headers={'User-Agent': 'Kabulhaden-RadioEngine/1.0'}
+                headers={
+                    'User-Agent': 'Kabulhaden-RadioEngine/1.0',
+                    # Required for ngrok free tier to bypass browser-challenge page
+                    'ngrok-skip-browser-warning': 'true',
+                }
             )
             elapsed_ms = (time.monotonic() - start) * 1000
             response.raise_for_status()
