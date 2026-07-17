@@ -9,6 +9,9 @@ class SiteSettings(TimeStampedModel):
     site_url = models.URLField(max_length=500, blank=True, default='')
     site_logo = models.ImageField(upload_to='settings/site/', blank=True, null=True)
     site_favicon = models.ImageField(upload_to='settings/site/', blank=True, null=True)
+    address = models.CharField(max_length=500, blank=True, default='', verbose_name='Alamat')
+    contact_email = models.EmailField(blank=True, default='', verbose_name='Email Kontak')
+    contact_phone = models.CharField(max_length=50, blank=True, default='', verbose_name='Nomor Telepon')
     maintenance_mode = models.BooleanField(default=False)
     maintenance_message = models.TextField(blank=True, default='Situs sedang dalam pemeliharaan.')
 

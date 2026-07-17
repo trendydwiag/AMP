@@ -11,6 +11,7 @@ class SiteSettingsForm(forms.ModelForm):
         model = SiteSettings
         fields = [
             'site_name', 'site_tagline', 'site_description', 'site_url',
+            'address', 'contact_email', 'contact_phone',
             'site_logo', 'site_favicon', 'maintenance_mode', 'maintenance_message'
         ]
         widgets = {
@@ -18,6 +19,9 @@ class SiteSettingsForm(forms.ModelForm):
             'site_tagline': forms.TextInput(attrs={'class': 'form-input'}),
             'site_description': forms.Textarea(attrs={'class': 'form-input', 'rows': 3}),
             'site_url': forms.URLInput(attrs={'class': 'form-input'}),
+            'address': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Jl. Contoh No. 1, Kota, Provinsi'}),
+            'contact_email': forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'info@contoh.id'}),
+            'contact_phone': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+62 21 1234 5678'}),
             'site_logo': forms.ClearableFileInput(attrs={'class': 'form-input'}),
             'site_favicon': forms.ClearableFileInput(attrs={'class': 'form-input'}),
             'maintenance_mode': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
