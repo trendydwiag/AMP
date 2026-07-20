@@ -9,3 +9,4 @@
 - [AMP Studio Dark Mode](amp-studio-dark-mode.md) — Must toggle both data-theme attr AND .dark class on <html>; Tailwind CDN needs darkMode:'class' + coffee palette in config.
 - [StreamHealth Model Fields](streamhealth-fields.md) — Correct field names for StreamHealth; common wrong names used in templates.
 - [CurrentProgramResolver Timezone](current-program-resolver-tz.md) — Must use localtime(now) not now; schedule times stored in WIB, server is UTC+7.
+- [Platform Template Dark Mode](platform-template-darkmode.md) — Platform templates use coffee/white palette not CSS vars; always use var(--amp-surface-primary) not bg-white in amp_studio-extending templates.
