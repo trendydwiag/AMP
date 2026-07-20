@@ -1,3 +1,4 @@
+- [Radio Streaming Proxy](radio-streaming-proxy.md) — Replit dev proxy buffers streaming; always return direct provider stream_url, never /radio/stream/ as default.
 - [Media Pipeline Engine](sprint-4-2-pipeline.md) — All uploads go through MediaPipelineService; pipeline.py/storage.py/events.py; 9 new fields on MediaFile; mutagen for metadata.
 - [Sprint 4.1 Polish Findings](sprint-4-1.md) — Coming Soon pattern fix, old media_manager card style, empty state standard, known tech debt.
 - [Sprint 3.5 Founder Experience](sprint-3-5.md) — 7 UX features + health widget; wizard uses session, tour uses localStorage; User.get_full_name is a property not method.
