@@ -2,411 +2,417 @@
 
 ## Overview
 
-This guide provides an in-depth look at the Radio module in Kabulhaden CMS, covering stations, programs, schedules, episodes, play queue, and stream management.
+Radio module (`apps/radio`) mengelola streaming live radio di Kabulhaden CMS: konfigurasi provider, metadata now-playing, listener statistics, stream health monitoring, dan live session tracking. Module ini terpisah dari `apps/broadcast` yang mengelola konten siaran (program, jadwal, rekaman).
 
 ---
 
-## Radio Module Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Radio Module                              │
-│                                                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │  Station     │  │  Program    │  │  Schedule   │         │
-│  │  (stasiun)   │──│  (program)  │──│  (jadwal)   │         │
-│  └─────────────┘  └─────────────┘  └─────────────┘         │
-│         │                │                │                   │
-│         ▼                ▼                ▼                   │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                    Episode                               ││
-│  │  (linked to Program, appears in Schedule)                ││
-│  └─────────────────────────────────────────────────────────┘│
-│         │                                                    │
-│         ▼                                                    │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                    Play Queue                            ││
-│  │  (ordered list of tracks/episodes to play)              ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                         Radio Module                                 │
+│                                                                      │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐            │
+│  │ RadioStation │──▶│ RadioProvider│   │ NowPlaying   │            │
+│  │ (stasiun)    │   │ (Icecast/AZ) │   │ Cache        │            │
+│  └──────────────┘   └──────────────┘   └──────────────┘            │
+│         │                  │                   │                     │
+│         │            ┌─────▼─────────────┐    │                     │
+│         │            │   Adapter Layer    │    │                     │
+│         │            │  IcecastAdapter    │    │                     │
+│         │            │  AzuraCastAdapter  │    │                     │
+│         │            │  BroadcastindoAdptr│    │                     │
+│         │            └─────────────────────┘    │                    │
+│         │                                       │                    │
+│  ┌──────▼──────────────────────────────────────▼──────────────────┐│
+│  │                    LiveRadioAPIView                              ││
+│  │  GET /api/v1/radio/live/  (20s cache, offline-safe)             ││
+│  └─────────────────────────────────────────────────────────────────┘│
+│                               │                                      │
+│              ┌────────────────▼─────────────────┐                   │
+│              │         Browser                   │                   │
+│              │   Alpine.store('radio')           │                   │
+│              │   audio.src = stream_url (direct) │                   │
+│              └───────────────────────────────────┘                  │
+└─────────────────────────────────────────────────────────────────────┘
 ```
+
+**Key Design Decision:** Browser connect langsung ke URL stream (Icecast/ngrok), bukan melalui Django proxy. Ini karena Replit's reverse proxy mem-buffer streaming responses. Lihat `docs/adr/0010-multi-provider-radio-engine.md`.
 
 ---
 
 ## Data Models
 
-### Station
+### RadioStation
+
+Stasiun radio. Satu instalasi bisa punya beberapa stasiun (multi-partner).
 
 ```python
-# apps/radio/models.py
-class Station(UUIDPrimaryKeyMixin, TimeStampMixin):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
-    description = models.TextField(blank=True)
-    stream_url = models.URLField(help_text='URL streaming audio')
-    is_active = models.BooleanField(default=True)
-    logo = models.ImageField(upload_to='radio/stations/', blank=True, null=True)
-    
-    class Meta:
-        ordering = ['name']
-    
-    def __str__(self):
-        return self.name
-    
+class RadioStation(models.Model):
+    id              = UUIDField (PK)
+    station_name    = CharField(max_length=200)
+    is_active       = BooleanField(default=True)
+    logo            = ImageField(upload_to='radio/stations/')
+    default_volume  = IntegerField(default=75)   # 0-100
+    autoplay        = BooleanField(default=False)
+    sticky_player   = BooleanField(default=True)
+
     @property
-    def current_program(self):
-        now = timezone.now()
-        current_time = now.time()
-        day_of_week = now.weekday()
-        
-        schedule = Schedule.objects.filter(
-            station=self,
-            day_of_week=day_of_week,
-            start_time__lte=current_time,
-            end_time__gt=current_time,
-        ).first()
-        
-        return schedule.program if schedule else None
+    def primary_provider(self):
+        return self.providers.filter(active=True).first()
 ```
 
-### Program
+### RadioProvider
+
+Konfigurasi koneksi ke streaming provider (Icecast, AzuraCast, dll).
 
 ```python
-class Program(UUIDPrimaryKeyMixin, TimeStampMixin):
-    station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='programs')
-    title = models.CharField(max_length=200)
-    slug = models.SlugField()
-    description = models.TextField(blank=True)
-    genre = models.CharField(max_length=50, choices=Genre.choices, blank=True)
-    host = models.CharField(max_length=100, blank=True)
-    duration_minutes = models.IntegerField(default=60)
-    is_active = models.BooleanField(default=True)
-    image = models.ImageField(upload_to='radio/programs/', blank=True, null=True)
-    
-    class Meta:
-        ordering = ['title']
-        unique_together = ['station', 'slug']
-    
-    def __str__(self):
-        return f"{self.station.name} - {self.title}"
+class RadioProvider(models.Model):
+    id            = UUIDField (PK)
+    station       = ForeignKey(RadioStation)
+    provider_name = CharField(max_length=200)
+    provider_type = CharField(choices=['ICECAST','AZURACAST','BROADCASTINDO','SIAR'])
+    api_url       = URLField()     # Endpoint metadata: .../status-json.xsl (Icecast)
+    stream_url    = URLField()     # URL audio yang dimainkan browser
+    username      = CharField()    # Opsional untuk provider yang butuh auth
+    password      = CharField()
+    timeout       = IntegerField(default=8)
+    active        = BooleanField(default=True)
+    backup_stream_url = URLField(blank=True)
 ```
 
-### Schedule
+### NowPlayingCache
+
+Cache metadata lagu yang sedang diputar. Diupdate setiap kali `LiveRadioAPIView` query provider.
 
 ```python
-class Schedule(UUIDPrimaryKeyMixin, TimeStampMixin):
-    station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='schedules')
-    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='schedules')
-    day_of_week = models.IntegerField(choices=DayOfWeek.choices)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    is_active = models.BooleanField(default=True)
-    
-    class Meta:
-        ordering = ['day_of_week', 'start_time']
-    
-    def __str__(self):
-        return f"{self.program.title} - {self.get_day_of_week_display()} {self.start_time}"
-    
-    @property
-    def duration_minutes(self):
-        start = datetime.combine(datetime.today(), self.start_time)
-        end = datetime.combine(datetime.today(), self.end_time)
-        return int((end - start).total_seconds() / 60)
-    
-    @property
-    def is_current(self):
-        now = timezone.now()
-        return (
-            now.weekday() == self.day_of_week and
-            self.start_time <= now.time() < self.end_time
-        )
+class NowPlayingCache(models.Model):
+    station        = OneToOneField(RadioStation)
+    song_title     = CharField()
+    artist         = CharField()
+    album          = CharField()
+    artwork        = URLField()
+    stream_status  = CharField()   # 'LIVE' | 'OFFLINE'
+    duration       = FloatField()  # detik
+    elapsed        = FloatField()
+    progress_percent = FloatField()
+    raw_response   = JSONField()   # Raw response dari provider API
 ```
 
-### Episode
+### ListenerStatistic
+
+Statistik jumlah pendengar saat ini dan peak.
 
 ```python
-class Episode(UUIDPrimaryKeyMixin, TimeStampMixin):
-    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='episodes')
-    title = models.CharField(max_length=200)
-    slug = models.SlugField()
-    description = models.TextField(blank=True)
-    audio_file = models.FileField(upload_to='radio/episodes/')
-    duration = models.FloatField(help_text='Duration in seconds')
-    episode_number = models.IntegerField(null=True, blank=True)
-    season_number = models.IntegerField(default=1)
-    air_date = models.DateField(null=True, blank=True)
-    is_published = models.BooleanField(default=False)
-    
-    class Meta:
-        ordering = ['-season_number', '-episode_number']
-        unique_together = ['program', 'season_number', 'episode_number']
-    
-    def __str__(self):
-        return f"{self.program.title} - S{self.season_number}E{self.episode_number}: {self.title}"
-    
-    @property
-    def duration_display(self):
-        minutes = int(self.duration // 60)
-        seconds = int(self.duration % 60)
-        return f"{minutes:02d}:{seconds:02d}"
+class ListenerStatistic(models.Model):
+    station          = ForeignKey(RadioStation)
+    current_listeners = IntegerField(default=0)
+    peak_listeners   = IntegerField(default=0)
+    recorded_at      = DateTimeField(auto_now=True)
 ```
 
-### Play Queue
+### StreamHealth
+
+Hasil health check stream terakhir.
 
 ```python
-class PlayQueue(UUIDPrimaryKeyMixin, TimeStampMixin):
-    station = models.OneToOneField(Station, on_delete=models.CASCADE, related_name='play_queue')
-    
-    class Meta:
-        verbose_name_plural = 'Play queues'
-    
-    @property
-    def current_track(self):
-        return self.tracks.filter(is_playing=True).first()
-    
-    @property
-    def next_track(self):
-        current = self.current_track
-        if current:
-            return self.tracks.filter(position__gt=current.position).first()
-        return self.tracks.filter(is_playing=False).first()
+class StreamHealth(models.Model):
+    station        = ForeignKey(RadioStation)
+    provider_status = CharField()  # 'HEALTHY' | 'DEGRADED' | 'DOWN'
+    http_status    = IntegerField()
+    response_time  = FloatField()  # ms
+    stream_bitrate = IntegerField()
+    last_checked   = DateTimeField(auto_now=True)
+```
 
+### LiveSession
 
-class QueueTrack(UUIDPrimaryKeyMixin):
-    queue = models.ForeignKey(PlayQueue, on_delete=models.CASCADE, related_name='tracks')
-    episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
-    position = models.IntegerField(default=0)
-    is_playing = models.BooleanField(default=False)
-    added_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        ordering = ['position']
+Sesi siaran langsung yang aktif.
+
+```python
+class LiveSession(models.Model):
+    station    = ForeignKey(RadioStation)
+    program    = CharField()
+    host       = CharField()
+    started_at = DateTimeField()
+    ended_at   = DateTimeField(null=True)
 ```
 
 ---
 
-## Schedule View (Weekly Grid)
+## Adapter Layer
 
-### Weekly Schedule Display
+Semua adapter mewarisi `BaseRadioAdapter` dari `apps/radio/adapters/base.py`.
 
+### BaseRadioAdapter
+
+```python
+class BaseRadioAdapter:
+    def __init__(self, api_url, stream_url, username='', password='', timeout=8):
+        ...
+
+    def _make_request(self, url, **kwargs):
+        """Semua HTTP request keluar melalui method ini.
+        Menambahkan header ngrok-skip-browser-warning: true secara otomatis."""
+        headers = {
+            'ngrok-skip-browser-warning': 'true',
+            'User-Agent': 'AMP-Studio/1.0',
+        }
+        response = requests.get(url, headers=headers, timeout=self.timeout, **kwargs)
+        return response
+
+    def get_now_playing(self) -> NowPlayingResult:
+        raise NotImplementedError
+
+    def get_listener_count(self) -> ListenerResult:
+        raise NotImplementedError
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│  Jadwal Radio - Studio Utama                                                 │
-│                                                                              │
-│       │ Senin    │ Selasa   │ Rabu    │ Kamis    │ Jumat    │ Sabtu  │ Minggu│
-│  ─────┼──────────┼──────────┼─────────┼──────────┼──────────┼────────┼───────│
-│  06:00│ Berita   │ Berita   │ Berita  │ Berita   │ Berita   │ Musik  │ Libur │
-│  08:00│ Musik    │ Musik    │ Musik   │ Musik    │ Musik    │ Musik  │ Libur │
-│  10:00│ Bicara   │ Bicara   │ Bicara  │ Bicara   │ Bicara   │ Anak   │ Libur │
-│  12:00│ Berita   │ Berita   │ Berita  │ Berita   │ Berita   │ Anak   │ Libur │
-│  14:00│ Musik    │ Musik    │ Musik   │ Musik    │ Musik    │ Musik  │ Libur │
-│  16:00│ Olahraga │ Budaya   │ Pendid. │ Keseh.  │ Agama    │ Musik  │ Libur │
-│  18:00│ Berita   │ Berita   │ Berita  │ Berita   │ Berita   │ Musik  │ Libur │
-│  20:00│ Malam    │ Malam    │ Malam   │ Malam    │ Malam    │ Musik  │ Libur │
-│  22:00│ Musik    │ Musik    │ Musik   │ Musik    │ Musik    │ Musik  │ Musik │
-└──────────────────────────────────────────────────────────────────────────────┘
+
+### IcecastAdapter (`adapters/icecast.py`)
+
+Mendukung Icecast 2.x via `/status-json.xsl`.
+
+**`_find_mount(data, mount_name)`** — helper kritis:
+- Icecast mengembalikan `icestats.source` (bukan `icestats.mount`)
+- Satu source → dict; lebih dari satu source → list
+- Cocokkan berdasarkan `listenurl` yang mengandung `mount_name`
+
+```python
+def _find_mount(self, data, mount_name):
+    icestats = data.get('icestats', {})
+    sources = icestats.get('source', icestats.get('mount'))
+    if not sources:
+        return None
+    if isinstance(sources, dict):
+        sources = [sources]   # normalize ke list
+    for s in sources:
+        if mount_name in s.get('listenurl', ''):
+            return s
+    return sources[0] if sources else None
+```
+
+**`get_now_playing()`** — mengambil `title`, `artist` dari `source.title` (format "Artist - Title"):
+```python
+raw_title = source.get('title', '')
+if ' - ' in raw_title:
+    artist, title = raw_title.split(' - ', 1)
+```
+
+**`get_listener_count()`** — membaca `source.listeners` (bukan `icestats.listeners`).
+
+### AzuraCastAdapter (`adapters/azuracast.py`)
+
+Mendukung AzuraCast via `/api/nowplaying/<station_id>` (JSON).
+
+### BroadcastindoAdapter (`adapters/broadcastindo.py`)
+
+Mendukung Broadcastindo/Siar.us via endpoint mereka sendiri.
+
+### Registrasi Adapter
+
+```python
+# apps/radio/adapters/__init__.py
+ADAPTER_MAP = {
+    'ICECAST':       IcecastAdapter,
+    'AZURACAST':     AzuraCastAdapter,
+    'BROADCASTINDO': BroadcastindoAdapter,
+    'SIAR':          BroadcastindoAdapter,  # alias
+}
+
+def get_adapter(provider_type: str) -> type[BaseRadioAdapter]:
+    return ADAPTER_MAP[provider_type.upper()]
 ```
 
 ---
 
-## Radio Services
+## LiveRadioAPIView
 
-```python
-# apps/radio/services.py
-class RadioService:
-    def __init__(self, repository):
-        self.repository = repository
-    
-    def get_current_schedule(self, station):
-        """Get currently airing program."""
-        now = timezone.now()
-        return Schedule.objects.filter(
-            station=station,
-            day_of_week=now.weekday(),
-            start_time__lte=now.time(),
-            end_time__gt=now.time(),
-        ).first()
-    
-    def get_next_program(self, station):
-        """Get next scheduled program."""
-        now = timezone.now()
-        current_time = now.time()
-        day_of_week = now.weekday()
-        
-        # Try to find next program today
-        next_today = Schedule.objects.filter(
-            station=station,
-            day_of_week=day_of_week,
-            start_time__gt=current_time,
-        ).order_by('start_time').first()
-        
-        if next_today:
-            return next_today
-        
-        # Otherwise, first program tomorrow
-        tomorrow = (day_of_week + 1) % 7
-        return Schedule.objects.filter(
-            station=station,
-            day_of_week=tomorrow,
-        ).order_by('start_time').first()
-    
-    def add_to_queue(self, station, episode):
-        """Add episode to play queue."""
-        queue, _ = PlayQueue.objects.get_or_create(station=station)
-        last_position = queue.tracks.count()
-        
-        QueueTrack.objects.create(
-            queue=queue,
-            episode=episode,
-            position=last_position,
-        )
-    
-    def reorder_queue(self, station, track_ids):
-        """Reorder tracks in queue."""
-        queue = PlayQueue.objects.get(station=station)
-        for position, track_id in enumerate(track_ids):
-            queue.tracks.filter(pk=track_id).update(position=position)
-    
-    def play_next(self, station):
-        """Skip to next track in queue."""
-        queue = PlayQueue.objects.get(station=station)
-        current = queue.current_track
-        
-        if current:
-            current.is_playing = False
-            current.save()
-        
-        next_track = queue.next_track
-        if next_track:
-            next_track.is_playing = True
-            next_track.save()
-        
-        return next_track
+`GET /api/v1/radio/live/` — endpoint utama yang dikonsumsi semua UI component.
+
+### Karakteristik
+- **No authentication required** — publik, bisa dicall dari browser tanpa login
+- **20 detik cache** (`STREAM_CACHE_TTL` setting, default 20)
+- **Offline-safe** — tidak pernah return HTTP error; selalu return HTTP 200 dengan `status: "offline"` jika upstream gagal
+- **DB-first provider** — selalu pakai provider yang disimpan di DB; settings sebagai fallback
+
+### Flow
+
 ```
+GET /api/v1/radio/live/
+  │
+  ├─ Cache hit? → return cached JSON
+  │
+  ├─ Resolve provider (DB-first):
+  │    station = RadioStationService.get_primary_station()
+  │    db_provider = station.primary_provider  (active=True)
+  │    listen_url_fallback = db_provider.stream_url
+  │
+  ├─ try:
+  │    adapter = get_adapter(db_provider.provider_type)(...)
+  │    np = adapter.get_now_playing()
+  │    listener_data = adapter.get_listener_count()
+  │    stream_url = np.raw_response.get('listen_url') or listen_url_fallback
+  │    → build data dict
+  │
+  ├─ except Exception:
+  │    → build fallback data (stream_url = listen_url_fallback)
+  │
+  ├─ cache.set('amp_v1_live_radio', data, cache_ttl)
+  └─ return JsonResponse(data)
+```
+
+### Response Schema
+
+```json
+{
+  "status":     "live" | "offline",
+  "station":    "Kabulhaden Online",
+  "program":    null,
+  "title":      "Song Title",
+  "artist":     "Artist Name",
+  "cover":      "",
+  "listeners":  3,
+  "started_at": null,
+  "stream_url": "https://<ngrok-subdomain>.ngrok-free.app/kabulhaden.mp3",
+  "is_live":    true,
+  "provider":   "icecast"
+}
+```
+
+> **Note:** `program` selalu `null` (TD-001 — integrasi broadcast schedule belum dilakukan).
 
 ---
 
-## Radio Dashboard
+## RadioStreamProxyView
 
-### Dashboard View
+`GET /radio/stream/` — same-origin proxy yang merelay byte audio dari Icecast ke browser.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  Radio Dashboard                                              │
-│                                                               │
-│  ┌─────────────────────┐  ┌─────────────────────┐           │
-│  │ Sedang Tayang        │  │ Selanjutnya          │           │
-│  │ 🎵 Musik Pagi        │  │ 📰 Berita Siang      │           │
-│  │ 08:00 - 10:00        │  │ 12:00 - 14:00        │           │
-│  │ Status: 🔴 LIVE      │  │ Tersisa: 2j 15m      │           │
-│  └─────────────────────┘  └─────────────────────┘           │
-│                                                               │
-│  ┌─────────────────────┐  ┌─────────────────────┐           │
-│  │ Antrian Play         │  │ Status Stream        │           │
-│  │ 1. Episode 42 ✅     │  │ Encoder: Connected   │           │
-│  │ 2. Episode 43 ⏳     │  │ Bitrate: 128 kbps    │           │
-│  │ 3. Episode 44 ⏳     │  │ Listeners: 234       │           │
-│  └─────────────────────┘  └─────────────────────┘           │
-│                                                               │
-│  Statistik Minggu Ini:                                        │
-│  Total Pendengar: 12,450                                      │
-│  Rata-rata per Jam: 245                                       │
-│  Peak: 567 (Senin 18:00)                                     │
-└──────────────────────────────────────────────────────────────┘
-```
+**Kapan digunakan:**
+- Production deployment di belakang Nginx (Nginx mendukung streaming response dengan benar)
+- Debugging server-side audio tanpa CORS consideration
+
+**Kapan TIDAK digunakan (default):**
+- Replit development — Replit's reverse proxy mem-buffer streaming response, sehingga browser tidak pernah menerima data audio (spinner terus berputar). Lihat `docs/deployment/TROUBLESHOOTING.md#radio-streaming-issues-replit`.
+
+**Default saat ini:** `LiveRadioAPIView` mengembalikan `stream_url` langsung (URL Icecast/ngrok), bukan `/radio/stream/`.
 
 ---
 
-## Management Commands
+## Frontend — Alpine.store('radio')
 
-### Refresh All Radio Data
+Radio player menggunakan Alpine.js global store, bukan komponen `x-data`. Ini memungkinkan template mana pun membaca dan mengontrol state player yang sama.
 
-```python
-# apps/radio/management/commands/refresh_radio_all.py
-class Command(BaseCommand):
-    help = 'Refresh all radio data (schedules, now playing, listeners)'
-    
-    def handle(self, *args, **options):
-        # Update now playing
-        self.stdout.write('Updating now playing...')
-        update_now_playing()
-        
-        # Update listener counts
-        self.stdout.write('Updating listener counts...')
-        update_listener_counts()
-        
-        # Check stream health
-        self.stdout.write('Checking stream health...')
-        check_stream_health()
-        
-        self.stdout.write(self.style.SUCCESS('Radio data refreshed'))
+### State Properties
+
+| Property | Type | Description |
+|---|---|---|
+| `isPlaying` | boolean | Audio sedang diputar |
+| `isLoading` | boolean | Buffer loading (spinner ditampilkan) |
+| `isLive` | boolean | Stream sedang live |
+| `isMuted` | boolean | Audio di-mute |
+| `volume` | number | Volume 0–100 (persisted ke localStorage) |
+| `streamUrl` | string | URL stream dari `/api/v1/radio/live/` |
+| `currentTrack` | object | `{ title, artist, artwork }` |
+| `listeners` | number | Jumlah pendengar saat ini |
+
+### Key Methods
+
+| Method | Description |
+|---|---|
+| `init()` | Setup audio element, event listeners, mulai polling. Dipanggil manual. |
+| `togglePlay()` | Play/pause. Selalu menghormati klik pengguna (tidak ada isLoading guard). |
+| `fetchStatus()` | Fetch `/api/v1/radio/live/`, update state. Poll setiap 25 detik. |
+| `scheduleReconnect()` | Exponential backoff (1s, 2s, 4s… max 30s). Reset `isLoading` di catch. |
+| `setVolume(event)` | Set volume dari click position pada progress bar. |
+
+### Penggunaan di Template
+
+```html
+<!-- Harus berada dalam x-data (bisa empty) -->
+<div x-data>
+  <button @click="$store.radio.togglePlay()">
+    <template x-if="$store.radio.isLoading">
+      <svg class="animate-spin">...</svg>
+    </template>
+    <template x-if="$store.radio.isPlaying && !$store.radio.isLoading">
+      <!-- pause icon -->
+    </template>
+    <template x-if="!$store.radio.isPlaying && !$store.radio.isLoading">
+      <!-- play icon -->
+    </template>
+  </button>
+  <span x-text="$store.radio.currentTrack.title"></span>
+  <span x-text="$store.radio.currentTrack.artist"></span>
+  <span x-text="$store.radio.listeners + ' pendengar'"></span>
+</div>
 ```
 
-### Check Stream Health
-
-```python
-# apps/radio/management/commands/check_stream_health.py
-class Command(BaseCommand):
-    help = 'Check health of all streams'
-    
-    def handle(self, *args, **options):
-        stations = Station.objects.filter(is_active=True)
-        
-        for station in stations:
-            is_healthy = self._check_stream(station.stream_url)
-            status = '✓ Healthy' if is_healthy else '✗ Unhealthy'
-            self.stdout.write(f'{station.name}: {status}')
-            
-            if not is_healthy:
-                # Send notification to admins
-                NotificationService.notify_stream_error(
-                    station,
-                    f'Stream {station.name} tidak merespons'
-                )
-```
+**Reference:** `static/js/radio-player.js`, `templates/website/components/sticky_player.html`, `templates/website/components/home/hero_radio.html`
 
 ---
 
-## Stream Status API
+## Hero Radio Layout
 
-```python
-# apps/radio/views.py
-class StreamStatusAPI(View):
-    """JSON API for stream status (used by players)."""
-    
-    def get(self, request, *args, **kwargs):
-        stations = Station.objects.filter(is_active=True)
-        data = []
-        
-        for station in stations:
-            current = station.current_program
-            data.append({
-                'id': str(station.pk),
-                'name': station.name,
-                'stream_url': station.stream_url,
-                'is_live': self._is_streaming(station),
-                'current_program': {
-                    'title': current.program.title if current else None,
-                    'host': current.program.host if current else None,
-                    'start_time': current.start_time.strftime('%H:%M') if current else None,
-                    'end_time': current.end_time.strftime('%H:%M') if current else None,
-                } if current else None,
-                'listeners': self._get_listener_count(station),
-            })
-        
-        return JsonResponse({'stations': data})
+`templates/website/components/home/hero_radio.html` — komponen player di homepage.
+
+| Property | Sebelum Sprint 4.3 | Sesudah Sprint 4.3 |
+|---|---|---|
+| min-height | 90vh | 72vh |
+| Vertical padding | py-28 | py-16 |
+| Tombol play | 120px | 80px |
+| Card width | 500px | 360px |
+| Album art | aspect-square (full) | fixed 160px height |
+
+---
+
+## Services
+
+| Service | Tanggung Jawab |
+|---|---|
+| `RadioStationService` | CRUD station, get_primary_station() |
+| `RadioProviderService` | CRUD provider, toggle_active() |
+| `NowPlayingService` | get_now_playing(station_id) |
+| `ListenerService` | get_current(station_id), export_csv/excel |
+| `StreamHealthService` | get_latest(station_id), get_health_history() |
+| `LiveSessionService` | get_active(station_id) |
+| `PlayerService` | get_player_config() → volume, autoplay, stream_url |
+| `FallbackService` | get_available_stream(station_id) → URL dengan fallback |
+| `MetadataService` | Metadata manipulation helpers |
+| `BroadcastIntegrationService` | get_current_program() — integrasi ke apps.broadcast |
+
+---
+
+## Catatan Operasional (ngrok)
+
+Saat testing dengan ngrok free-tier, URL berubah setiap restart tunnel. Update manual diperlukan:
+
+```bash
+# Update via Django shell
+python3 manage.py shell -c "
+from apps.radio.models import RadioProvider
+p = RadioProvider.objects.filter(active=True).first()
+p.api_url = 'https://NEW-SUBDOMAIN.ngrok-free.app/status-json.xsl'
+p.stream_url = 'https://NEW-SUBDOMAIN.ngrok-free.app/kabulhaden.mp3'
+p.save()
+from django.core.cache import cache
+cache.delete('amp_v1_live_radio')
+print('Updated and cache cleared.')
+"
 ```
+
+Atau lewat: **AMP Studio → Radio → Provider → Edit**.
 
 ---
 
 ## Related Documentation
 
-- `erd.md` - Radio entity relationships
-- `31_API_ENDPOINTS_REFERENCE.md` - Radio API endpoints
-- `22_ANIMATION_GUIDE.md` - Now-playing animations
-- `06_USER_FLOWS.md` - Radio management flows
+- `docs/adr/0010-multi-provider-radio-engine.md` — ADR untuk multi-provider architecture
+- `docs/31_API_ENDPOINTS_REFERENCE.md` — semua radio API endpoints
+- `docs/26_ALPINEJS_PATTERNS.md` — Alpine.store('radio') pattern detail
+- `docs/changelog/sprint-4.3.md` — bug fixes Sprint 4.3
+- `docs/architecture/TECH_DEBT.md` — TD-001 (program null), TD-008 (ngrok URL)
+- `docs/deployment/TROUBLESHOOTING.md#radio-streaming-issues-replit` — troubleshooting audio
 
 ---
 
-*Last updated: 2026-07-15*
+*Last updated: Sprint 4.3 — 20 Juli 2026*

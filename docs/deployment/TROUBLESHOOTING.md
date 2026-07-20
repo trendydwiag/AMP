@@ -14,6 +14,7 @@ Common issues and their solutions.
 6. [Authentication Issues](#authentication-issues)
 7. [Performance Issues](#performance-issues)
 8. [Email Issues](#email-issues)
+9. [Radio Streaming Issues (Replit)](#radio-streaming-issues-replit)
 
 ---
 
@@ -442,6 +443,89 @@ s.quit()
 print('Connection successful')
 "
 ```
+
+---
+
+## Radio Streaming Issues (Replit)
+
+### Audio player spinner terus berputar, tidak ada suara
+
+**Gejala:** Tombol play berubah jadi spinner, tetapi tidak ada audio yang keluar. Tidak ada error di console.
+
+**Penyebab:** Replit's reverse proxy mem-buffer seluruh streaming response sebelum diteruskan ke browser. Untuk live stream (infinite body), ini berarti browser tidak pernah menerima data audio.
+
+**Solusi:** `LiveRadioAPIView` harus mengembalikan URL stream **langsung** ke browser (URL Icecast/ngrok), bukan URL proxy Django (`/radio/stream/`). Browser kemudian connect langsung ke Icecast, bypass Replit's proxy.
+
+```python
+# apps/radio/views.py — BENAR
+data = { 'stream_url': stream_url }  # URL Icecast langsung
+
+# SALAH — tidak gunakan untuk default
+data = { 'stream_url': '/radio/stream/' }  # Django proxy diblokir oleh Replit proxy
+```
+
+Verifikasi di browser DevTools → Network: request ke stream URL harus muncul dan mengembalikan `audio/mpeg`.
+
+---
+
+### `NotSupportedError: Failed to load because no supported source was found`
+
+**Gejala:** Console menampilkan `[Radio] play() rejected: NotSupportedError`.
+
+**Penyebab paling umum:**
+
+1. **Stream offline** — tidak ada broadcaster yang terhubung ke Icecast. Mount point mengembalikan 404 HTML.
+   ```bash
+   curl -si https://<ngrok-url>/kabulhaden.mp3 | head -3
+   # Harus: HTTP/2 200 dengan Content-Type: audio/mpeg
+   # Jika: HTTP/2 404 → stream offline, tidak ada yang bisa dilakukan dari sisi code
+   ```
+
+2. **ngrok URL sudah berubah** — ngrok free-tier men-generate URL baru setiap restart.
+   ```bash
+   # Update di DB via Django shell
+   python3 manage.py shell -c "
+   from apps.radio.models import RadioProvider
+   p = RadioProvider.objects.filter(active=True).first()
+   p.api_url = 'https://NEW-SUBDOMAIN.ngrok-free.app/status-json.xsl'
+   p.stream_url = 'https://NEW-SUBDOMAIN.ngrok-free.app/kabulhaden.mp3'
+   p.save()
+   "
+   # Atau lewat UI: AMP Studio → Radio → Provider → Edit
+   ```
+
+3. **Cache stale** — `LiveRadioAPIView` cache TTL 20 detik. Flush cache:
+   ```bash
+   python3 manage.py shell -c "from django.core.cache import cache; cache.delete('amp_v1_live_radio')"
+   ```
+
+---
+
+### `[Radio] audio error code=4`
+
+Error code 4 = `MEDIA_ERR_SRC_NOT_SUPPORTED`. Server mengembalikan response yang bukan audio (HTML, JSON, dll).
+
+Cek apa yang dikembalikan oleh URL stream:
+```bash
+curl -si <stream_url> | head -5
+# Content-Type harus: audio/mpeg
+```
+
+---
+
+### Metadata (judul lagu, artis) tidak muncul
+
+1. Cek provider terkonfigurasi di DB: **AMP Studio → Radio → Provider**
+2. Pastikan `api_url` mengarah ke Icecast status endpoint yang valid: `.../status-json.xsl`
+3. Test manual:
+   ```bash
+   curl -s <api_url> | python3 -m json.tool
+   ```
+4. Cek apakah adapter `_find_mount()` menemukan source yang benar. Icecast mengembalikan:
+   - `icestats.source` (dict) jika 1 source terhubung
+   - `icestats.source` (list) jika > 1 source terhubung
+
+---
 
 ### Gmail "less secure apps" error
 

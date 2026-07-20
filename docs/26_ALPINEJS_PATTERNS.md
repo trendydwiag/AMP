@@ -361,6 +361,97 @@ Kabulhaden CMS uses Alpine.js for interactive UI components: dropdowns, modals, 
 
 ---
 
+## Global Store — Radio Player
+
+The live radio player uses `Alpine.store('radio', ...)` — a **global store** pattern rather than a component-scoped `x-data`. This allows any template (sticky player bar, hero section, Studio sidebar) to read and control the same player state without duplicating logic.
+
+### Why `Alpine.store` and NOT `x-data="radioPlayer()"`
+
+| | `Alpine.store` | `x-data="radioPlayer()"` |
+|---|---|---|
+| Scope | Global — one instance | Per-element — multiple instances |
+| Cross-template | ✅ Any template reads `$store.radio` | ❌ Must be in same DOM subtree |
+| Initialization | Explicit `init()` call needed | Auto-called by Alpine |
+| ProfilingPanel crash | ✅ Safe | ❌ Crashes debug toolbar |
+
+### Setup
+
+`radio-player.js` is loaded **synchronously** (no `defer`) in the `extra_js` block, before Alpine's deferred initialization fires:
+
+```html
+<!-- templates/website/main.html -->
+{% block extra_js %}
+  <script src="{% static 'js/radio-player.js' %}?v=2"></script>
+{% endblock %}
+```
+
+```javascript
+// static/js/radio-player.js
+document.addEventListener('alpine:init', () => {
+    Alpine.store('radio', {
+        isPlaying: false,
+        isLoading: false,
+        isLive: false,
+        volume: parseInt(localStorage.getItem('radio_volume') || '75'),
+        currentTrack: { title: '', artist: '', artwork: '' },
+        streamUrl: '',
+        // ...
+
+        init() { /* called manually after store registration */ },
+        togglePlay() { /* always honours user click */ },
+        fetchStatus() { /* polls /api/v1/radio/live/ every 25s */ },
+        scheduleReconnect() { /* exponential backoff, resets isLoading on failure */ },
+    });
+
+    Alpine.store('radio').init();  // must be called manually
+});
+```
+
+### Using the store in templates
+
+```html
+<!-- Any template — read state -->
+<div x-data>
+  <button @click="$store.radio.togglePlay()">
+    <span x-show="$store.radio.isLoading">⏳</span>
+    <span x-show="$store.radio.isPlaying && !$store.radio.isLoading">⏸</span>
+    <span x-show="!$store.radio.isPlaying && !$store.radio.isLoading">▶</span>
+  </button>
+  <span x-text="$store.radio.currentTrack.title"></span>
+  <span x-text="$store.radio.currentTrack.artist"></span>
+</div>
+```
+
+Note: every element that reads `$store.radio` must still be inside an `x-data` element (even an empty `x-data` attribute works).
+
+### isLoading Guard — Fixed Behaviour (Sprint 4.3)
+
+Previous code had `if (this.isLoading) return;` at the top of `togglePlay()`. This meant that if a reconnect attempt silently failed (empty catch), `isLoading` stayed `true` forever and all subsequent clicks were swallowed.
+
+**Current behaviour:** `togglePlay()` always cancels any pending reconnect timer and resets `isLoading = false` before attempting play. The guard is gone.
+
+```javascript
+togglePlay() {
+    if (this.isPlaying) { /* pause */ return; }
+
+    // Always honour user click
+    if (this.reconnectTimer) { clearTimeout(this.reconnectTimer); this.reconnectTimer = null; }
+    this.isLoading = false;
+
+    // ... set src, call play()
+    this.audio.play()
+        .catch((err) => {
+            console.warn('[Radio] play() rejected:', err?.name, err?.message);
+            this.isLoading = false;   // always reset
+            this.scheduleReconnect();
+        });
+}
+```
+
+**Reference:** `static/js/radio-player.js`
+
+---
+
 ## FOUC Prevention
 
 All `x-show` elements include `style="display: none;"` to prevent Flash of Unstyled Content before Alpine.js initializes.

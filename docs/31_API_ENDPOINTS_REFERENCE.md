@@ -109,44 +109,69 @@ python manage.py generate_thumbnails  # Generate thumbnails
 
 ## Radio (`/radio/`)
 
+### AMP Studio Management (Login Required)
+
 | URL Pattern | View | Method | Description |
 |-------------|------|--------|-------------|
 | `/radio/` | `RadioDashboardView` | GET | Radio dashboard |
-| `/radio/stasiun/` | `StationListView` | GET | List stations |
-| `/radio/stasiun/tambah/` | `StationCreateView` | GET/POST | Create station |
-| `/radio/stasiun/<uuid>/` | `StationDetailView` | GET | View station |
-| `/radio/stasiun/<uuid>/edit/` | `StationUpdateView` | GET/POST | Edit station |
-| `/radio/stasiun/<uuid>/hapus/` | `StationDeleteView` | POST | Delete station |
-| `/radio/program/` | `ProgramListView` | GET | List programs |
-| `/radio/program/tambah/` | `ProgramCreateView` | GET/POST | Create program |
-| `/radio/program/<uuid>/` | `ProgramDetailView` | GET | View program |
-| `/radio/program/<uuid>/edit/` | `ProgramUpdateView` | GET/POST | Edit program |
-| `/radio/program/<uuid>/hapus/` | `ProgramDeleteView` | POST | Delete program |
-| `/radio/jadwal/` | `ScheduleListView` | GET | List schedules |
-| `/radio/jadwal/tambah/` | `ScheduleCreateView` | GET/POST | Create schedule |
-| `/radio/jadwal/<uuid>/` | `ScheduleDetailView` | GET | View schedule |
-| `/radio/jadwal/<uuid>/edit/` | `ScheduleUpdateView` | GET/POST | Edit schedule |
-| `/radio/jadwal/<uuid>/hapus/` | `ScheduleDeleteView` | POST | Delete schedule |
-| `/radio/episode/` | `EpisodeListView` | GET | List episodes |
-| `/radio/episode/tambah/` | `EpisodeCreateView` | GET/POST | Create episode |
-| `/radio/episode/<uuid>/` | `EpisodeDetailView` | GET | View episode |
-| `/radio/episode/<uuid>/edit/` | `EpisodeUpdateView` | GET/POST | Edit episode |
-| `/radio/episode/<uuid>/hapus/` | `EpisodeDeleteView` | POST | Delete episode |
-| `/radio/antrian/` | `QueueListView` | GET | View play queue |
-| `/radio/antrian/tambah/` | `QueueAddView` | POST | Add to queue |
-| `/radio/antrian/<uuid>/hapus/` | `QueueRemoveView` | POST | Remove from queue |
-| `/radio/antrian/reorder/` | `QueueReorderView` | POST | Reorder queue |
-| `/radio/statistik/` | `RadioStatsView` | GET | View statistics |
-| `/radio/cache/refresh/` | `CacheRefreshView` | POST | Refresh cache |
+| `/radio/station/` | `RadioStationListView` | GET | List radio stations |
+| `/radio/station/buat/` | `RadioStationCreateView` | GET/POST | Create station |
+| `/radio/station/<pk>/edit/` | `RadioStationEditView` | GET/POST | Edit station |
+| `/radio/station/<pk>/toggle/` | `RadioStationDeleteView` | POST | Toggle station active/inactive |
+| `/radio/provider/` | `RadioProviderListView` | GET | List providers |
+| `/radio/provider/buat/` | `RadioProviderCreateView` | GET/POST | Create provider |
+| `/radio/provider/<pk>/edit/` | `RadioProviderEditView` | GET/POST | Edit provider (stream URL, API URL, credentials) |
+| `/radio/provider/<pk>/toggle/` | `RadioProviderDeleteView` | POST | Toggle provider active/inactive |
+| `/radio/listener/export/<station_id>/` | `ExportCSVView` | GET | Export listener stats CSV |
+| `/radio/listener/export/<station_id>/excel/` | `ExportExcelView` | GET | Export listener stats Excel |
+
+### Internal Radio APIs (No Auth Required)
+
+| URL Pattern | View | Method | Description |
+|-------------|------|--------|-------------|
+| `/radio/api/status/` | `RadioStatusAPIView` | GET | Full station status JSON |
+| `/radio/api/now-playing/` | `RadioNowPlayingAPIView` | GET | Current song/artist |
+| `/radio/api/player-config/` | `RadioPlayerConfigAPIView` | GET | Player config (volume, autoplay) |
+| `/radio/api/listeners/` | `RadioListenerAPIView` | GET | Current & peak listener count |
+| `/radio/api/health/` | `RadioHealthAPIView` | GET | Stream health status |
+| `/radio/api/current-program/` | `RadioCurrentProgramAPIView` | GET | Current live program info |
+| `/radio/api/current-host/` | `RadioCurrentHostAPIView` | GET | Current broadcast host |
+| `/radio/api/providers/` | `RadioProvidersAPIView` | GET | List active providers |
+| `/radio/stream/` | `RadioStreamProxyView` | GET | **Same-origin audio proxy** — relays Icecast stream; adds ngrok bypass header. Not used as default in Replit dev (buffering issue). Available for production deployments behind Nginx. |
+
+### Public Live Radio API
+
+| URL Pattern | View | Method | Description |
+|-------------|------|--------|-------------|
+| `/api/v1/radio/live/` | `LiveRadioAPIView` | GET | **Primary endpoint** — normalized live data for all UI components. DB-first provider lookup. 20 s cache. Never crashes (offline fallback). |
+
+#### `/api/v1/radio/live/` Response Schema
+
+```json
+{
+  "status": "live",
+  "station": "Kabulhaden Online",
+  "program": null,
+  "title": "Song Title",
+  "artist": "Artist Name",
+  "cover": "",
+  "listeners": 3,
+  "started_at": null,
+  "stream_url": "https://<ngrok-subdomain>.ngrok-free.app/kabulhaden.mp3",
+  "is_live": true,
+  "provider": "icecast"
+}
+```
+
+**Notes:**
+- `stream_url` adalah URL langsung ke Icecast/ngrok. Browser connect langsung — tidak melalui Django proxy.
+- `program` selalu `null` (TD-001 — integrasi broadcast schedule belum dilakukan).
+- Response di-cache 20 detik (`STREAM_CACHE_TTL` setting).
 
 ### Management Commands
 
 ```bash
-python manage.py refresh_radio_all       # Refresh all radio data
-python manage.py refresh_now_playing     # Update now playing
-python manage.py refresh_listener        # Update listener count
-python manage.py check_stream_health     # Check stream health
-python manage.py cleanup_cache           # Clean old cache entries
+python manage.py demo_seed [--reset]   # Seed demo data including radio station
 ```
 
 ---
@@ -257,4 +282,4 @@ python manage.py init_settings  # Initialize default settings
 
 ---
 
-*Last updated: 2026-07-15*
+*Last updated: 2026-07-20 — Sprint 4.3 (radio API endpoints, RadioStreamProxyView, LiveRadioAPIView schema)*

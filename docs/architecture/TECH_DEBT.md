@@ -27,21 +27,15 @@ In `LiveRadioAPIView.get()` (`apps/radio/views.py`), query `apps/broadcast` for 
 ## TD-002 — No Fallback Stream URL
 **Sprint introduced:** 3.4D
 **Priority:** High (playback failure)
-**Status:** Open — tracked as Task #8
+**Status:** ✅ RESOLVED — Sprint 4.3
 
-### Description
-`LiveRadioAPIView` extracts `stream_url` from `raw_response.station.listen_url` in the upstream provider's nowplaying JSON. If the provider omits this field (version change, config issue, provider swap), `stream_url` returns an empty string. The audio player's play button becomes non-functional with no error shown to the user.
-
-### Impact
-Silent playback failure. Users click play; nothing happens.
-
-### Suggested Solution
-1. Add `STREAM_URL` to `config/settings/base.py` (env-var readable)
-2. In `LiveRadioAPIView`, use `station.listen_url` when present; fall back to `settings.STREAM_URL`
-3. In `radio-player.js`, show a visible error state when `streamUrl` is empty after a fetch
-
-### Estimated Effort
-1–2 hours.
+### Resolution
+`LiveRadioAPIView` sekarang memiliki fallback eksplisit:
+```python
+listen_url_fallback = db_provider.stream_url  # set sebelum try block
+stream_url = raw_response.get('listen_url') or listen_url_fallback
+```
+`listen_url_fallback` selalu tersedia di except block sehingga bahkan jika upstream API gagal total, URL stream masih dikembalikan ke browser.
 
 ---
 
@@ -107,6 +101,25 @@ JS reads `parseInt(document.querySelector('meta[name="stream-poll-interval"]').c
 
 ### Estimated Effort
 1–2 hours.
+
+---
+
+## TD-008 — ngrok URL Harus Diupdate Manual Setiap Restart
+**Sprint introduced:** 4.3
+**Priority:** Medium (operasional)
+**Status:** Open — by design untuk development
+
+### Description
+`RadioProvider.stream_url` dan `RadioProvider.api_url` di DB menyimpan URL ngrok yang berubah setiap kali tunnel di-restart. Tidak ada mekanisme otomatis untuk mendeteksi URL baru.
+
+### Impact
+Setelah ngrok restart, `LiveRadioAPIView` mengembalikan URL lama → browser menerima 404 dari Icecast → `NotSupportedError` di audio element.
+
+### Suggested Solution
+Simpan URL base ngrok sebagai environment variable (`NGROK_BASE_URL`) dan buat `RadioProvider` model membaca dari env saat `stream_url` kosong. Atau gunakan ngrok paid plan dengan static domain.
+
+### Estimated Effort
+1–2 jam.
 
 ---
 

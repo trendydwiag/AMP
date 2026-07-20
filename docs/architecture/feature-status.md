@@ -1,5 +1,5 @@
 # AMP Studio — Feature Status Inventory
-**Generated:** Sprint 4.0 (July 17, 2026)
+**Generated:** Sprint 4.0 (July 17, 2026) — last updated Sprint 4.3 (July 20, 2026)
 **Status Legend:** ✅ Complete | 🟡 Partial | ⚪ Planned
 
 ---
@@ -210,7 +210,7 @@
 | Sidebar Navigation | ✅ | Collapsible, role-filtered |
 | Command Palette (Ctrl+K) | ✅ | |
 | Notification Panel | ✅ | |
-| Radio Player Bar | ✅ | Alpine.store('radio') |
+| Radio Player Bar | ✅ | Alpine.store('radio') — isLoading bug fixed Sprint 4.3 |
 | Setup Wizard | ✅ | Session-based, 5 steps |
 | Guided Tour | ✅ | localStorage-based |
 | Health Widget | ✅ | Stream health in header |
@@ -229,7 +229,7 @@
 
 | Feature | Status | Notes |
 |---|---|---|
-| Homepage with live radio player | ✅ | |
+| Homepage with live radio player | ✅ | Direct stream URL (Sprint 4.3); hero layout compacted |
 | Program Listing | ✅ | |
 | Broadcast Schedule | ✅ | |
 | Podcast Listing | ✅ | |

@@ -70,4 +70,32 @@ None. The existing `/radio/api/status/` endpoint is unchanged. All changes are a
 
 ---
 
+---
+
+## Sprint 4.3 — Radio Live Player Stabilization (20 Juli 2026)
+
+### Summary
+Enam bug diperbaiki secara berurutan hingga live radio player benar-benar menghasilkan suara di browser. Sebelumnya player menampilkan metadata dengan benar tapi audio tidak keluar.
+
+### Bugs Fixed
+- **`LiveRadioAPIView` mengabaikan DB provider** — view membaca `settings.STREAM_PROVIDER` secara hardcoded; diperbaiki ke DB-first via `RadioStationService`
+- **`icecast.py` NameError** — `get_listener_count()` mereferensikan variabel `ice` sebelum di-assign
+- **ngrok bypass header hilang** — `BaseAdapter._make_request()` sekarang mengirim `ngrok-skip-browser-warning: true` ke semua upstream request
+- **`_find_mount()` key salah** — Icecast mengembalikan `icestats.source` bukan `icestats.mount`; handle dict (1 source) dan list (banyak source)
+- **`isLoading` tersangkut `true`** — catch block di `scheduleReconnect()` tidak reset state; `togglePlay()` dirombak agar selalu honouri klik pengguna
+- **Replit reverse proxy mem-buffer streaming** — `stream_url` di API response diubah dari `/radio/stream/` (Django proxy) ke URL stream langsung; browser connect ke Icecast tanpa melewati Replit proxy
+
+### Architecture Decision
+`RadioStreamProxyView` tetap tersedia di `/radio/stream/` sebagai fallback untuk production non-Replit, tapi bukan default karena Replit's reverse proxy mem-buffer infinite streaming responses.
+
+### Files Modified
+`apps/radio/views.py`, `apps/radio/urls.py`, `apps/radio/adapters/icecast.py`, `apps/radio/adapters/base.py`, `static/js/radio-player.js`, `templates/website/main.html`, `templates/website/components/home/hero_radio.html`, `config/settings/development.py`
+
+### Tech Debt Resolved
+- TD-002 (No Fallback Stream URL) — CLOSED
+
+> Lihat `docs/changelog/sprint-4.3.md` untuk detail lengkap.
+
+---
+
 _Previous sprint history will be appended above this line as new sprints are completed._
