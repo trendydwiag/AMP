@@ -211,9 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(r => r.json())
             .then(data => {
                 // Update status badge, listeners, etc.
-                console.log('Radio status refreshed:', data);
             })
-            .catch(err => console.error('Refresh error:', err));
+            .catch(() => {});
     }, 30000);
 });
 </script>

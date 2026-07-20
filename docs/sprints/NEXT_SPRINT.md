@@ -1,105 +1,101 @@
 # Next Sprint Recommendations
-**Based on:** Sprint 4.0 completion (Knowledge Base Refresh)
+**Based on:** Sprint 4.0.1 completion (Documentation Synchronization)
 **Demo date:** July 21, 2026
-**Prepared:** July 17, 2026
-
-> ⚠️ **NOTE:** File ini diperbarui di Sprint 4.0. Versi sebelumnya merujuk ke Sprint 3.5A.
-> Sprint 3.5, 3.6, 3.7, dan 4.0 sudah **SELESAI**.
+**Prepared:** July 20, 2026
 
 ---
 
-## Status Sprint Terkini
+## Current Status
 
-| Sprint | Judul | Status |
+| Sprint | Title | Status |
 |---|---|---|
-| 3.5 | Founder Experience | ✅ DONE |
-| 3.6 | Platform UI Consistency | ✅ DONE |
-| 3.7 | UX/Visual Regression Fixes | ✅ DONE |
-| 4.0 | Knowledge Base Refresh | ✅ DONE |
+| 4.1 | Demo Readiness & Founder Experience | ✅ DONE |
+| 4.2 | Media Pipeline Engine | ✅ DONE |
+| 4.3 | Radio Live Player Stabilization | ✅ DONE |
+| 4.0.1 | Knowledge Base Governance & Documentation Sync | ✅ DONE |
 
 ---
 
-## Sprint Berikutnya yang Direkomendasikan
+## Sprint Recommendations (Post-Demo)
 
-### 🚨 PRIORITY 0 — Task #2 (CRITICAL untuk demo)
+### 🔴 PRIORITY 0 — Critical for Production
 
-**Sprint 4.1 — Superuser Setup & Demo Verification**
+**Sprint 4.4 — Wire Program Name to Live API (TD-001)**
 
-**Task:** Buat superuser account dan verifikasi studio login
-- Jalankan: `python manage.py create_superadmin`
-- Atau: `python manage.py reset_admin`
-- Verifikasi login di `/akun/masuk/` → redirect ke `/studio/`
-- Verifikasi dark mode toggle berfungsi
-- Verifikasi radio player bar berfungsi
-- Jalankan demo seed: `python manage.py demo_seed --reset`
+**Task:** Connect broadcast schedule to live API
+- In `LiveRadioAPIView.get()`, query `apps/broadcast` for currently active schedule slot by current day/time
+- Populate `program` field with the on-air program name
+- Cache together with upstream data (20s TTL)
+- Currently `program` is always null — looks broken in demo
 
-**Effort:** 30 menit
-**Blocker:** Tanpa ini, AMP Studio tidak bisa di-demo
-
----
-
-### 🔴 PRIORITY 1 — Technical Debt Kritis
-
-**Sprint 4.2 — Live API Program Name (TD-001)**
-
-**Task:** Wire program name ke `GET /api/v1/radio/live/`
-- Di `LiveRadioAPIView.get()`, query `apps/broadcast` untuk jadwal slot aktif berdasarkan hari/jam sekarang
-- Populate field `program` dengan nama program yang sedang on-air
-- Cache bersama dengan data upstream (20s TTL)
-- Saat ini field `program` selalu return null → terlihat sebagai bug di demo
-
-**Effort:** 2–4 jam
+**Effort:** 2–4 hours
 **Files:** `apps/radio/views.py` (LiveRadioAPIView), `apps/broadcast/repositories.py` (ScheduleRepository)
 
-**Sprint 4.3 — Stream URL Fallback (TD-002)**
+---
 
-**Task:** Tambah fallback stream URL
-- Tambah `STREAM_URL` ke `config/settings/base.py` (env-var readable)
-- Di `LiveRadioAPIView`, gunakan `station.listen_url` jika ada; fallback ke `settings.STREAM_URL`
-- Di `radio-player.js`, tampilkan visible error state jika `streamUrl` kosong
+### 🔴 PRIORITY 1 — Technical Debt
 
-**Effort:** 1–2 jam
+**Sprint 4.5 — Superuser Setup & Platform Migrations (TD-006, TD-007)**
+
+**Task:** Ensure superuser exists and platform migrations are applied
+- Run `python manage.py showmigrations` to verify pending migrations
+- Apply if safe: `python manage.py migrate`
+- Verify superuser login works
+- Fix demo_seed admin `is_superuser=True` bug (NEW-002)
+
+**Effort:** 1 hour
 
 ---
 
-### 🟡 PRIORITY 2 — Task #4 (Real Radio Stream)
+**Sprint 4.6 — AMP Studio Dashboard Service Extraction (NEW-001)**
 
-**Sprint 4.4 — Connect Real Radio Stream**
+**Task:** Extract inline ORM queries from `AMPStudioDashboardView`
+- Move ~25+ inline queries to a new `StudioService` or `DashboardService`
+- Follow Service-Repository pattern
+- Add caching for expensive queries (storage calculation, system health)
 
-**Task:** Pastikan live player tampil data now-playing dari stream nyata
-- Verifikasi `a7.siar.us` reachable dari dev/production environment
-- Jika tidak reachable: configure AzuraCast adapter sebagai primary
-- Pastikan `/api/v1/radio/live/` return `"status": "live"` (bukan `"offline"`)
-- Verifikasi track title dan listener count muncul di dashboard
-
-**Note:** Architecture sudah ada (BroadcastindoAdapter active). Problem utama adalah network access dari Replit ke upstream provider.
+**Effort:** 4–6 hours
 
 ---
 
-### 🟡 PRIORITY 3 — Medium Priority
+### 🟡 PRIORITY 2 — Medium Priority
 
-**Sprint 4.5 — Analytics Dashboard (Real Data)**
-- Agregasi `ListenerStatistic` records ke dashboard analytics
+**Sprint 4.7 — Automated Tests for LiveRadioAPIView (TD-003)**
+- Create `apps/radio/tests/test_live_api.py`
+- Test happy path, offline fallback, cache behavior, provider errors
+- Mock adapter's `_make_request` method
+
+**Sprint 4.8 — CSP Security Hardening (NEW-003)**
+- Add `django-csp` to INSTALLED_APPS and MIDDLEWARE
+- Verify CSP headers are actually sent
+- Test that media streaming works with CSP restrictions
+
+**Sprint 4.9 — Analytics Dashboard (Real Data)**
+- Aggregate `ListenerStatistic` records to dashboard analytics
 - Chart listener over time
-- Status: view + template sudah ada, data belum diagregasi
-
-**Sprint 4.6 — Automated Tests**
-- `apps/radio/tests/test_live_api.py`
-- Test happy path + offline fallback + cache behavior
-
-**Sprint 4.7 — Platform Migrations**
-- Verifikasi dan apply unapplied migrations di `apps/platform`
-- `python manage.py showmigrations` → `python manage.py migrate`
+- Status: view + template exist, data not yet aggregated
 
 ---
 
-## Post-Demo Scope (Jangan Dimulai Sebelum 21 Juli)
+### ⚪ PRIORITY 3 — Low Priority / Future
 
-| Item | Alasan defer |
+| Item | Effort | Notes |
+|---|---|---|
+| BroadcastindoAdapter optimization (TD-004) | 1 hour | Cache within adapter instance |
+| Configurable polling intervals (TD-005) | 1–2 hours | Pass STREAM_CACHE_TTL to frontend via meta tag |
+| content/repos.py rename (NEW-004) | 30 min | Rename to repositories.py per convention |
+| pyproject.toml cleanup (NEW-005) | 30 min | Sync deps, fix name from "repl-nix-workspace" |
+| WebSocket/SSE real-time updates | Multi-day | Requires Django Channels |
+| Mobile app | Future scope | — |
+
+---
+
+## Post-Demo Scope
+
+| Item | Reason Deferred |
 |---|---|
-| WebSocket/SSE real-time updates | Butuh Django Channels — multi-day effort |
-| Full AMP Streaming Connector architecture | Post-demo replacement untuk Broadcastindo adapter |
+| WebSocket/SSE real-time updates | Requires Django Channels — multi-day effort |
+| Full AMP Streaming Connector | Post-demo replacement for Broadcastindo adapter |
 | Mobile app | Future scope |
-| Listener history charts dengan real data | DB records belum ter-populate dari live stream |
-| Service extraction (StudioService) | Low priority, tidak blocking |
+| Listener history charts with real data | DB records not yet populated from live stream |
 | Merge duplicate tag/category models | Breaking change, needs careful migration |

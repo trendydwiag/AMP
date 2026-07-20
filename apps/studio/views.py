@@ -49,34 +49,43 @@ class AMPStudioDashboardView(TemplateView):
 
         # ── Today's Schedule ──
         today_schedule = []
+        current_program_info = {'current_program': '', 'host': '', 'start_time': '', 'end_time': '', 'remaining_minutes': 0, 'next_program': '', 'next_start_time': ''}
         try:
-            from apps.broadcast.models import BroadcastSchedule
+            from apps.broadcast.services import CurrentProgramResolver, ScheduleService
             from django.utils import timezone
+            from utils.choices import DayOfWeek
             now = timezone.now()
-            today_schedules = BroadcastSchedule.objects.filter(
-                day_of_week=now.weekday()
-            ).select_related('program', 'host').order_by('start_time')
+            day_map = {
+                0: DayOfWeek.MONDAY, 1: DayOfWeek.TUESDAY, 2: DayOfWeek.WEDNESDAY,
+                3: DayOfWeek.THURSDAY, 4: DayOfWeek.FRIDAY, 5: DayOfWeek.SATURDAY, 6: DayOfWeek.SUNDAY,
+            }
+            current_day = day_map[now.weekday()]
+            schedule_svc = ScheduleService()
+            today_schedules = schedule_svc.get_for_day(current_day)
 
             for s in today_schedules:
                 is_live = False
                 is_past = False
-                if hasattr(s, 'start_time') and hasattr(s, 'end_time'):
-                    current_time = now.time()
-                    is_live = s.start_time <= current_time <= s.end_time
-                    is_past = current_time > s.end_time
+                current_time = now.time()
+                is_live = s.start_time <= current_time < s.end_time
+                is_past = current_time >= s.end_time
 
                 today_schedule.append({
-                    'program_name': s.program.name if s.program else str(s),
-                    'host_name': s.host.get_full_name() if s.host else '',
+                    'program_name': s.program.title if s.program else str(s),
+                    'host_name': s.program.host_members.filter(is_lead=True).select_related('host').first().host.display_name if s.program else '',
                     'start_time': s.start_time,
                     'end_time': s.end_time,
                     'is_live': is_live,
                     'is_past': is_past,
                 })
+
+            resolver = CurrentProgramResolver()
+            current_program_info = resolver.resolve()
         except Exception:
             pass
 
         context['today_schedule'] = today_schedule
+        context['current_program_info'] = current_program_info
 
         # ── Recent Articles ──
         try:

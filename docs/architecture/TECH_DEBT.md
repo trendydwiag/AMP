@@ -8,19 +8,10 @@ Do not hide problems — document them so they can be planned and resolved.
 ## TD-001 — `program` Field Always Returns Null in Live API
 **Sprint introduced:** 3.4D
 **Priority:** High (visible in demo)
-**Status:** Open — tracked as Task #7
+**Status:** ✅ RESOLVED — Sprint 4.4
 
-### Description
-`GET /api/v1/radio/live/` always returns `"program": null`. The live broadcast schedule (managed via `apps/broadcast`) is not queried during the live API response. The dashboard and Streaming Center display "Tidak ada program" / "Program tidak diketahui" even when a scheduled show is actively running.
-
-### Impact
-Demo visitors see a blank program name on the dashboard live card and Streaming Center banner. This looks like a broken feature, not a known limitation.
-
-### Suggested Solution
-In `LiveRadioAPIView.get()` (`apps/radio/views.py`), query `apps/broadcast` for the currently active schedule slot by current day/time, and populate `program` with the slot's `program_name`. Cache the result together with the upstream data.
-
-### Estimated Effort
-2–4 hours. The broadcast schedule model already exists; the query is straightforward.
+### Resolution
+`CurrentProgramResolver` service created in `apps/broadcast/services.py` resolves the currently airing program from the broadcast schedule. `LiveRadioAPIView.get()` now queries this resolver and populates `program`, `host`, `start_time`, `end_time`, `remaining_minutes`, `next_program`, and `next_start_time` in the API response. Homepage hero widget and Studio Dashboard both display the resolved program info. The resolver queries `Schedule` by current day_of_week and time, then resolves lead host via `HostMemberRepository`.
 
 ---
 

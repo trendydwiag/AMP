@@ -1,0 +1,33 @@
+{% extends "media_manager/base.html" %}
+{% block title %}Buat Tag — AMP Studio{% endblock %}
+
+{% block media_content %}
+<div class="space-y-6 max-w-lg">
+  <div>
+    <h1 class="amp-page-title">Buat Tag Baru</h1>
+    <p class="amp-page-subtitle">Beri label pada file media untuk pencarian yang lebih mudah.</p>
+  </div>
+
+  <div class="amp-card p-6">
+    <form method="post" action="{% url 'media_manager:tag_create' %}" class="space-y-4">
+      {% csrf_token %}
+      {% for field in form %}
+      <div>
+        <label class="block text-xs font-semibold text-[var(--amp-text-secondary)] uppercase tracking-wide mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <p class="text-xs text-red-600 dark:text-red-400 mt-1">{{ field.errors.0 }}</p>
+        {% endif %}
+        {% if field.help_text %}
+        <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ field.help_text }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <div class="flex items-center gap-3 pt-2">
+        <button type="submit" class="amp-btn amp-btn-primary text-sm">Buat Tag</button>
+        <a href="{% url 'media_manager:tags' %}" class="amp-btn amp-btn-ghost text-sm">Batal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

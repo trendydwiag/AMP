@@ -77,12 +77,23 @@
                         <p class="text-xs font-body text-white/60 truncate" x-text="$store.radio.currentTrack.artist || 'Menunggu siaran...'">Menunggu siaran...</p>
                     </div>
 
-                    {% if current_program_info and current_program_info.program %}
+                    {% if current_program_info and current_program_info.current_program %}
                     <div class="bg-white/5 rounded-lg px-4 py-3 mb-4 border border-white/10">
                         <p class="text-xs font-body text-white/40 uppercase tracking-wider mb-0.5">Program Saat Ini</p>
-                        <p class="text-sm font-heading font-semibold text-white truncate">{{ current_program_info.program }}</p>
+                        <p class="text-sm font-heading font-semibold text-white truncate">{{ current_program_info.current_program }}</p>
                         {% if current_program_info.host %}
                         <p class="text-xs font-body text-white/50 mt-0.5">dengan {{ current_program_info.host }}</p>
+                        {% endif %}
+                        {% if current_program_info.start_time and current_program_info.end_time %}
+                        <p class="text-xs font-body text-white/40 mt-1">
+                            {{ current_program_info.start_time }} – {{ current_program_info.end_time }}
+                            {% if current_program_info.remaining_minutes > 0 %}
+                            <span class="text-white/30">· {{ current_program_info.remaining_minutes }}m tersisa</span>
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                        {% if current_program_info.next_program %}
+                        <p class="text-xs font-body text-white/30 mt-0.5">Berikutnya: {{ current_program_info.next_program }} pukul {{ current_program_info.next_start_time }}</p>
                         {% endif %}
                     </div>
                     {% endif %}

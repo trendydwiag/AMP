@@ -98,7 +98,7 @@ function radioPlayer() {
                 this.progressPercent = data.progress_percent || 0;
                 this.currentListeners = data.current_listeners || 0;
             } catch (e) {
-                console.error('Failed to fetch radio status:', e);
+                // Silent error handling
             }
         },
 

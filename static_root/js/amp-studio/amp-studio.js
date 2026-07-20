@@ -282,7 +282,7 @@ function streamStatus() {
         this.isLive = data.is_live || false;
         this.listenerCount = data.listeners || 0;
         this.currentProgram = data.program || '';
-        this.currentHost = '';
+        this.currentHost = data.host || '';
         this.streamUrl = data.stream_url || '';
       } catch (e) {
         this.isLive = false;

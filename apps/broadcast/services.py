@@ -403,6 +403,102 @@ class AnnouncementService(BaseService[AnnouncementRepository]):
         return None
 
 
+class CurrentProgramResolver:
+    """Resolves the currently airing program from the broadcast schedule.
+
+    Business rule: Broadcast Schedule → current datetime → current program.
+    This is schedule-based resolution — no stream metadata dependency.
+    Returns a dict with program name, host, schedule times, remaining minutes,
+    and next program info. All fields are nullable/empty-safe.
+    """
+
+    DAY_MAP = {
+        0: DayOfWeek.MONDAY,
+        1: DayOfWeek.TUESDAY,
+        2: DayOfWeek.WEDNESDAY,
+        3: DayOfWeek.THURSDAY,
+        4: DayOfWeek.FRIDAY,
+        5: DayOfWeek.SATURDAY,
+        6: DayOfWeek.SUNDAY,
+    }
+
+    def __init__(self):
+        self.schedule_repo = ScheduleRepository()
+        self.host_member_repo = HostMemberRepository()
+
+    def resolve(self) -> Dict[str, Any]:
+        """Return current program info dict, empty-safe."""
+        now = timezone.now()
+        current_time = now.time()
+        current_day = self.DAY_MAP[now.weekday()]
+
+        schedules = self.schedule_repo.get_for_day(current_day)
+
+        # Find the schedule that covers now
+        current_schedule = None
+        for sched in schedules:
+            if sched.start_time <= current_time < sched.end_time:
+                current_schedule = sched
+                break
+
+        if not current_schedule:
+            return self._empty_response()
+
+        # Resolve host
+        host_member = self.host_member_repo.get_lead_hosts(
+            current_schedule.program_id
+        ).first()
+        host_name = host_member.host.display_name if host_member else ''
+
+        # Calculate remaining minutes
+        now_dt = now.replace(tzinfo=None)
+        end_dt = now.replace(
+            hour=current_schedule.end_time.hour,
+            minute=current_schedule.end_time.minute,
+            second=0, microsecond=0, tzinfo=None
+        )
+        remaining_minutes = max(0, int((end_dt - now_dt).total_seconds() / 60))
+
+        # Find next schedule
+        next_schedule = self._get_next_schedule(schedules, current_time, current_day)
+        next_program = ''
+        next_start = ''
+        if next_schedule:
+            next_program = next_schedule.program.title
+            next_start = next_schedule.start_time.strftime('%H:%M')
+
+        return {
+            'current_program': current_schedule.program.title,
+            'host': host_name,
+            'start_time': current_schedule.start_time.strftime('%H:%M'),
+            'end_time': current_schedule.end_time.strftime('%H:%M'),
+            'remaining_minutes': remaining_minutes,
+            'next_program': next_program,
+            'next_start_time': next_start,
+        }
+
+    def _get_next_schedule(self, schedules, current_time, current_day):
+        """Find the next schedule after current time, or first of tomorrow."""
+        future = [
+            s for s in schedules
+            if s.start_time > current_time
+        ]
+        if future:
+            return min(future, key=lambda s: s.start_time)
+        return None
+
+    def _empty_response(self) -> Dict[str, Any]:
+        return {
+            'current_program': '',
+            'host': '',
+            'start_time': '',
+            'end_time': '',
+            'remaining_minutes': 0,
+            'next_program': '',
+            'next_start_time': '',
+        }
+
+
 class CalendarService:
     def __init__(self):
         self.schedule_svc = ScheduleService()

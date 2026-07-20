@@ -1,5 +1,5 @@
 # AMP Studio — Feature Status Inventory
-**Generated:** Sprint 4.0 (July 17, 2026) — last updated Sprint 4.3 (July 20, 2026)
+**Generated:** Sprint 4.0 (July 17, 2026) — last updated Sprint 4.4 (July 20, 2026)
 **Status Legend:** ✅ Complete | 🟡 Partial | ⚪ Planned
 
 ---
@@ -100,8 +100,8 @@
 | Analytics View | ✅ | Template + view exist |
 | Export (CSV/Excel) | ✅ | |
 | Public API: `/api/v1/radio/live/` | ✅ | Normalized schema, provider-agnostic |
-| Program field in live API | ❌ | **TD-001** — always returns null |
-| Fallback stream URL | ❌ | **TD-002** — empty string if provider omits it |
+| Program field in live API | ✅ | TD-001 RESOLVED Sprint 4.4 — `CurrentProgramResolver` service |
+| Fallback stream URL | ✅ | TD-002 RESOLVED Sprint 4.3 — explicit fallback in `LiveRadioAPIView` |
 | Automated tests for live API | ❌ | **TD-003** |
 | WebSocket / SSE for real-time | ⚪ | Planned (ADR future: Django Channels) |
 | Streaming Center | ✅ | `/studio/streaming/` — template field names fixed Sprint 4.0 |

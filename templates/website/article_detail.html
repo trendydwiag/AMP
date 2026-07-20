@@ -13,7 +13,7 @@
 
     <header class="mb-8">
         {% if article.category %}
-        <a href="#" class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-coffee-50 dark:bg-coffee-500/10 text-coffee-600 dark:text-coffee-400 mb-4">{{ article.category }}</a>
+        <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-coffee-50 dark:bg-coffee-500/10 text-coffee-600 dark:text-coffee-400 mb-4">{{ article.category }}</span>
         {% endif %}
         <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white leading-tight mb-4">{{ article.title }}</h1>
         <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">

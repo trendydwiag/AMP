@@ -1,6 +1,7 @@
 import csv
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse, HttpRequest, StreamingHttpResponse
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
@@ -91,14 +92,14 @@ class RadioStationEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        station = RadioStation.objects.get(pk=kwargs['pk'])
+        station = get_object_or_404(RadioStation, pk=kwargs['pk'])
         context['form'] = RadioStationForm(instance=station)
         context['is_edit'] = True
         context['station'] = station
         return context
 
     def post(self, request, *args, **kwargs):
-        station = RadioStation.objects.get(pk=kwargs['pk'])
+        station = get_object_or_404(RadioStation, pk=kwargs['pk'])
         form = RadioStationForm(request.POST, request.FILES, instance=station)
         if form.is_valid():
             form.save()
@@ -153,14 +154,14 @@ class RadioProviderEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        provider = RadioProvider.objects.get(pk=kwargs['pk'])
+        provider = get_object_or_404(RadioProvider, pk=kwargs['pk'])
         context['form'] = RadioProviderForm(instance=provider)
         context['is_edit'] = True
         context['provider'] = provider
         return context
 
     def post(self, request, *args, **kwargs):
-        provider = RadioProvider.objects.get(pk=kwargs['pk'])
+        provider = get_object_or_404(RadioProvider, pk=kwargs['pk'])
         form = RadioProviderForm(request.POST, instance=provider)
         if form.is_valid():
             form.save()
@@ -358,7 +359,7 @@ class RadioStationDeleteView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['station'] = RadioStation.objects.get(pk=kwargs['pk'])
+        context['station'] = get_object_or_404(RadioStation, pk=kwargs['pk'])
         return context
 
     def post(self, request, *args, **kwargs):
@@ -381,7 +382,7 @@ class RadioProviderDeleteView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['provider'] = RadioProvider.objects.get(pk=kwargs['pk'])
+        context['provider'] = get_object_or_404(RadioProvider, pk=kwargs['pk'])
         return context
 
     def post(self, request, *args, **kwargs):
@@ -445,17 +446,23 @@ class LiveRadioAPIView(View):
     On any upstream failure: returns status=offline with HTTP 200 — never crashes.
 
     Schema:
-        status      "live" | "offline"
-        station     Station name from settings
-        program     Current program name or null
-        title       Now-playing song title
-        artist      Now-playing artist
-        cover       Artwork URL
-        listeners   Current listener count (int)
-        started_at  ISO datetime or null
-        stream_url  Audio stream URL from provider
-        is_live     Boolean shorthand for status == "live"
-        provider    Provider key (lowercase, e.g. "broadcastindo")
+        status            "live" | "offline"
+        station           Station name from settings
+        program           Current program name or null (from broadcast schedule)
+        host              Current program host name
+        start_time        Schedule start time (HH:MM)
+        end_time          Schedule end time (HH:MM)
+        remaining_minutes Minutes remaining in current program
+        next_program      Next program name or null
+        next_start_time   Next program start time (HH:MM)
+        title             Now-playing song title
+        artist            Now-playing artist
+        cover             Artwork URL
+        listeners         Current listener count (int)
+        started_at        ISO datetime or null
+        stream_url        Audio stream URL from provider
+        is_live           Boolean shorthand for status == "live"
+        provider          Provider key (lowercase, e.g. "broadcastindo")
     """
     CACHE_KEY = 'amp_v1_live_radio'
 
@@ -465,6 +472,7 @@ class LiveRadioAPIView(View):
         from django.conf import settings
         from .adapters import get_adapter
         from .services import RadioStationService
+        from apps.broadcast.services import CurrentProgramResolver
 
         logger = logging.getLogger('radio')
 
@@ -537,10 +545,27 @@ class LiveRadioAPIView(View):
                 status = 'offline' if is_offline else 'live'
                 is_live = not is_offline
 
+            # Resolve current program from broadcast schedule (TD-001)
+            try:
+                resolver = CurrentProgramResolver()
+                program_info = resolver.resolve()
+            except Exception:
+                program_info = {
+                    'current_program': '', 'host': '', 'start_time': '',
+                    'end_time': '', 'remaining_minutes': 0,
+                    'next_program': '', 'next_start_time': '',
+                }
+
             data = {
                 'status': status,
                 'station': station_name,
-                'program': None,  # Live schedule wire-up planned for a future sprint
+                'program': program_info['current_program'] or None,
+                'host': program_info['host'],
+                'start_time': program_info['start_time'],
+                'end_time': program_info['end_time'],
+                'remaining_minutes': program_info['remaining_minutes'],
+                'next_program': program_info['next_program'] or None,
+                'next_start_time': program_info['next_start_time'],
                 'title': np.song_title or 'Kabulhaden Radio',
                 'artist': np.artist or 'Siaran Langsung',
                 'cover': np.artwork or '',
@@ -560,6 +585,12 @@ class LiveRadioAPIView(View):
                 'status': 'live',
                 'station': station_name,
                 'program': None,
+                'host': '',
+                'start_time': '',
+                'end_time': '',
+                'remaining_minutes': 0,
+                'next_program': None,
+                'next_start_time': '',
                 'title': 'Kabulhaden Radio',
                 'artist': 'Siaran Langsung',
                 'cover': '',

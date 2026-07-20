@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -103,14 +104,14 @@ class ProgramEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        program = Program.objects.get(pk=kwargs['pk'])
+        program = get_object_or_404(Program, pk=kwargs['pk'])
         ctx['form'] = ProgramForm(instance=program)
         ctx['is_edit'] = True
         ctx['program'] = program
         return ctx
 
     def post(self, request, *args, **kwargs):
-        program = Program.objects.get(pk=kwargs['pk'])
+        program = get_object_or_404(Program, pk=kwargs['pk'])
         form = ProgramForm(request.POST, request.FILES, instance=program)
         if form.is_valid():
             updated = form.save(commit=False)
@@ -189,14 +190,14 @@ class HostEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        host = Host.objects.get(pk=kwargs['pk'])
+        host = get_object_or_404(Host, pk=kwargs['pk'])
         ctx['form'] = HostForm(instance=host)
         ctx['is_edit'] = True
         ctx['host'] = host
         return ctx
 
     def post(self, request, *args, **kwargs):
-        host = Host.objects.get(pk=kwargs['pk'])
+        host = get_object_or_404(Host, pk=kwargs['pk'])
         form = HostForm(request.POST, request.FILES, instance=host)
         if form.is_valid():
             form.save()
@@ -285,14 +286,14 @@ class ScheduleEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        schedule = Schedule.objects.get(pk=kwargs['pk'])
+        schedule = get_object_or_404(Schedule, pk=kwargs['pk'])
         ctx['form'] = ScheduleForm(instance=schedule)
         ctx['is_edit'] = True
         ctx['schedule'] = schedule
         return ctx
 
     def post(self, request, *args, **kwargs):
-        schedule = Schedule.objects.get(pk=kwargs['pk'])
+        schedule = get_object_or_404(Schedule, pk=kwargs['pk'])
         form = ScheduleForm(request.POST, instance=schedule)
         if form.is_valid():
             svc = ScheduleService()
@@ -323,7 +324,7 @@ class ScheduleDeleteView(View):
     def post(self, request, *args, **kwargs):
         from django.shortcuts import redirect
         from django.contrib import messages
-        schedule = Schedule.objects.get(pk=kwargs['pk'])
+        schedule = get_object_or_404(Schedule, pk=kwargs['pk'])
         schedule.delete()
         messages.success(request, 'Jadwal berhasil dihapus.')
         return redirect('broadcast:schedule_list')
@@ -385,14 +386,14 @@ class BroadcastSessionEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        session = BroadcastSession.objects.get(pk=kwargs['pk'])
+        session = get_object_or_404(BroadcastSession, pk=kwargs['pk'])
         ctx['form'] = BroadcastSessionForm(instance=session)
         ctx['is_edit'] = True
         ctx['session'] = session
         return ctx
 
     def post(self, request, *args, **kwargs):
-        session = BroadcastSession.objects.get(pk=kwargs['pk'])
+        session = get_object_or_404(BroadcastSession, pk=kwargs['pk'])
         form = BroadcastSessionForm(request.POST, instance=session)
         if form.is_valid():
             form.save()
@@ -474,14 +475,14 @@ class EpisodeEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        episode = Episode.objects.get(pk=kwargs['pk'])
+        episode = get_object_or_404(Episode, pk=kwargs['pk'])
         ctx['form'] = EpisodeForm(instance=episode)
         ctx['is_edit'] = True
         ctx['episode'] = episode
         return ctx
 
     def post(self, request, *args, **kwargs):
-        episode = Episode.objects.get(pk=kwargs['pk'])
+        episode = get_object_or_404(Episode, pk=kwargs['pk'])
         form = EpisodeForm(request.POST, request.FILES, instance=episode)
         if form.is_valid():
             form.save()
@@ -551,14 +552,14 @@ class AnnouncementEditView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        announcement = Announcement.objects.get(pk=kwargs['pk'])
+        announcement = get_object_or_404(Announcement, pk=kwargs['pk'])
         ctx['form'] = AnnouncementForm(instance=announcement)
         ctx['is_edit'] = True
         ctx['announcement'] = announcement
         return ctx
 
     def post(self, request, *args, **kwargs):
-        announcement = Announcement.objects.get(pk=kwargs['pk'])
+        announcement = get_object_or_404(Announcement, pk=kwargs['pk'])
         form = AnnouncementForm(request.POST, request.FILES, instance=announcement)
         if form.is_valid():
             form.save()

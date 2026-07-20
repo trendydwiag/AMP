@@ -1,26 +1,44 @@
-# AI_CONTEXT.md — Kabulhaden CMS / AMP Studio
-**Wajib dibaca sebelum mengerjakan sprint apapun.**
-**Last updated:** Sprint 4.0 — July 17, 2026
+# AI_CONTEXT.md — AMP Studio (Aradhana Media Platform)
+**Permanent Architecture Document**
+**Last verified:** Sprint 4.0.1 — July 20, 2026
+
+> This document is the **permanent architecture reference** for AMP Studio.
+> It does NOT contain sprint progress, tech debt tracking, or project status.
+> For project status, see `docs/PROJECT_STATE.md`.
+> For tech debt, see `docs/architecture/TECH_DEBT.md`.
+> For feature status, see `docs/architecture/feature-status.md`.
 
 ---
 
-## Visi Project
+## Project Vision
 
-**Kabulhaden CMS** (codename: **AMP Studio** — Aradhana Media Platform) adalah sistem manajemen konten berbasis Django yang dibangun khusus untuk stasiun radio. Tujuannya: menggantikan patchwork tool yang dipakai stasiun radio (sistem streaming terpisah, spreadsheet jadwal, website statis) dengan satu platform terpadu.
+**Kabulhaden CMS** (codename: **AMP Studio**) is a Django-based content management system built specifically for radio stations. It replaces the patchwork of disconnected tools (separate streaming systems, spreadsheet schedules, static websites) with a single unified platform.
 
-**Satu platform untuk:** live radio stream → jadwal siaran → episode → podcast → berita → komunitas → sponsor → website publik.
+**One platform for:** live radio stream → broadcast schedules → episodes → podcasts → news → community → sponsors → public website.
 
-Klien pertama: **Radio Kabulhaden** (demo target: 21 Juli 2026).
+First client: **Radio Kabulhaden**.
 
 ---
 
-## Arsitektur
+## Stack
 
-### Stack
-- **Backend:** Django 5.0.14 | Python 3.13 | PostgreSQL (psycopg3)
-- **Frontend:** Alpine.js 3 (lokal) | Tailwind CSS CDN (Play mode) | HTMX 1.9.10
-- **Static:** WhiteNoise + brotli
-- **Dev server:** Gunicorn di Replit (port 5000)
+| Layer | Technology | Version |
+|---|---|---|
+| **Backend** | Django | 5.0.14 |
+| **Language** | Python | 3.13 |
+| **Database** | PostgreSQL (psycopg3) | 16 |
+| **Frontend JS** | Alpine.js 3 (local) | 3.x |
+| **CSS** | Tailwind CSS CDN (Play mode) | 3.x |
+| **Dynamic Content** | HTMX | 1.9.10 |
+| **Static Files** | WhiteNoise + Brotli | 6.7+ |
+| **WSGI Server** | Gunicorn | 22+ |
+| **Config** | django-environ | 0.11+ |
+| **Security** | django-axes, django-csp | Axes 6.4, CSP 3.8 |
+| **Audio Metadata** | mutagen | 1.47+ |
+
+---
+
+## Architecture
 
 ### Layer Architecture
 ```
@@ -32,18 +50,26 @@ Request → Django URL routing
         → PostgreSQL
 ```
 
-Semua business logic ada di `apps/*/services.py`.
-Semua ORM query ada di `apps/*/repositories.py`.
-View hanya mengorchestrasi — tidak boleh ada query ORM langsung di view.
-
-**Pengecualian yang diketahui (Technical Debt):** `AMPStudioDashboardView` di `apps/studio/views.py` masih punya inline model queries. Ini TD yang harus diperbaiki di sprint berikutnya.
+- All business logic lives in `apps/*/services.py`
+- All ORM queries live in `apps/*/repositories.py`
+- Views only orchestrate — no direct ORM queries in views
+- **Known exception:** `AMPStudioDashboardView` has inline queries (technical debt)
 
 ### Multi-Tenant Architecture
-Setiap content item (Program, Article, Podcast, MediaFile) punya `FK → platform.Partner`. Middleware resolve partner aktif dari request. Superuser bisa switch partner via dropdown sidebar. Setiap partner bisa punya custom theme, feature flags, dan usage limits.
+Every content item (Program, Article, Podcast, MediaFile) has a `FK → platform.Partner`. Middleware resolves the active partner from the request. Superusers can switch partners via the sidebar dropdown. Each partner can have custom themes, feature flags, and usage limits.
 
-### Folder Convention
+### Service-Repository Pattern
+- `BaseRepository` (`utils/repositories.py`): generic CRUD operations
+- `BaseService` (`utils/services.py`): transaction wrapper with `execute_in_transaction(fn)`
+- App repositories extend `BaseRepository[Model]`
+- App services extend `BaseService[Repository]`
+
+---
+
+## Folder Convention
+
 ```
-apps/<nama_app>/
+apps/<app_name>/
     models.py        # Data models
     services.py      # Business logic (no direct ORM)
     repositories.py  # ORM queries only
@@ -53,11 +79,11 @@ apps/<nama_app>/
     templatetags/    # Custom template tags
 
 templates/
-    amp_studio/      # Semua template CMS Studio
-        base.html    # BASE TEMPLATE TUNGGAL untuk semua halaman CMS
+    amp_studio/      # All CMS Studio templates
+        base.html    # THE single base template for all CMS pages
         components/  # Header, sidebar, player_bar, etc.
     broadcast/       # Broadcast CMS templates
-    settings/        # Settings templates (base.html sendiri)
+    settings/        # Settings templates (own base.html)
     website/         # Public website templates
     users/           # Auth + user admin templates
 
@@ -66,15 +92,77 @@ static/
     js/amp-studio/   # amp-studio.js (Alpine components + theme engine)
 ```
 
+### 14 Django Apps
+
+| App | Namespace | Mount | Purpose |
+|---|---|---|---|
+| `users` | `users` | `/akun/` | Auth, RBAC, user management |
+| `core` | `core` | `/` | Context processors, error handlers, health |
+| `studio` | `studio` | `/studio/` | AMP Studio CMS hub |
+| `settings` | `settings` | `/pengaturan/` | Singleton site config |
+| `media_manager` | `media_manager` | `/media/` | File asset management + pipeline engine |
+| `radio` | `radio` | `/radio/` | Radio engine, streaming, now-playing |
+| `broadcast` | `broadcast` | `/broadcast/` | Programs, schedules, episodes |
+| `podcast` | `podcast` | `/podcast/` | Podcast series and episodes |
+| `news` | `news` | `/berita/` | Article publishing |
+| `content` | `content` | `/konten/` | Shared tags, authors, SEO, versions |
+| `community` | — | (inline in studio) | Discussions, replies |
+| `sponsor` | — | (inline in studio) | Sponsors, advertisements |
+| `platform` | `platform` | `/platform/` | Partner/tenant management |
+| `website` | `website` | `/` | Public-facing website |
+
+---
+
+## Coding Rules
+
+### Mandatory
+1. **All ORM queries in repositories** — no `Model.objects.filter()` directly in views
+2. **All business logic in services** — views only orchestrate
+3. **UUID primary keys** — via `UUIDPrimaryKeyMixin`
+4. **TimeStampedModel** — all models have `created_at`, `updated_at`
+5. **Indonesian language in UI** — all labels, breadcrumbs, navigation in Bahasa Indonesia
+6. **AMP Studio base template** — all CMS pages extend `amp_studio/base.html`
+7. **AuditLogMixin** — all CMS write views must include audit logging
+8. **LoginRequiredMixin** — all CMS views must be protected
+
+### Forbidden
+1. No direct ORM queries in views or templates
+2. No hardcoded hex colors in templates — use CSS variables `var(--amp-coffee-*)`
+3. No hardcoded localhost in application code — use relative URLs
+4. No new base templates — use the existing `amp_studio/base.html`
+5. No refactoring without approved task
+6. No deleting documentation — mark `DEPRECATED` if no longer relevant
+7. No committing credentials or secrets to git
+
+### Alpine.js
+- Use `Alpine.store('radio')` — not `x-data="radioPlayer()"`
+- Global store `ampStudio` already exists in `amp-studio.js` — do not duplicate
+- For dark mode toggle: set `data-theme` attribute AND `.dark` class on `<html>` **simultaneously**
+
+---
+
+## Naming Convention
+
+| Element | Convention | Example |
+|---|---|---|
+| URL name (Indonesian) | snake_case Indonesia | `program_list`, `jadwal_buat` |
+| Template file | lowercase_underscore | `program_list.html` |
+| View class | PascalCase + suffix | `ProgramListView`, `ProgramCreateView` |
+| Service class | PascalCase + Service | `ProgramService` |
+| Repository class | PascalCase + Repository | `ProgramRepository` |
+| Model field | snake_case | `start_time`, `is_active` |
+| CSS class (AMP) | `amp-` prefix | `amp-badge`, `amp-card` |
+| URL namespace | lowercase app name | `broadcast`, `radio`, `podcast` |
+
 ---
 
 ## Design System
 
-### Warna — Coffee Palette
-| Token | Hex | Penggunaan |
+### Color Palette — Coffee
+| Token | Hex | Usage |
 |---|---|---|
-| coffee-50 | #FAF7F3 | Background page (light) |
-| coffee-100 | #F5F0EA | Surface cards (light) |
+| coffee-50 | #FAF7F3 | Page background (light) |
+| coffee-100 | #F5F0EA | Card surfaces (light) |
 | coffee-200 | #E7DDD3 | Borders (light) |
 | coffee-300 | #C89B6D | Accent light |
 | coffee-400 | #8C5A3C | Primary action |
@@ -84,17 +172,17 @@ static/
 | coffee-800 | #2B1A13 | Surface (dark mode) |
 | coffee-900 | #1A0F0B | Background (dark mode) |
 
-CSS variables: `var(--amp-coffee-600)` etc. Didefinisikan di `static/css/amp-studio/design-tokens.css`.
+CSS variables: `var(--amp-coffee-600)` etc. Defined in `static/css/amp-studio/design-tokens.css`.
 
 ### Typography
 - **Heading:** Poppins (CDN Google Fonts)
 - **Body:** Inter (CDN Google Fonts)
 
 ### Dark Mode
-- AMP Studio CSS menggunakan selector `[data-theme="dark"]`
-- Tailwind `dark:` variants membutuhkan class `.dark` di `<html>`
-- **KEDUANYA harus diset bersamaan** di `amp-studio.js`: `data-theme` attribute + `.dark` class
-- Tailwind CDN config: `darkMode: 'class'` + coffee palette → di `templates/amp_studio/base.html`
+- AMP Studio CSS uses selector `[data-theme="dark"]`
+- Tailwind `dark:` variants require `.dark` class on `<html>`
+- **BOTH must be set simultaneously** in `amp-studio.js`: `data-theme` attribute + `.dark` class
+- Tailwind CDN config: `darkMode: 'class'` + coffee palette → in `templates/amp_studio/base.html`
 
 ### Tailwind Config (amp_studio/base.html)
 ```js
@@ -117,80 +205,37 @@ window.tailwind = {
 
 ---
 
-## Coding Rules
-
-### WAJIB
-1. **Semua query ORM di repository** — tidak ada `Model.objects.filter()` langsung di view
-2. **Semua business logic di service** — view hanya orchestrate
-3. **UUID primary keys** — via `UUIDPrimaryKeyMixin`
-4. **TimeStampedModel** — semua model punya `created_at`, `updated_at`
-5. **Bahasa Indonesia di UI** — semua label, breadcrumb, navigasi dalam Bahasa Indonesia
-6. **AMP Studio base template** — semua halaman CMS extend `amp_studio/base.html`
-7. **AuditLogMixin** — semua view CMS yang write harus include audit logging
-8. **LoginRequiredMixin** — semua view CMS harus protected
-
-### DILARANG
-1. Jangan query ORM langsung di view atau template
-2. Jangan hardcode warna hex di template — gunakan CSS variables `var(--amp-coffee-*)`
-3. Jangan hardcode localhost di kode aplikasi — gunakan relative URL
-4. Jangan buat base template baru — gunakan `amp_studio/base.html` yang sudah ada
-5. Jangan refactor tanpa task yang di-approve user
-6. Jangan hapus dokumentasi — tandai `DEPRECATED` jika sudah tidak relevan
-7. Jangan commit kredensial atau secret ke git
-
-### Alpine.js
-- Gunakan `Alpine.store('radio')` — bukan `x-data="radioPlayer()"`
-- Global store `ampStudio` sudah ada di `amp-studio.js` — jangan duplicate
-- Untuk toggle dark mode: set `data-theme` attribute DAN `.dark` class di `<html>` **bersamaan**
-
----
-
-## Naming Convention
-
-| Element | Convention | Contoh |
-|---|---|---|
-| URL name (Indonesia) | snake_case Indonesia | `program_list`, `jadwal_buat` |
-| Template file | lowercase_underscore | `program_list.html` |
-| View class | PascalCase + suffix | `ProgramListView`, `ProgramCreateView` |
-| Service class | PascalCase + Service | `ProgramService` |
-| Repository class | PascalCase + Repository | `ProgramRepository` |
-| Model field | snake_case | `start_time`, `is_active` |
-| CSS class (AMP) | `amp-` prefix | `amp-badge`, `amp-card` |
-| URL namespace | lowercase app name | `broadcast`, `radio`, `podcast` |
-
----
-
 ## Business Rules
 
 ### RBAC Roles
-| Role | Level | Akses |
+| Role | Level | Access |
 |---|---|---|
-| SUPERUSER | 4 | Semua — termasuk platform management, partner switch |
-| ADMINISTRATOR | 3 | CMS semua modul, user management |
-| EDITOR | 2 | Buat/edit konten, tidak bisa delete user |
-| VIEWER | 1 | Read-only di semua modul |
+| SUPERUSER | 4 | Everything — including platform management, partner switch |
+| ADMINISTRATOR | 3 | All CMS modules, user management |
+| EDITOR | 2 | Create/edit content, cannot delete users |
+| VIEWER | 1 | Read-only in all modules |
 
 ### Partner Concept
-- Setiap stasiun radio adalah satu `Partner`
-- Partner pertama = Kabulhaden (seeded via `init_settings` + `seed_platform`)
-- User bisa punya membership di multiple partners
-- SUPERUSER bisa switch partner tanpa membership
+- Each radio station is one `Partner`
+- First partner = Kabulhaden (seeded via `init_settings` + `seed_platform`)
+- Users can have membership in multiple partners
+- SUPERUSER can switch partners without membership
 
 ### Settings Singleton
-- Semua settings (`SiteSettings`, `SocialMediaSettings`, dll) punya pk=1
-- Akses via `.load()` class method
-- Jangan gunakan `SiteSettings.objects.first()` — gunakan `SiteSettings.load()`
-- Context processor sudah expose semua settings ke semua template secara otomatis
+- All settings (`SiteSettings`, `SocialMediaSettings`, etc.) have `pk=1`
+- Access via `.load()` class method
+- Do NOT use `SiteSettings.objects.first()` — use `SiteSettings.load()`
+- Context processor exposes all settings to all templates automatically
 
 ### Live Radio API
 - Endpoint: `GET /api/v1/radio/live/`
-- Response di-cache 20 detik (env: `STREAM_CACHE_TTL`)
-- Provider aktif: Broadcastindo (`a7.siar.us`) — via `BroadcastindoAdapter`
-- Field `program` selalu null (**TD-001** — belum ada integrasi ke broadcast schedule)
-- Polling dari frontend: 25 detik (sesuai cache TTL)
+- Response cached 20 seconds (env: `STREAM_CACHE_TTL`)
+- Active provider: Icecast via ngrok (primary), Broadcastindo (fallback)
+- `program` field always returns null (not yet wired to broadcast schedule)
+- Frontend polling: 25 seconds (matches cache TTL)
 
 ### StreamHealth Field Names
-| BENAR | SALAH (jangan pakai) |
+| CORRECT | WRONG (do not use) |
 |---|---|
 | `provider_status` | `status` |
 | `last_checked` | `checked_at` |
@@ -201,25 +246,25 @@ window.tailwind = {
 | Status values: HEALTHY/DEGRADED/DOWN/TIMEOUT | healthy/degraded/down |
 
 ### Demo Seed
-- Jalankan: `python manage.py demo_seed [--reset]`
-- Mengisi ~340 records data REAL Kabulhaden (dari pitch deck)
-- Harus dijalankan setelah `python manage.py migrate`
+- Run: `python manage.py demo_seed [--reset]`
+- Seeds ~340 records of real Kabulhaden data (from pitch deck)
+- Must run after `python manage.py migrate`
 
 ---
 
 ## Broadcast Concept
 
 ```
-Program (acara radio)
-  └── Schedule (jadwal siaran: hari + jam)
-      └── BroadcastSession (instance siaran: scheduled → live → finished)
-          └── Episode (rekaman dari session)
-              └── EpisodeGuest (bintang tamu)
-  └── HostMember (host tetap program)
-  └── Playlist → PlaylistItem (lagu-lagu yang diputar)
+Program (radio show)
+  └── Schedule (broadcast schedule: day + time)
+      └── BroadcastSession (broadcast instance: scheduled → live → finished)
+          └── Episode (recording from session)
+              └── EpisodeGuest (guest star)
+  └── HostMember (permanent program host)
+  └── Playlist → PlaylistItem (songs played)
 ```
 
-Pengumuman (`Announcement`) adalah independent dari program — bersifat global.
+Announcements (`Announcement`) are independent from programs — global scope.
 
 ## Podcast Concept
 
@@ -228,127 +273,66 @@ Podcast (serial/show)
   └── PodcastEpisode (episode: season/episode number, audio file)
 ```
 
-Distribution links (Spotify, iTunes, Google) ada di level Podcast, bukan Episode.
+Distribution links (Spotify, iTunes, Google) are at the Podcast level, not Episode.
+
+## Media Pipeline Concept
+
+```
+MediaFileService.upload_file()
+  → MediaPipelineService.process(file, context)
+      → validate → extract_metadata → save → generate_waveform (stub)
+      → analyze_audio (stub) → generate_preview (stub)
+      → mark READY → dispatch_event
+```
+
+Stages 4–6 (waveform, analysis, preview) are stubs. Storage backends: local (active), S3/R2/MinIO (stubs).
+
+---
 
 ## Analytics Concept
 
-Analytics saat ini **stub** — view dan template ada tapi data belum real. Data listener dari `ListenerStatistic` tersedia tapi belum diagregasi ke dashboard analytics. Sprint mendatang perlu mengisi ini.
+Analytics are currently **stub** — views and templates exist but data is not real. Listener data from `ListenerStatistic` is available but not aggregated into the analytics dashboard.
 
 ---
 
-## Current Sprint
+## Documentation Hierarchy
 
-**Sprint 4.2 — Media Pipeline Engine**
-- Jenis: Backend architecture — tidak ada perubahan UI
-- Deliverables: pipeline.py, storage.py, events.py, migration 0003, Media Inspector view, changelog/sprint-4.2.md
-- Status: Selesai (17 Juli 2026)
+When there is a conflict between documents, follow this priority order:
 
----
+1. **Actual Source Code** — the ultimate source of truth
+2. **`docs/PROJECT_STATE.md`** — current project status, sprint, demo readiness
+3. **`docs/architecture/TECH_DEBT.md`** — technical debt register
+4. **`docs/architecture/feature-status.md`** — feature inventory with status
+5. **`docs/AI_CONTEXT.md`** — this document (architecture reference)
+6. **`docs/sprints/`** — roadmap and sprint planning
+7. **`docs/changelog/`** — sprint changelogs
 
-## Completed Sprints
-
-| Sprint | Judul | Status | Tanggal |
-|---|---|---|---|
-| 1.x | Project Setup & Foundation | ✅ DONE | — |
-| 2.x | Core modules (users, settings, media) | ✅ DONE | — |
-| 3.0–3.3 | Broadcast, Radio, Podcast, News, Content | ✅ DONE | — |
-| 3.4 | Live Radio Engine (multi-provider, now-playing API) | ✅ DONE | Juli 2026 |
-| 3.4D | Streaming integration + now-playing cache | ✅ DONE | Juli 2026 |
-| 3.5 | Founder Experience (wizard, tour, dark mode, health widget) | ✅ DONE | Juli 17, 2026 |
-| 3.6 | Platform UI Consistency (amp_studio/base migration, breadcrumbs, komunitas/iklan pages) | ✅ DONE | Juli 17, 2026 |
-| 3.6+ | Logo/footer dari DB, contact fields, social media icons di footer | ✅ DONE | Juli 17, 2026 |
-| 3.7 | UX/visual regressions (dark mode .dark class, streaming 500, settings dark mode) | ✅ DONE | Juli 17, 2026 |
-| 4.0 | Knowledge Base Refresh & Project Reindex | ✅ DONE | Juli 17, 2026 |
-
----
-
-## Pending Sprints (Post-Demo)
-
-| Sprint | Judul | Priority |
-|---|---|---|
-| 4.1 | Wire program name ke live API (TD-001) | 🔴 HIGH |
-| 4.2 | Stream URL fallback (TD-002) | 🔴 HIGH |
-| 4.3 | Superuser creation + verify login (Task #2) | 🔴 CRITICAL |
-| 4.4 | Real radio stream integration (Task #4) | 🟡 HIGH |
-| 4.5 | Analytics dashboard (real data) | 🟡 MEDIUM |
-| 4.6 | Automated tests for LiveRadioAPIView (TD-003) | 🟡 MEDIUM |
-| 4.7 | Apply pending platform migrations (TD-006) | 🟡 MEDIUM |
-| 4.8 | Studio service extraction (inline queries di dashboard view) | ⚪ LOW |
-| 4.9 | WebSocket/SSE for real-time updates | ⚪ LOW (post-demo) |
-
----
-
-## Known Issues
-
-| ID | Issue | Impact | Sprint |
-|---|---|---|---|
-| TD-001 | `program` field selalu null di live API | HIGH — terlihat di demo | 4.1 |
-| TD-002 | Tidak ada fallback stream URL | HIGH — silent play failure | 4.2 |
-| TD-003 | Tidak ada automated tests untuk LiveRadioAPIView | MEDIUM | 4.6 |
-| TD-004 | BroadcastindoAdapter buat 2 HTTP call per cache miss | LOW | — |
-| TD-006 | Unapplied migrations di apps/platform | MEDIUM | 4.7 |
-| TD-007 | Belum ada superuser account di dev | CRITICAL (Task #2) | 4.3 |
-| — | `templates/dashboard/home.html` masih extend dashboard_base.html | LOW | — |
-| — | `templates/core/home.html` masih extend dashboard_base.html | LOW | — |
-| — | `AMPStudioDashboardView` punya inline ORM queries | LOW | 4.8 |
-| — | `sponsor.Partner` vs `platform.Partner` — nama model sama di 2 app | MEDIUM | — |
-| — | `news.Tag` vs `media_manager.Tag` vs `content.ContentTag` — 3 tag models | MEDIUM | — |
-
----
-
-## Technical Debt
-
-Semua TD terdokumentasi di `docs/architecture/TECH_DEBT.md`.
-
-**Prinsip:** Jangan sembunyikan masalah — dokumentasikan agar bisa direncanakan.
-
----
-
-## DO NOT
-
-1. **Jangan edit business logic** tanpa task yang di-approve
-2. **Jangan refactor** tanpa explicit instruction
-3. **Jangan buat fitur baru** tanpa sprint planning
-4. **Jangan hardcode** warna, URL, atau credential
-5. **Jangan duplicate** base template — satu base, `amp_studio/base.html`
-6. **Jangan hapus** dokumentasi — tandai DEPRECATED
-7. **Jangan commit** secret/credential ke repository
-8. **Jangan gunakan** field names yang salah di `StreamHealth` — lihat tabel di atas
-9. **Jangan polling** lebih cepat dari cache TTL (20s) — waste upstream bandwidth
-10. **Jangan assume** — cek dokumentasi dulu sebelum implement
+**Rule:** If documentation conflicts with code, trust the code. If documentation conflicts with PROJECT_STATE, trust PROJECT_STATE.
 
 ---
 
 ## Best Practices
 
-1. **Baca dulu:** AI_CONTEXT.md → roadmap → changelog sprint terakhir
-2. **Cek tech debt register** sebelum mulai sprint
-3. **Demo seed dulu** sebelum screenshot atau test live
-4. **Test di authenticated session** — hampir semua view butuh login
-5. **Restart workflow** setelah code change, cek logs sebelum screenshot
-6. **Commit ke GitHub** setelah setiap sprint selesai (GitHub PAT tersedia via secret)
-7. **Management commands** untuk init: `init_settings` → `seed_platform` → `demo_seed`
-8. **Login demo:** `admin` / `admin1234` (jika sudah dibuat via `create_superadmin`)
+1. **Read first:** AI_CONTEXT.md → PROJECT_STATE.md → roadmap → latest sprint changelog
+2. **Check tech debt register** before starting any sprint
+3. **Demo seed first** before screenshots or live testing
+4. **Test in authenticated session** — almost all views require login
+5. **Restart workflow** after code changes, check logs before screenshots
+6. **Commit to GitHub** after each sprint completes
+7. **Management commands** for init: `init_settings` → `seed_platform` → `demo_seed`
+8. **Login demo:** `admin` / `DemoAdmin2024!` (via `create_superadmin` or `demo_seed`)
 
 ---
 
-## Template Warisan (Legacy)
+## DO NOT
 
-File-file berikut masih menggunakan layout lama dan **belum dimigrasikan**:
-- `templates/dashboard/home.html` — extend `dashboard_base.html`
-- `templates/core/home.html` — extend `dashboard_base.html`
-
-Semua file lain sudah dimigrasikan ke `amp_studio/base.html`.
-
----
-
-## Credential Dev (non-secret)
-
-- **Login dev:** username `admin`, password `admin1234` (via `create_superadmin` atau `reset_admin`)
-- **Demo seed:** `python manage.py demo_seed --reset`
-- **Port dev:** 5000
-
----
-
-*Dokumen ini diperbarui setiap sprint. Source of truth adalah kode aktual.*
-*Jika ada konflik antara dokumen ini dan kode, percayai kode.*
+1. **Do not edit business logic** without an approved task
+2. **Do not refactor** without explicit instruction
+3. **Do not create new features** without sprint planning
+4. **Do not hardcode** colors, URLs, or credentials
+5. **Do not duplicate** the base template — one base, `amp_studio/base.html`
+6. **Do not delete** documentation — mark DEPRECATED if no longer relevant
+7. **Do not commit** secrets/credentials to the repository
+8. **Do not use wrong field names** in `StreamHealth` — see table above
+9. **Do not poll** faster than cache TTL (20s) — wastes upstream bandwidth
+10. **Do not assume** — check documentation before implementing

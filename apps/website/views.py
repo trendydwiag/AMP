@@ -83,16 +83,25 @@ class HomeView(TemplateView):
             station_id = primary_station.pk if primary_station else None
 
             if station_id:
-                integration_svc = BroadcastIntegrationService()
-                context['current_program_info'] = integration_svc.get_current_program(station_id)
+                from apps.broadcast.services import CurrentProgramResolver
+                resolver = CurrentProgramResolver()
+                context['current_program_info'] = resolver.resolve()
 
                 np_svc = NowPlayingService()
                 context['now_playing'] = np_svc.get_now_playing(station_id)
             else:
-                context['current_program_info'] = {'program': '', 'host': '', 'started_at': None, 'duration': ''}
+                context['current_program_info'] = {
+                    'current_program': '', 'host': '', 'start_time': '',
+                    'end_time': '', 'remaining_minutes': 0,
+                    'next_program': '', 'next_start_time': '',
+                }
                 context['now_playing'] = None
         except Exception:
-            context['current_program_info'] = {'program': '', 'host': '', 'started_at': None, 'duration': ''}
+            context['current_program_info'] = {
+                'current_program': '', 'host': '', 'start_time': '',
+                'end_time': '', 'remaining_minutes': 0,
+                'next_program': '', 'next_start_time': '',
+            }
             context['now_playing'] = None
 
         try:
