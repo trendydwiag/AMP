@@ -546,9 +546,10 @@ class LiveRadioAPIView(View):
                 'cover': np.artwork or '',
                 'listeners': listener_data.current_listeners,
                 'started_at': np.started_at.isoformat() if np.started_at else None,
-                # Always use the same-origin proxy URL so the browser plays without
-                # CORS / iframe-sandbox / ngrok interstitial issues.
-                'stream_url': '/radio/stream/',
+                # Direct stream URL — browser connects straight to the source.
+                # The Django proxy (/radio/stream/) is skipped because Replit's
+                # reverse proxy buffers streaming responses, preventing audio delivery.
+                'stream_url': stream_url,
                 'is_live': is_live,
                 'provider': provider_key.lower(),
             }
@@ -564,7 +565,7 @@ class LiveRadioAPIView(View):
                 'cover': '',
                 'listeners': 0,
                 'started_at': None,
-                'stream_url': '/radio/stream/',
+                'stream_url': listen_url_fallback,
                 'is_live': True,
                 'provider': provider_key.lower(),
             }
