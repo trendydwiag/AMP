@@ -554,9 +554,12 @@ class CommunityView(TemplateView):
             from apps.community.models import Discussion, Reply
             context['discussion_count'] = Discussion.objects.count()
             context['reply_count'] = Reply.objects.count()
-            context['discussions'] = Discussion.objects.select_related(
-                'author'
-            ).order_by('-created_at')[:10]
+            # Force evaluation inside try so any ORM error is caught here,
+            # not deferred to template rendering. Discussion has no FK 'author'
+            # (uses author_name / author_email CharField instead).
+            context['discussions'] = list(
+                Discussion.objects.order_by('-created_at')[:10]
+            )
         except Exception:
             context['discussion_count'] = 0
             context['reply_count'] = 0

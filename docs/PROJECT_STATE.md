@@ -1,6 +1,6 @@
 # PROJECT_STATE.md — AMP Studio
 **Source of Truth for Project Status**
-**Last Updated:** Sprint 4.4 — July 20, 2026
+**Last Updated:** Sprint 4.4.1B — July 20, 2026
 
 > This document is the **authoritative source of truth** for AMP Studio's current state.
 > For architecture reference, see `docs/AI_CONTEXT.md`.
@@ -11,17 +11,18 @@
 
 ## Current Version
 
-**AMP Studio v0.4.4** (after Sprint 4.4 completion)
+**AMP Studio v0.4.4.1** (after Sprint 4.4.1B Production Audit)
 
 ---
 
 ## Current Sprint
 
-**Sprint 4.4 — Live Broadcast Intelligence**
+**Sprint 4.4.1B — Production Audit**
 
-- Type: Backend + Frontend — wire broadcast schedule into Live API
-- Objective: Resolve TD-001 by populating `program` field from broadcast schedule
+- Type: QA + Bug Fix
+- Objective: Full production audit of all 67 URL endpoints; fix all FAIL items
 - Status: ✅ DONE
+- Result: 95.5% production readiness (64 PASS / 3 WARNING / 0 FAIL)
 
 ---
 
@@ -44,6 +45,7 @@
 | 4.3 | Radio Live Player Stabilization | Bug Fix | July 20, 2026 | ✅ DONE |
 | 4.0.1 | Knowledge Base Governance & Documentation Sync | Documentation | July 20, 2026 | ✅ DONE |
 | 4.4 | Live Broadcast Intelligence (TD-001) | Backend + Frontend | July 20, 2026 | ✅ DONE |
+| 4.4.1B | Production Audit (67 URLs; 5 bugs fixed) | QA + Bug Fix | July 20, 2026 | ✅ DONE |
 
 ---
 

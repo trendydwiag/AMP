@@ -95,6 +95,43 @@ JS reads `parseInt(document.querySelector('meta[name="stream-poll-interval"]').c
 
 ---
 
+## TD-010 — Tailwind CSS CDN Digunakan di Production Templates
+**Sprint introduced:** 4.4.1 (Production Audit)
+**Priority:** Medium
+**Status:** Open
+
+### Description
+Semua template menggunakan `cdn.tailwindcss.com` CDN. Browser console menampilkan warning di setiap page load: `"cdn.tailwindcss.com should not be used in production"`. CDN Tailwind mengunduh seluruh framework CSS (~3.5MB) dan lebih lambat daripada build output yang di-purge.
+
+### Impact
+- Performance: halaman mengunduh CSS berukuran besar di setiap visit
+- Browser warning di semua halaman
+- Tidak bisa purge unused CSS
+
+### Suggested Solution
+Setup Tailwind CLI/PostCSS build pipeline. Generate `static/css/tailwind.min.css` dan referensikan dari base templates.
+
+### Estimated Effort
+3–4 jam.
+
+---
+
+## TD-009 — `broadcast/services.py` Unnecessary Timezone Strip
+**Sprint introduced:** 4.4.1 (Production Audit)
+**Priority:** Low
+**Status:** Open
+
+### Description
+`CurrentProgramResolver.resolve()` (line 454) strips timezone info dari `now` dengan `now.replace(tzinfo=None)` untuk melakukan aritmatika waktu. Kode berfungsi tapi semantically confusing: membuat dua naive datetime dari timezone-aware source.
+
+### Suggested Solution
+Gunakan `now.astimezone(timezone.get_current_timezone())` untuk timezone-aware arithmetic, atau biarkan karena tidak crash.
+
+### Estimated Effort
+15 menit.
+
+---
+
 ## TD-008 — ngrok URL Harus Diupdate Manual Setiap Restart
 **Sprint introduced:** 4.3
 **Priority:** Medium (operasional)

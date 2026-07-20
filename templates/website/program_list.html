@@ -75,9 +75,6 @@
             {% endfor %}
         </div>
 
-        <div x-show="activeCategory !== 'Semua'" x-cloak class="hidden" x-effect="
-            let count = document.querySelectorAll('[x-show*=\"activeCategory\"]:not([x-cloak])').length;
-        "></div>
     </div>
     {% else %}
     <div class="text-center py-20">
