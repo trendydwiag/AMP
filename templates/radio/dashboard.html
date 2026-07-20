@@ -1,219 +1,224 @@
 {% extends "amp_studio/base.html" %}
 
-{% block title %}Radio Engine - Kabulhaden CMS{% endblock %}
+{% block title %}Dashboard Radio — AMP Studio{% endblock %}
 
 {% block breadcrumb %}
 <nav class="amp-breadcrumb" aria-label="Breadcrumb">
   <a href="{% url 'studio:dashboard' %}"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
-  <span>›</span>
-  <span>Radio</span>
-  <span>›</span>
-  <span>Dashboard Radio</span>
+  <span>›</span><span>Radio</span><span>›</span><span>Dashboard</span>
 </nav>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Radio Engine Dashboard</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Monitor and manage your radio stations</p>
+
+  <!-- Header -->
+  <div class="amp-page-header">
+    <div>
+      <h1 class="amp-page-title">Radio Engine</h1>
+      <p class="amp-page-subtitle">Monitor dan kelola stasiun radio Anda.</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'radio:station_list' %}" class="amp-btn amp-btn-ghost">Stasiun</a>
+      <a href="{% url 'radio:provider_list' %}" class="amp-btn amp-btn-ghost">Provider</a>
+      <a href="{% url 'radio:analytics' %}" class="amp-btn amp-btn-primary flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </a>
+    </div>
+  </div>
+
+  {% if station %}
+
+  <!-- Status Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <!-- Stream Status -->
+    <div class="amp-card">
+      <div class="amp-card-body">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="amp-metric-label">Status Stream</p>
+            <p class="text-2xl font-bold mt-1 {% if now_playing.stream_status == 'ONLINE' %}text-green-500{% else %}text-red-500{% endif %}">
+              {{ now_playing.get_stream_status_display|default:"UNKNOWN" }}
+            </p>
+          </div>
+          <div class="w-11 h-11 rounded-full flex items-center justify-center {% if now_playing.stream_status == 'ONLINE' %}bg-green-100 dark:bg-green-900/30{% else %}bg-red-100 dark:bg-red-900/30{% endif %}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{% if now_playing.stream_status == 'ONLINE' %}currentColor{% else %}currentColor{% endif %}" stroke-width="1.5" class="{% if now_playing.stream_status == 'ONLINE' %}text-green-500{% else %}text-red-500{% endif %}"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </div>
         </div>
-        <div class="flex gap-2">
-            <a href="{% url 'radio:station_list' %}" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm font-medium">
-                Stations
+      </div>
+    </div>
+
+    <!-- Now Playing -->
+    <div class="amp-card">
+      <div class="amp-card-body">
+        <p class="amp-metric-label">Sedang Diputar</p>
+        <p class="text-base font-bold text-[var(--amp-text-primary)] mt-1 truncate">{{ now_playing.song_title|default:"—" }}</p>
+        <p class="text-xs text-[var(--amp-text-tertiary)] truncate mt-0.5">{{ now_playing.artist|default:"—" }}</p>
+      </div>
+    </div>
+
+    <!-- Listeners -->
+    <div class="amp-card">
+      <div class="amp-card-body">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="amp-metric-label">Pendengar Aktif</p>
+            <p class="amp-metric-value mt-1">{{ listener_stat.current_listeners|default:"0" }}</p>
+            <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Puncak: {{ listener_stat.peak_listeners|default:"0" }}</p>
+          </div>
+          <div class="w-11 h-11 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-secondary)" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health -->
+    <div class="amp-card">
+      <div class="amp-card-body">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="amp-metric-label">Kesehatan</p>
+            <p class="text-2xl font-bold mt-1 {% if health.provider_status == 'HEALTHY' %}text-green-500{% elif health.provider_status == 'WARNING' %}text-amber-500{% else %}text-red-500{% endif %}">
+              {{ health.get_provider_status_display|default:"—" }}
+            </p>
+            <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">{{ health.response_time|floatformat:0 }}ms</p>
+          </div>
+          <div class="w-11 h-11 rounded-full flex items-center justify-center {% if health.provider_status == 'HEALTHY' %}bg-green-100 dark:bg-green-900/30{% elif health.provider_status == 'WARNING' %}bg-amber-100 dark:bg-amber-900/30{% else %}bg-red-100 dark:bg-red-900/30{% endif %}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="{% if health.provider_status == 'HEALTHY' %}text-green-500{% elif health.provider_status == 'WARNING' %}text-amber-500{% else %}text-red-500{% endif %}"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Program & Providers -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Current Program -->
+    <div class="amp-card">
+      <div class="amp-card-header">
+        <h2 class="text-sm font-semibold text-[var(--amp-text-primary)]">Program Saat Ini</h2>
+      </div>
+      <div class="amp-card-body">
+        {% if active_session %}
+        <dl class="space-y-3">
+          <div>
+            <dt class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide">Program</dt>
+            <dd class="text-base font-medium text-[var(--amp-text-primary)] mt-0.5">{{ active_session.program }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide">Host</dt>
+            <dd class="text-base font-medium text-[var(--amp-text-primary)] mt-0.5">{{ active_session.host }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-[var(--amp-text-tertiary)] uppercase tracking-wide">Durasi</dt>
+            <dd class="text-base font-medium text-[var(--amp-text-primary)] mt-0.5">{{ active_session.duration_display }}</dd>
+          </div>
+        </dl>
+        {% else %}
+        <p class="text-sm text-[var(--amp-text-tertiary)]">Tidak ada sesi program aktif saat ini.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Providers -->
+    <div class="amp-card">
+      <div class="amp-card-header flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-[var(--amp-text-primary)]">Provider</h2>
+        <a href="{% url 'radio:provider_create' %}" class="text-xs font-medium text-[var(--amp-text-secondary)] hover:text-[var(--amp-text-primary)] transition-colors">+ Tambah</a>
+      </div>
+      <div class="amp-card-body space-y-2">
+        {% for provider in providers %}
+        <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--amp-surface-secondary)]">
+          <div>
+            <p class="text-sm font-medium text-[var(--amp-text-primary)]">{{ provider.provider_name }}</p>
+            <p class="text-xs text-[var(--amp-text-tertiary)]">{{ provider.get_provider_type_display }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="amp-badge amp-badge-sm {% if provider.active %}amp-badge-success{% else %}amp-badge-danger{% endif %}">
+              {% if provider.active %}Aktif{% else %}Nonaktif{% endif %}
+            </span>
+            <a href="{% url 'radio:provider_edit' provider.pk %}" class="text-[var(--amp-text-tertiary)] hover:text-[var(--amp-text-primary)] transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </a>
-            <a href="{% url 'radio:provider_list' %}" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm font-medium">
-                Providers
-            </a>
-            <a href="{% url 'radio:analytics' %}" class="px-4 py-2 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 text-sm font-medium">
-                Analytics
-            </a>
+          </div>
         </div>
+        {% empty %}
+        <p class="text-sm text-[var(--amp-text-tertiary)]">Belum ada provider terkonfigurasi.</p>
+        {% endfor %}
+      </div>
     </div>
+  </div>
 
-    {% if station %}
-    <!-- Status Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Stream Status -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Stream Status</p>
-                    <p class="text-2xl font-bold mt-1 {% if now_playing.stream_status == 'ONLINE' %}text-green-600{% else %}text-red-600{% endif %}">
-                        {{ now_playing.get_stream_status_display|default:"UNKNOWN" }}
-                    </p>
-                </div>
-                <div class="w-12 h-12 rounded-full {% if now_playing.stream_status == 'ONLINE' %}bg-green-100 dark:bg-green-900{% else %}bg-red-100 dark:bg-red-900{% endif %} flex items-center justify-center">
-                    <svg class="w-6 h-6 {% if now_playing.stream_status == 'ONLINE' %}text-green-600{% else %}text-red-600{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Now Playing -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4">
-            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Now Playing</p>
-            <p class="text-lg font-bold text-slate-900 dark:text-white mt-1 truncate">{{ now_playing.song_title|default:"-" }}</p>
-            <p class="text-sm text-slate-500 dark:text-slate-400 truncate">{{ now_playing.artist|default:"-" }}</p>
-        </div>
-
-        <!-- Listeners -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Current Listeners</p>
-                    <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ listener_stat.current_listeners|default:"0" }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Peak: {{ listener_stat.peak_listeners|default:"0" }}</p>
-                </div>
-                <div class="w-12 h-12 rounded-full bg-coffee-100 dark:bg-coffee-900 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-coffee-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Health -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Health Status</p>
-                    <p class="text-2xl font-bold mt-1 {% if health.provider_status == 'HEALTHY' %}text-green-600{% elif health.provider_status == 'WARNING' %}text-yellow-600{% else %}text-red-600{% endif %}">
-                        {{ health.get_provider_status_display|default:"UNKNOWN" }}
-                    </p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ health.response_time|floatformat:0 }}ms response</p>
-                </div>
-                <div class="w-12 h-12 rounded-full {% if health.provider_status == 'HEALTHY' %}bg-green-100 dark:bg-green-900{% elif health.provider_status == 'WARNING' %}bg-yellow-100 dark:bg-yellow-900{% else %}bg-red-100 dark:bg-red-900{% endif %} flex items-center justify-center">
-                    <svg class="w-6 h-6 {% if health.provider_status == 'HEALTHY' %}text-green-600{% elif health.provider_status == 'WARNING' %}text-yellow-600{% else %}text-red-600{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-        </div>
+  <!-- Health History -->
+  <div class="amp-card overflow-hidden">
+    <div class="amp-card-header">
+      <h2 class="text-sm font-semibold text-[var(--amp-text-primary)]">Riwayat Kesehatan</h2>
     </div>
-
-    <!-- Current Program & Providers -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Current Program -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-            <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Current Program</h2>
-            {% if active_session %}
-            <div class="space-y-3">
-                <div>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Program</p>
-                    <p class="text-lg font-medium text-slate-900 dark:text-white">{{ active_session.program }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Host</p>
-                    <p class="text-lg font-medium text-slate-900 dark:text-white">{{ active_session.host }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Duration</p>
-                    <p class="text-lg font-medium text-slate-900 dark:text-white">{{ active_session.duration_display }}</p>
-                </div>
-            </div>
-            {% else %}
-            <p class="text-slate-500 dark:text-slate-400">No active program session</p>
-            {% endif %}
-        </div>
-
-        <!-- Providers -->
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Providers</h2>
-                <a href="{% url 'radio:provider_create' %}" class="text-sm text-coffee-500 hover:text-coffee-600 dark:text-coffee-400">+ Add Provider</a>
-            </div>
-            <div class="space-y-3">
-                {% for provider in providers %}
-                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-                    <div>
-                        <p class="font-medium text-slate-900 dark:text-white">{{ provider.provider_name }}</p>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">{{ provider.get_provider_type_display }}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-2 py-1 text-xs rounded-full {% if provider.active %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
-                            {% if provider.active %}Active{% else %}Inactive{% endif %}
-                        </span>
-                        <a href="{% url 'radio:provider_edit' provider.pk %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                {% empty %}
-                <p class="text-slate-500 dark:text-slate-400 text-sm">No providers configured</p>
-                {% endfor %}
-            </div>
-        </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--amp-border-subtle)]">
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Waktu</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Response</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">HTTP</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Bitrate</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--amp-border-subtle)]">
+          {% for h in health_history %}
+          <tr class="hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+            <td class="px-5 py-3 text-[var(--amp-text-secondary)]">{{ h.last_checked|date:"d M H:i" }}</td>
+            <td class="px-5 py-3">
+              <span class="amp-badge amp-badge-sm {% if h.provider_status == 'HEALTHY' %}amp-badge-success{% elif h.provider_status == 'WARNING' %}amp-badge-warning{% else %}amp-badge-danger{% endif %}">
+                {{ h.get_provider_status_display }}
+              </span>
+            </td>
+            <td class="px-5 py-3 text-[var(--amp-text-secondary)]">{{ h.response_time|floatformat:0 }}ms</td>
+            <td class="px-5 py-3 text-[var(--amp-text-secondary)]">{{ h.http_status }}</td>
+            <td class="px-5 py-3 text-[var(--amp-text-secondary)]">{{ h.stream_bitrate }} kbps</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="px-5 py-10 text-center text-sm text-[var(--amp-text-tertiary)]">Belum ada data kesehatan.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <!-- Health History -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Health History</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                <thead class="bg-slate-50 dark:bg-slate-700/50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Time</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Response</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">HTTP</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Bitrate</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                    {% for h in health_history %}
-                    <tr>
-                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{{ h.last_checked|date:"d M H:i" }}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 text-xs rounded-full {% if h.provider_status == 'HEALTHY' %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% elif h.provider_status == 'WARNING' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
-                                {{ h.get_provider_status_display }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{{ h.response_time|floatformat:0 }}ms</td>
-                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{{ h.http_status }}</td>
-                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{{ h.stream_bitrate }} kbps</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 text-center">No health data yet</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+  {% else %}
 
-    {% else %}
-    <!-- No Station -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-12 text-center">
-        <svg class="w-16 h-16 mx-auto text-slate-400 dark:text-slate-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
-        <h2 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Station Configured</h2>
-        <p class="text-slate-500 dark:text-slate-400 mb-6">Create a radio station to get started.</p>
-        <a href="{% url 'radio:station_create' %}" class="px-6 py-3 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 font-medium">
-            Create Station
-        </a>
+  <!-- No Station -->
+  <div class="amp-card">
+    <div class="amp-card-body py-20 text-center">
+      <div class="w-16 h-16 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center mx-auto mb-4">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+      </div>
+      <h2 class="text-lg font-semibold text-[var(--amp-text-primary)] mb-2">Belum Ada Stasiun</h2>
+      <p class="text-sm text-[var(--amp-text-secondary)] mb-6">Buat stasiun radio untuk mulai memantau dan mengelola siaran.</p>
+      <a href="{% url 'radio:station_create' %}" class="amp-btn amp-btn-primary">Buat Stasiun</a>
     </div>
-    {% endif %}
+  </div>
+
+  {% endif %}
+
 </div>
 
-<!-- Auto-refresh script -->
+<!-- Auto-refresh -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    setInterval(function() {
-        fetch("{% url 'radio:api_status' %}")
-            .then(r => r.json())
-            .then(data => {
-                // Update status badge, listeners, etc.
-            })
-            .catch(() => {});
-    }, 30000);
+  setInterval(function() {
+    fetch("{% url 'radio:api_status' %}")
+      .then(r => r.json())
+      .then(data => {})
+      .catch(() => {});
+  }, 30000);
 });
 </script>
 {% endblock %}

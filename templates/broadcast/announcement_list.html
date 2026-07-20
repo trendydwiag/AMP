@@ -1,72 +1,85 @@
 {% extends "amp_studio/base.html" %}
 
-{% block title %}Pengumuman - Broadcast Management{% endblock %}
+{% block title %}Pengumuman — AMP Studio{% endblock %}
 
 {% block breadcrumb %}
 <nav class="amp-breadcrumb" aria-label="Breadcrumb">
   <a href="{% url 'studio:dashboard' %}"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
-  <span>›</span>
-  <span>Siaran</span>
-  <span>›</span>
-  <span>Pengumuman</span>
+  <span>›</span><span>Siaran</span><span>›</span><span>Pengumuman</span>
 </nav>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Pengumuman</h1>
-        <a href="{% url 'broadcast:announcement_create' %}" class="px-4 py-2 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 text-sm font-medium">
-            + Tambah Pengumuman
-        </a>
-    </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead class="bg-slate-50 dark:bg-slate-700/50">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Judul</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Periode</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                {% for ann in announcements %}
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                    <td class="px-4 py-3">
-                        <div>
-                            <p class="font-medium text-slate-900 dark:text-white">{{ ann.title }}</p>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">{{ ann.content|truncatewords:10 }}</p>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
-                        {{ ann.publish_start|date:"d M Y" }} - {{ ann.publish_end|date:"d M Y"|default:"Tidak ditentukan" }}
-                    </td>
-                    <td class="px-4 py-3">
-                        {% if ann.is_current %}
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">Aktif</span>
-                        {% elif ann.active %}
-                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300">Terjadwal</span>
-                        {% else %}
-                        <span class="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300">Nonaktif</span>
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 flex gap-2">
-                        <a href="{% url 'broadcast:announcement_edit' ann.pk %}" class="text-coffee-500 hover:text-coffee-600 dark:text-coffee-400 text-sm">Edit</a>
-                        <form method="post" action="{% url 'broadcast:announcement_delete' ann.pk %}" onsubmit="return confirm('Nonaktifkan pengumuman ini?')">
-                            {% csrf_token %}
-                            <button type="submit" class="text-red-600 hover:text-red-700 dark:text-red-400 text-sm">Nonaktifkan</button>
-                        </form>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">Belum ada pengumuman</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+  <div class="amp-page-header">
+    <div>
+      <h1 class="amp-page-title">Pengumuman</h1>
+      <p class="amp-page-subtitle">Kelola pengumuman on-air dan terjadwal.</p>
     </div>
+    <a href="{% url 'broadcast:announcement_create' %}" class="amp-btn amp-btn-primary flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Tambah Pengumuman
+    </a>
+  </div>
+
+  <!-- Table -->
+  <div class="amp-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--amp-border-subtle)]">
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Judul</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Periode</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Status</th>
+            <th class="px-5 py-3 text-right text-xs font-semibold text-[var(--amp-text-tertiary)] uppercase tracking-wide">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--amp-border-subtle)]">
+          {% for ann in announcements %}
+          <tr class="hover:bg-[var(--amp-surface-tertiary)] transition-colors">
+            <td class="px-5 py-4">
+              <p class="font-medium text-[var(--amp-text-primary)]">{{ ann.title }}</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-0.5 line-clamp-1">{{ ann.content|truncatewords:10 }}</p>
+            </td>
+            <td class="px-5 py-4 text-[var(--amp-text-secondary)]">
+              {{ ann.publish_start|date:"d M Y" }} – {{ ann.publish_end|date:"d M Y"|default:"Terbuka" }}
+            </td>
+            <td class="px-5 py-4">
+              {% if ann.is_current %}
+              <span class="amp-badge amp-badge-sm amp-badge-success">Aktif</span>
+              {% elif ann.active %}
+              <span class="amp-badge amp-badge-sm amp-badge-warning">Terjadwal</span>
+              {% else %}
+              <span class="amp-badge amp-badge-sm amp-badge-neutral">Nonaktif</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-4 text-right">
+              <div class="flex items-center justify-end gap-3">
+                <a href="{% url 'broadcast:announcement_edit' ann.pk %}" class="text-xs font-medium text-[var(--amp-text-secondary)] hover:text-[var(--amp-text-primary)] transition-colors">Edit</a>
+                <span class="text-[var(--amp-border-subtle)]">|</span>
+                <form method="post" action="{% url 'broadcast:announcement_delete' ann.pk %}" onsubmit="return confirm('Nonaktifkan pengumuman ini?')" class="inline">
+                  {% csrf_token %}
+                  <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition-colors">Hapus</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="px-5 py-16 text-center">
+              <div class="w-12 h-12 rounded-full bg-[var(--amp-surface-tertiary)] flex items-center justify-center mx-auto mb-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amp-text-tertiary)" stroke-width="1.5"><path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+              </div>
+              <p class="text-sm font-medium text-[var(--amp-text-secondary)]">Belum ada pengumuman</p>
+              <p class="text-xs text-[var(--amp-text-tertiary)] mt-1">Tambahkan pengumuman siaran pertama.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

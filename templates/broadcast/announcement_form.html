@@ -1,48 +1,49 @@
 {% extends "amp_studio/base.html" %}
 
-{% block title %}{% if is_edit %}Edit Pengumuman{% else %}Tambah Pengumuman{% endif %} - Broadcast Management{% endblock %}
+{% block title %}{% if is_edit %}Edit Pengumuman{% else %}Tambah Pengumuman{% endif %} — AMP Studio{% endblock %}
 
 {% block breadcrumb %}
 <nav class="amp-breadcrumb" aria-label="Breadcrumb">
   <a href="{% url 'studio:dashboard' %}"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
-  <span>›</span>
-  <span>Siaran</span>
-  <span>›</span>
+  <span>›</span><span>Siaran</span><span>›</span>
   <a href="{% url 'broadcast:announcement_list' %}">Pengumuman</a>
-  <span>›</span>
-  <span>Form Pengumuman</span>
+  <span>›</span><span>{% if is_edit %}Edit{% else %}Tambah{% endif %}</span>
 </nav>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-3xl">
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-        {% if is_edit %}Edit Pengumuman: {{ announcement.title }}{% else %}Tambah Pengumuman Baru{% endif %}
-    </h1>
-    <form method="post" enctype="multipart/form-data" class="space-y-6">
-        {% csrf_token %}
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 space-y-4">
-            {% for field in form %}
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
-                {% endif %}
-                {% if field.help_text %}
-                <p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
+<div class="max-w-3xl space-y-6">
+
+  <h1 class="amp-page-title">
+    {% if is_edit %}Edit Pengumuman: {{ announcement.title }}{% else %}Tambah Pengumuman Baru{% endif %}
+  </h1>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-5">
+    {% csrf_token %}
+    <div class="amp-card">
+      <div class="amp-card-body space-y-4">
+        {% for field in form %}
+        <div>
+          <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <p class="mt-1 text-xs text-red-500">{{ field.errors.0 }}</p>
+          {% endif %}
+          {% if field.help_text %}
+          <p class="mt-1 text-xs text-[var(--amp-text-tertiary)]">{{ field.help_text }}</p>
+          {% endif %}
         </div>
-        <div class="flex justify-end gap-3">
-            <a href="{% url 'broadcast:announcement_list' %}" class="px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium">
-                Batal
-            </a>
-            <button type="submit" class="px-6 py-2 bg-coffee-500 text-white rounded-lg hover:bg-coffee-600 font-medium">
-                {% if is_edit %}Simpan Perubahan{% else %}Buat Pengumuman{% endif %}
-            </button>
-        </div>
-    </form>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <a href="{% url 'broadcast:announcement_list' %}" class="amp-btn amp-btn-secondary">Batal</a>
+      <button type="submit" class="amp-btn amp-btn-primary">
+        {% if is_edit %}Simpan Perubahan{% else %}Buat Pengumuman{% endif %}
+      </button>
+    </div>
+  </form>
+
 </div>
 {% endblock %}

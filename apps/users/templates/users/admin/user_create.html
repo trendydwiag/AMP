@@ -1,94 +1,102 @@
 {% extends 'amp_studio/base.html' %}
 
-{% block title %}Buat Pengguna | {{ SITE_NAME }}{% endblock %}
+{% block title %}Buat Pengguna — AMP Studio{% endblock %}
 
 {% block breadcrumb %}
 <nav class="amp-breadcrumb" aria-label="Breadcrumb">
   <a href="{% url 'studio:dashboard' %}"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
-  <span>›</span>
+  <span>›</span><span>Pengaturan</span><span>›</span>
   <a href="{% url 'users:admin_user_list' %}">Pengguna</a>
-  <span>›</span>
-  <span>Buat Pengguna</span>
+  <span>›</span><span>Buat</span>
 </nav>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto">
-    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
-        <h1 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Buat Pengguna Baru</h1>
+<div class="max-w-lg space-y-6">
 
-        {% if messages %}
-        <div class="mb-4 space-y-2">
-            {% for message in messages %}
-            <div class="p-3 rounded-lg text-sm {% if message.tags == 'error' %}bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300 border border-red-200 dark:border-red-800{% else %}bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300 border border-green-200 dark:border-green-800{% endif %}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+  <h1 class="amp-page-title">Buat Pengguna Baru</h1>
 
-        {% if form.non_field_errors %}
-        <div class="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300 border border-red-200 dark:border-red-800">
-            {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <form method="post" class="space-y-4">
-            {% csrf_token %}
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Depan</label>
-                    {{ form.first_name }}
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Belakang</label>
-                    {{ form.last_name }}
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Username <span class="text-red-500">*</span></label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.username.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email <span class="text-red-500">*</span></label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password <span class="text-red-500">*</span></label>
-                {{ form.password }}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Peran <span class="text-red-500">*</span></label>
-                {{ form.role }}
-            </div>
-
-            <div class="flex items-center gap-2">
-                {{ form.is_staff }}
-                <label class="text-sm text-slate-700 dark:text-slate-300">Staff (akses admin panel)</label>
-            </div>
-
-            <div class="flex justify-end gap-3 pt-4">
-                <a href="{% url 'users:admin_user_list' %}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition">
-                    Batal
-                </a>
-                <button type="submit" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-lg transition">
-                    Buat Pengguna
-                </button>
-            </div>
-        </form>
+  {% if messages %}
+  <div class="space-y-2">
+    {% for message in messages %}
+    <div class="flex items-start gap-3 px-4 py-3 rounded-xl border text-sm
+        {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-800 dark:text-red-300
+        {% else %}bg-green-50 border-green-200 text-green-700 dark:bg-green-950/30 dark:border-green-800 dark:text-green-300{% endif %}">
+      {{ message }}
     </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+  <div class="flex items-start gap-3 px-4 py-3 rounded-xl border text-sm bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-800 dark:text-red-300">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+    <div class="amp-card">
+      <div class="amp-card-body space-y-4">
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">Nama Depan</label>
+            {{ form.first_name }}
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">Nama Belakang</label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">
+            Username <span class="text-red-500">*</span>
+          </label>
+          {{ form.username }}
+          {% if form.username.errors %}
+          <p class="mt-1 text-xs text-red-500">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">
+            Email <span class="text-red-500">*</span>
+          </label>
+          {{ form.email }}
+          {% if form.email.errors %}
+          <p class="mt-1 text-xs text-red-500">{{ form.email.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">
+            Password <span class="text-red-500">*</span>
+          </label>
+          {{ form.password }}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-[var(--amp-text-primary)] mb-1.5">
+            Peran <span class="text-red-500">*</span>
+          </label>
+          {{ form.role }}
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          {{ form.is_staff }}
+          <label class="text-sm text-[var(--amp-text-secondary)]">Staff (akses admin panel Django)</label>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <a href="{% url 'users:admin_user_list' %}" class="amp-btn amp-btn-secondary">Batal</a>
+      <button type="submit" class="amp-btn amp-btn-primary">Buat Pengguna</button>
+    </div>
+  </form>
+
 </div>
 {% endblock %}
