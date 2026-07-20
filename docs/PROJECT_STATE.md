@@ -1,6 +1,6 @@
 # PROJECT_STATE.md — AMP Studio
 **Source of Truth for Project Status**
-**Last Updated:** Sprint 4.4.1B — July 20, 2026
+**Last Updated:** Sprint 4.5 — July 20, 2026
 
 > This document is the **authoritative source of truth** for AMP Studio's current state.
 > For architecture reference, see `docs/AI_CONTEXT.md`.
@@ -11,18 +11,18 @@
 
 ## Current Version
 
-**AMP Studio v0.4.4.1** (after Sprint 4.4.1B Production Audit)
+**AMP Studio v0.4.5** (after Sprint 4.5 Demo Freeze Validation)
 
 ---
 
 ## Current Sprint
 
-**Sprint 4.4.1B — Production Audit**
+**Sprint 4.5 — Demo Freeze Validation**
 
-- Type: QA + Bug Fix
-- Objective: Full production audit of all 67 URL endpoints; fix all FAIL items
+- Type: QA + Bug Fix (8-phase audit)
+- Objective: Fix all visible bugs before investor demo (July 21, 2026)
 - Status: ✅ DONE
-- Result: 95.5% production readiness (64 PASS / 3 WARNING / 0 FAIL)
+- Result: 93/100 demo readiness, 85 endpoints tested, 4 bugs fixed, 0 FAIL remaining
 
 ---
 

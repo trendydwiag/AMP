@@ -5,6 +5,56 @@ This file is append-only — never overwrite previous history.
 
 ---
 
+## Sprint 4.5 — Demo Freeze Validation (20 Juli 2026)
+
+Full QA pass sebelum demo investor. 8 fase audit: HTTP status, navigasi, form CRUD, role RBAC, responsif, visual, streaming, report. 85 endpoint diuji, 4 bug diperbaiki, 0 FAIL tersisa.
+
+### Bugs Fixed
+
+**BUG-101 — `/podcast/cms/episode/tambah/` HTTP 500 (CRITICAL)**
+`PodcastEpisodeCMSCreateView` dan `PodcastEpisodeCMSUpdateView` menyebut field `seo_title`/`seo_description` di `fields = [...]` — field tersebut tidak ada di model `PodcastEpisode` (model memakai `og_title`/`og_description`). Django `FieldError` saat GET.
+- Fix: ganti `seo_title` → `og_title`, `seo_description` → `og_description`
+- File: `apps/podcast/views.py`
+
+**BUG-102 — `/broadcast/cms/episode/tambah/` HTTP 500 (CRITICAL)**
+Sama: `BroadcastEpisodeCMSCreateView` dan `BroadcastEpisodeCMSUpdateView` menyebut `seo_title` yang tidak ada di model `Episode` (model memakai `og_title`).
+- Fix: hapus `seo_title` dari kedua `fields` list
+- File: `apps/broadcast/views.py`
+
+**BUG-103 — Admin User Pages Accessible to Any Logged-in User (SECURITY)**
+`AdminUserListView`, `AdminUserCreateView`, `AdminUserDetailView` hanya menggunakan `LoginRequiredMixinCustom` — tidak ada pemeriksaan role. Editor dan Viewer bisa mengakses manajemen pengguna.
+- Fix: tambah `@method_decorator(admin_required, name='dispatch')` ke ketiga view; tambah `from django.utils.decorators import method_decorator`
+- File: `apps/users/views.py`
+
+**BUG-104 — `CurrentProgramResolver` Selalu Return Null (HIGH)**
+`CurrentProgramResolver.resolve()` menggunakan `timezone.now().time()` (UTC) untuk membandingkan dengan waktu jadwal yang disimpan dalam WIB. Dengan `TIME_ZONE='Asia/Jakarta'` dan `USE_TZ=True`, semua jadwal diinput sebagai WIB. Perbedaan UTC+7 menyebabkan tidak ada jadwal yang cocok → program selalu null.
+- Fix: ganti `now.time()` → `timezone.localtime(now).time()`, dan `now.weekday()` → `timezone.localtime(now).weekday()`. Juga update kalkulasi `remaining_minutes` untuk pakai `local_now`.
+- File: `apps/broadcast/services.py` (CurrentProgramResolver.resolve)
+- Verification: resolver sekarang mengembalikan `'Nada Siang'` (host: Buux, sisa 90 menit, next: Warung Kopi Kabulhaden)
+
+### Passwords Reset
+Semua password demo dikembalikan ke nilai dokumentasi:
+- `superadmin` / `DemoAdmin2024!`
+- `admin` / `DemoAdmin2024!`
+- `editor` / `DemoEditor2024!`
+- `viewer` / `DemoViewer2024!`
+
+### Files Modified
+| File | Perubahan |
+|---|---|
+| `apps/podcast/views.py` | Fix seo_title→og_title, seo_description→og_description di Create+Update |
+| `apps/broadcast/views.py` | Hapus seo_title dari Episode Create+Update |
+| `apps/users/views.py` | Tambah admin_required + method_decorator import ke 3 AdminUser views |
+| `apps/broadcast/services.py` | Fix timezone: localtime(now) di CurrentProgramResolver |
+| `docs/reports/demo-freeze-report.md` | Dibuat |
+
+### Demo Readiness Score
+**93/100** (dari 78/100 sebelum sprint)
+
+> Lihat `docs/reports/demo-freeze-report.md` untuk detail lengkap.
+
+---
+
 ## Sprint 4.4 — Live Broadcast Intelligence (TD-001)
 **Date:** July 20, 2026
 **Goal:** Resolve TD-001 by wiring the broadcast schedule into the Live API so the `program` field returns the currently airing program, host, schedule times, remaining time, and next program.

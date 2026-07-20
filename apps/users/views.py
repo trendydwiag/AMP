@@ -9,6 +9,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView, FormView
 
@@ -443,6 +444,7 @@ class TwoFactorDisableView(LoginRequiredMixinCustom, View):
         return redirect('users:profile')
 
 
+@method_decorator(admin_required, name='dispatch')
 class AdminUserListView(LoginRequiredMixinCustom, TemplateView):
     """View for admin to list and manage all users."""
     template_name = 'users/admin/user_list.html'
@@ -476,6 +478,7 @@ class AdminUserListView(LoginRequiredMixinCustom, TemplateView):
         return render(request, self.template_name, context)
 
 
+@method_decorator(admin_required, name='dispatch')
 class AdminUserCreateView(LoginRequiredMixinCustom, FormView):
     """View for admin to create a new user."""
     form_class = UserAdminCreationForm
@@ -512,6 +515,7 @@ class AdminUserCreateView(LoginRequiredMixinCustom, FormView):
         return self.request.META.get('REMOTE_ADDR', '127.0.0.1')
 
 
+@method_decorator(admin_required, name='dispatch')
 class AdminUserDetailView(LoginRequiredMixinCustom, TemplateView):
     """View for admin to view user details and manage the account."""
     template_name = 'users/admin/user_detail.html'

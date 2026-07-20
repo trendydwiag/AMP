@@ -429,8 +429,11 @@ class CurrentProgramResolver:
     def resolve(self) -> Dict[str, Any]:
         """Return current program info dict, empty-safe."""
         now = timezone.now()
-        current_time = now.time()
-        current_day = self.DAY_MAP[now.weekday()]
+        # Convert to server's configured timezone (Asia/Jakarta) so that
+        # schedule times — which are stored in WIB — are compared correctly.
+        local_now = timezone.localtime(now)
+        current_time = local_now.time()
+        current_day = self.DAY_MAP[local_now.weekday()]
 
         schedules = self.schedule_repo.get_for_day(current_day)
 
@@ -450,9 +453,9 @@ class CurrentProgramResolver:
         ).first()
         host_name = host_member.host.display_name if host_member else ''
 
-        # Calculate remaining minutes
-        now_dt = now.replace(tzinfo=None)
-        end_dt = now.replace(
+        # Calculate remaining minutes using local time (WIB) for accuracy
+        now_dt = local_now.replace(tzinfo=None)
+        end_dt = local_now.replace(
             hour=current_schedule.end_time.hour,
             minute=current_schedule.end_time.minute,
             second=0, microsecond=0, tzinfo=None

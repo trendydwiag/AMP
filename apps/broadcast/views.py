@@ -913,7 +913,7 @@ class BroadcastEpisodeCMSListView(LoginRequiredMixin, AuditLogMixin, ListView):
 class BroadcastEpisodeCMSCreateView(LoginRequiredMixin, AuditLogMixin, CreateView):
     model = Episode
     template_name = 'broadcast/cms/episode_form.html'
-    fields = ['program', 'title', 'description', 'episode_number', 'cover_image', 'recording_audio', 'recording_video', 'status', 'transcript', 'seo_title', 'og_title', 'og_description']
+    fields = ['program', 'title', 'description', 'episode_number', 'cover_image', 'recording_audio', 'recording_video', 'status', 'transcript', 'og_title', 'og_description']
     success_url = reverse_lazy('broadcast:cms_episode_list')
 
     def form_valid(self, form):
@@ -925,7 +925,7 @@ class BroadcastEpisodeCMSCreateView(LoginRequiredMixin, AuditLogMixin, CreateVie
 class BroadcastEpisodeCMSUpdateView(LoginRequiredMixin, AuditLogMixin, UpdateView):
     model = Episode
     template_name = 'broadcast/cms/episode_form.html'
-    fields = ['program', 'title', 'description', 'episode_number', 'cover_image', 'recording_audio', 'recording_video', 'status', 'published', 'publish_date', 'transcript', 'seo_title', 'og_title', 'og_description']
+    fields = ['program', 'title', 'description', 'episode_number', 'cover_image', 'recording_audio', 'recording_video', 'status', 'published', 'publish_date', 'transcript', 'og_title', 'og_description']
     success_url = reverse_lazy('broadcast:cms_episode_list')
 
     def form_valid(self, form):

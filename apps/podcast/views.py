@@ -127,7 +127,7 @@ class PodcastEpisodeCMSListView(LoginRequiredMixin, AuditLogMixin, ListView):
 class PodcastEpisodeCMSCreateView(LoginRequiredMixin, AuditLogMixin, CreateView):
     model = PodcastEpisode
     template_name = 'podcast/cms/episode_form.html'
-    fields = ['podcast', 'title', 'description', 'audio_file', 'audio_url', 'cover_image', 'duration', 'episode_number', 'season_number', 'status', 'transcript', 'seo_title', 'seo_description']
+    fields = ['podcast', 'title', 'description', 'audio_file', 'audio_url', 'cover_image', 'duration', 'episode_number', 'season_number', 'status', 'transcript', 'og_title', 'og_description']
     success_url = reverse_lazy('podcast:cms_episode_list')
 
     def form_valid(self, form):
@@ -141,7 +141,7 @@ class PodcastEpisodeCMSCreateView(LoginRequiredMixin, AuditLogMixin, CreateView)
 class PodcastEpisodeCMSUpdateView(LoginRequiredMixin, AuditLogMixin, UpdateView):
     model = PodcastEpisode
     template_name = 'podcast/cms/episode_form.html'
-    fields = ['podcast', 'title', 'description', 'audio_file', 'audio_url', 'cover_image', 'duration', 'episode_number', 'season_number', 'status', 'published', 'publish_date', 'transcript', 'seo_title', 'seo_description']
+    fields = ['podcast', 'title', 'description', 'audio_file', 'audio_url', 'cover_image', 'duration', 'episode_number', 'season_number', 'status', 'published', 'publish_date', 'transcript', 'og_title', 'og_description']
     success_url = reverse_lazy('podcast:cms_episode_list')
 
     def form_valid(self, form):
