@@ -186,21 +186,8 @@ function ampCalendar() {
   const todayHour = today.getHours();
   const todayDay = today.getDay(); // 0=Sun, 1=Mon,...
 
-  // Kabulhaden dummy schedule (repeating weekly Mon-Fri / daily)
-  const weeklySchedule = [
-    // Mon-Fri programs
-    { id: 1, title: 'Pagi Bersama Kabulhaden', startHour: 6, endHour: 9, days: [1,2,3,4,5], host: 'Dewi R' },
-    { id: 2, title: 'Kabar Pagi', startHour: 9, endHour: 10, days: [1,2,3,4,5], host: 'Budi S' },
-    { id: 3, title: 'Lagu Pop Indonesia', startHour: 10, endHour: 12, days: [1,2,3,4,5], host: 'Auto DJ' },
-    { id: 4, title: 'Makan Siang Bersama', startHour: 12, endHour: 13, days: [1,2,3,4,5], host: 'Rina M' },
-    { id: 5, title: 'Musik Siang', startHour: 13, endHour: 15, days: [1,2,3,4,5], host: 'Auto DJ' },
-    { id: 6, title: 'Relaksasi Sore', startHour: 15, endHour: 17, days: [1,2,3,4,5], host: 'Dewi R' },
-    { id: 7, title: 'Kabulhaden Malam', startHour: 21, endHour: 23, days: [0,1,2,3,4,5,6], host: 'Hendra K' },
-    // Weekend only
-    { id: 8, title: 'Pagi Minggu', startHour: 7, endHour: 10, days: [0,6], host: 'Rina M' },
-    { id: 9, title: 'Weekend Hits', startHour: 10, endHour: 14, days: [0,6], host: 'Auto DJ' },
-    { id: 10, title: 'Sore Santai', startHour: 15, endHour: 18, days: [0,6], host: 'Budi S' },
-  ];
+  // Broadcast schedule from database
+  const weeklySchedule = {{ schedule_json|safe }};
 
   function getEventsForDateStr(dateStr) {
     const d = new Date(dateStr + 'T12:00:00');

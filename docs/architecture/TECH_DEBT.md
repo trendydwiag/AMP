@@ -173,7 +173,53 @@ Run `python manage.py migrate` in a maintenance window and verify no data is los
 ## TD-007 — No Superuser Account in Development Environment
 **Sprint introduced:** Pre-existing (discovered 3.4D)
 **Priority:** High (blocks all AMP Studio verification)
-**Status:** Open — tracked as Task #2
+**Status:** ✅ RESOLVED — `demo_seed` command creates all 4 demo users
+
+---
+
+## TD-008 — Broadcast Templates: Tailwind Dark Syntax vs AMP Studio CSS Vars
+**Sprint introduced:** 4.4.2
+**Priority:** Low (cosmetic only — dark mode works via .dark class)
+**Status:** Open
+
+### Description
+Templates in `templates/broadcast/` (host_list, program_list, episode_list, schedule_list, etc.) use Tailwind dark-mode utilities (`dark:text-white`, `dark:bg-slate-800`) rather than AMP Studio CSS variables (`text-[var(--amp-text-primary)]`, `bg-[var(--amp-surface-primary)]`). These templates work visually in dark mode because AMP Studio sets `.dark` on `<html>`, but they are not using the official design token system.
+
+### Impact
+Minor: If the color palette changes in CSS vars, broadcast templates won't update automatically. No user-visible bug.
+
+### Suggested Solution
+Systematically replace Tailwind dark utilities with CSS var equivalents in all `templates/broadcast/` files. Scope is large (~15 templates) — best done as a standalone sprint.
+
+---
+
+## TD-009 — Playlist + PlaylistItem Have No Demo Seed Data
+**Sprint introduced:** 4.4.2
+**Priority:** Medium (playlist list shows empty state in demo)
+**Status:** Open
+
+### Description
+`Playlist` and `PlaylistItem` models have 0 records in the database. The `demo_seed` command (`python manage.py demo_seed`) does not create any playlists. The new `/broadcast/playlist/` page shows an empty state during demo.
+
+### Suggested Solution
+Add playlist seed data to `apps/broadcast/management/commands/demo_seed.py` — create 2-3 playlists with 5-10 items each, linked to existing programs.
+
+---
+
+## TD-010 — Workflow Panel Buttons Not Using `amp-btn` Classes
+**Sprint introduced:** 4.4.2
+**Priority:** Low (visual-only, functional)
+**Status:** Open
+
+### Description
+`templates/content/components/workflow_panel.html` uses custom color classes for workflow action buttons (orange for submit-to-review, green for approve, red for reject). These are semantically intentional but don't use the AMP Studio `amp-btn` design system.
+
+### Suggested Solution
+Define `amp-btn-warning`, `amp-btn-success`, `amp-btn-danger` variants in the AMP Studio design system and apply them here.
+
+---
+
+## TD-011 — No Superuser Account in Development Environment (RESOLVED)
 
 ### Description
 There is no superuser account in the development database. All AMP Studio pages (`/studio/*`) require login. This blocks manual QA of every studio feature.

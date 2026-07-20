@@ -11,18 +11,18 @@
 
 ## Current Version
 
-**AMP Studio v0.4.5** (after Sprint 4.5 Demo Freeze Validation)
+**AMP Studio v0.4.6** (after Sprint 4.4.2 Demo Freeze & UI Consistency)
 
 ---
 
 ## Current Sprint
 
-**Sprint 4.5 — Demo Freeze Validation**
+**Sprint 4.4.2 — Demo Freeze & UI Consistency**
 
-- Type: QA + Bug Fix (8-phase audit)
-- Objective: Fix all visible bugs before investor demo (July 21, 2026)
+- Type: QA + Bug Fix + UI Polish
+- Objective: Route audit, CRUD completeness, dead link removal, platform dark mode fixes
 - Status: ✅ DONE
-- Result: 93/100 demo readiness, 85 endpoints tested, 4 bugs fixed, 0 FAIL remaining
+- Result: 97/100 demo readiness, playlist CRUD added, calendar data real, 3 bugs fixed
 
 ---
 
@@ -46,6 +46,8 @@
 | 4.0.1 | Knowledge Base Governance & Documentation Sync | Documentation | July 20, 2026 | ✅ DONE |
 | 4.4 | Live Broadcast Intelligence (TD-001) | Backend + Frontend | July 20, 2026 | ✅ DONE |
 | 4.4.1B | Production Audit (67 URLs; 5 bugs fixed) | QA + Bug Fix | July 20, 2026 | ✅ DONE |
+| 4.5 | Demo Freeze Validation (93/100; 4 bugs fixed) | QA + Bug Fix | July 20, 2026 | ✅ DONE |
+| 4.4.2 | Demo Freeze & UI Consistency (97/100; playlist CRUD, real calendar, dark mode) | Polish | July 20, 2026 | ✅ DONE |
 
 ---
 

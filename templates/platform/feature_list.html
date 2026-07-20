@@ -10,35 +10,35 @@
         <p class="text-coffee-600 mt-1">Kelola fitur platform dan ketersediaan per partner</p>
     </div>
 
-    <div class="bg-white rounded-xl border border-coffee-200 overflow-hidden">
+    <div class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] overflow-hidden">
         <table class="w-full">
-            <thead class="bg-coffee-50 border-b border-coffee-200">
+            <thead class="bg-[var(--amp-surface-secondary)] border-b border-[var(--amp-border-default)]">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Key</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Nama</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Kategori</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Scope</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Status</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-coffee-700">Tier Minimum</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-[var(--amp-text-secondary)]">Key</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-[var(--amp-text-secondary)]">Nama</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-[var(--amp-text-secondary)]">Kategori</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-[var(--amp-text-secondary)]">Scope</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-[var(--amp-text-secondary)]">Status</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-[var(--amp-text-secondary)]">Tier Minimum</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-coffee-100">
+            <tbody class="divide-y divide-[var(--amp-border-light)]">
                 {% for flag in flags %}
-                <tr class="hover:bg-coffee-50 transition">
-                    <td class="px-6 py-4 text-sm font-mono text-coffee-600">{{ flag.key }}</td>
-                    <td class="px-6 py-4 text-sm text-coffee-800">{{ flag.name }}</td>
-                    <td class="px-6 py-4 text-sm text-coffee-600">{{ flag.category|default:"-" }}</td>
-                    <td class="px-6 py-4 text-sm text-coffee-600">{{ flag.get_scope_display }}</td>
+                <tr class="hover:bg-[var(--amp-surface-secondary)] transition">
+                    <td class="px-6 py-4 text-sm font-mono text-[var(--amp-text-secondary)]">{{ flag.key }}</td>
+                    <td class="px-6 py-4 text-sm text-[var(--amp-text-primary)]">{{ flag.name }}</td>
+                    <td class="px-6 py-4 text-sm text-[var(--amp-text-secondary)]">{{ flag.category|default:"-" }}</td>
+                    <td class="px-6 py-4 text-sm text-[var(--amp-text-secondary)]">{{ flag.get_scope_display }}</td>
                     <td class="px-6 py-4">
                         <span class="px-2 py-1 text-xs font-medium rounded-full {% if flag.is_enabled %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-700{% endif %}">
                             {% if flag.is_enabled %}Aktif{% else %}Nonaktif{% endif %}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-sm text-coffee-600">{{ flag.required_tier|default:"Semua" }}</td>
+                    <td class="px-6 py-4 text-sm text-[var(--amp-text-secondary)]">{{ flag.required_tier|default:"Semua" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-coffee-500">Belum ada feature flag.</td>
+                    <td colspan="6" class="px-6 py-12 text-center text-[var(--amp-text-tertiary)]">Belum ada feature flag.</td>
                 </tr>
                 {% endfor %}
             </tbody>

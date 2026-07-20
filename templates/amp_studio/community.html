@@ -23,9 +23,9 @@
       <p class="amp-page-subtitle">Kelola diskusi, komentar, dan interaksi pendengar.</p>
     </div>
     <div class="flex items-center gap-3">
-      <a href="#" class="amp-btn amp-btn-secondary text-sm" x-data @click.prevent="$dispatch('notify', {message: 'Modul undangan akan segera tersedia.', type: 'info'})">
+      <button type="button" class="amp-btn amp-btn-secondary text-sm" @click="$dispatch('notify', {message: 'Modul undangan akan segera tersedia.', type: 'info'})">
         Undang Pendengar
-      </a>
+      </button>
     </div>
   </div>
 

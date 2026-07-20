@@ -10,11 +10,11 @@
         <h1 class="text-2xl font-bold text-coffee-800 mt-2">Tambah Partner Baru</h1>
     </div>
 
-    <form method="post" class="bg-white rounded-xl border border-coffee-200 p-6">
+    <form method="post" class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] p-6">
         {% csrf_token %}
         {% for field in form %}
         <div class="mb-4">
-            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-coffee-700 mb-1">{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-[var(--amp-text-secondary)] mb-1">{{ field.label }}</label>
             {% if field.field.widget.input_type == 'checkbox' %}
                 <div class="flex items-center">
                     {{ field }}
@@ -44,16 +44,15 @@
     select, textarea, input[type="text"], input[type="email"], input[type="number"], input[type="url"], input[type="password"] {
         width: 100%;
         border-radius: 0.5rem;
-        border: 1px solid #d6ccc0;
+        border: 1px solid var(--amp-border-default);
         padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
-        color: #1A0F0B;
-        background-color: white;
+        color: var(--amp-text-primary);
+        background-color: var(--amp-surface-secondary);
     }
     select:focus, textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, input[type="url"]:focus {
         outline: none;
-        ring: 2px;
-        border-color: #4E2F1F;
+        border-color: var(--amp-coffee-500);
         box-shadow: 0 0 0 2px rgba(78, 47, 31, 0.2);
     }
     select {

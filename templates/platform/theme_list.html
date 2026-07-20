@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for theme in themes %}
-        <div class="bg-white rounded-xl border border-coffee-200 overflow-hidden">
+        <div class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] overflow-hidden">
             <div class="h-3" style="background: linear-gradient(90deg, {{ theme.primary_color }} 0%, {{ theme.secondary_color }} 50%, {{ theme.accent_color }} 100%)"></div>
             <div class="p-5">
                 <div class="flex items-center justify-between mb-3">

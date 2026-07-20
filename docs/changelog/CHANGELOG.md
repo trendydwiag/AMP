@@ -5,6 +5,32 @@ This file is append-only — never overwrite previous history.
 
 ---
 
+## Sprint 4.4.2 — Demo Freeze & UI Consistency (20 Juli 2026)
+
+QA + UI polish pass: playlist CRUD dibuat, kalender dikoneksi ke data real, dead href diperbaiki, platform templates dark mode diperbaiki.
+
+### Features Added
+- **Broadcast Playlist CRUD**: `PlaylistListView`, `PlaylistCreateView`, `PlaylistEditView`, `PlaylistDeleteView` + 4 URLs + 2 templates (sebelumnya hanya API endpoint)
+
+### Bugs Fixed
+
+**BUG-105 — Kalender studio pakai hardcoded dummy schedule (MEDIUM)**
+`/studio/kalender/` menampilkan `weeklySchedule` hardcoded dengan komentar "Kabulhaden dummy schedule" alih-alih data dari database.
+- Fix: `AMPStudioCalendarView` sekarang mengambil schedule real dari `ScheduleService.get_active_schedules()`, dikonversi ke JSON dan di-pass ke template
+- File: `apps/studio/views.py`, `templates/amp_studio/calendar.html`
+
+**BUG-106 — `href="#"` dead link di Community page (LOW)**
+Tombol "Undang Pendengar" menggunakan `<a href="#">` yang dapat mengakibatkan page jump dan accessibility issue.
+- Fix: Diganti ke `<button type="button">` dengan Alpine.js `@click` handler
+- File: `templates/amp_studio/community.html`
+
+**BUG-107 — Platform templates tidak support dark mode (MEDIUM)**
+`feature_list.html`, `partner_form.html`, `partner_detail.html`, `theme_list.html`, `theme_edit.html` menggunakan `bg-white` dan hardcoded colors yang tidak beradaptasi dengan dark mode.
+- Fix: Semua `bg-white` → `bg-[var(--amp-surface-primary)]`, heading colors dan borders → CSS vars
+- Files: 5 template files di `templates/platform/`
+
+---
+
 ## Sprint 4.5 — Demo Freeze Validation (20 Juli 2026)
 
 Full QA pass sebelum demo investor. 8 fase audit: HTTP status, navigasi, form CRUD, role RBAC, responsif, visual, streaming, report. 85 endpoint diuji, 4 bug diperbaiki, 0 FAIL tersisa.

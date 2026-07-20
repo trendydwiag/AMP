@@ -1,0 +1,521 @@
+# SPRINT 4.4.2 — DEMO FREEZE
+# Kabulhaden CMS / AMP Studio
+# PRIORITY: CRITICAL
+#
+# WAJIB dibaca sebelum mulai:
+# 1. docs/AI_CONTEXT.md
+# 2. docs/PROJECT_STATE.md
+# 3. docs/changelog/CHANGELOG.md
+# 4. docs/sprints/NEXT_SPRINT.md
+# 5. docs/architecture/TECH_DEBT.md
+#
+# Jangan berasumsi.
+# Jika dokumentasi berbeda dengan kode, percayai kode lalu update dokumentasi.
+
+==================================================
+GOAL
+==================================================
+
+Kabulhaden CMS harus siap dipresentasikan ke klien.
+
+Target sprint ini BUKAN membuat fitur baru.
+
+Target sprint ini adalah membuat seluruh sistem terasa sebagai SATU PRODUK yang matang, stabil, konsisten, dan profesional.
+
+Tidak boleh ada halaman yang terlihat unfinished.
+
+Tidak boleh ada error yang terlihat user.
+
+==================================================
+PHASE 1
+FULL ROUTE AUDIT
+==================================================
+
+Audit seluruh urls.py.
+
+Pastikan seluruh route:
+
+- dapat diakses
+- tidak 404
+- tidak 500
+- tidak redirect loop
+- template tersedia
+- menu menuju halaman yang benar
+
+Perbaiki semua route yang bermasalah.
+
+==================================================
+PHASE 2
+CRUD AUDIT
+==================================================
+
+Audit seluruh modul.
+
+Broadcast
+
+Program
+
+Schedule
+
+Episode
+
+Playlist
+
+Podcast
+
+News
+
+Media
+
+Community
+
+Sponsor
+
+Users
+
+Settings
+
+Pastikan seluruh halaman:
+
+List
+
+Detail
+
+Create
+
+Edit
+
+Delete
+
+berjalan normal.
+
+Jika ada halaman yang belum memiliki template,
+buat template menggunakan AMP Studio.
+
+==================================================
+PHASE 3
+DEAD LINK & TEMPLATE AUDIT
+==================================================
+
+Cari:
+
+href="#"
+
+TODO
+
+FIXME
+
+Coming Soon
+
+Lorem Ipsum
+
+Dummy Text
+
+Developer Comment
+
+Sprint Marker
+
+Template Placeholder
+
+hapus semuanya.
+
+Jika ada link mati,
+hubungkan ke halaman yang benar.
+
+==================================================
+PHASE 4
+ROLE AUDIT
+==================================================
+
+Login sebagai:
+
+SUPERUSER
+
+ADMIN
+
+EDITOR
+
+VIEWER
+
+Pastikan:
+
+menu sesuai role
+
+permission benar
+
+403 tampil jika memang tidak boleh
+
+tidak ada menu yang hilang
+
+tidak ada menu yang bocor
+
+==================================================
+PHASE 5
+UI CONSISTENCY AUDIT
+==================================================
+
+Audit SELURUH halaman.
+
+Target:
+
+AMP Studio harus terasa sebagai SATU aplikasi.
+
+Periksa:
+
+--------------------------------------------------
+
+SIDEBAR
+
+--------------------------------------------------
+
+Menu aktif harus jelas.
+
+JANGAN sampai text putih di background terang.
+
+JANGAN sampai icon hilang.
+
+Active state harus sama di seluruh halaman.
+
+Hover harus sama.
+
+--------------------------------------------------
+
+HEADER
+
+--------------------------------------------------
+
+Semua halaman harus memakai header yang sama.
+
+Breadcrumb sama.
+
+Spacing sama.
+
+Search sama.
+
+User menu sama.
+
+Theme toggle sama.
+
+--------------------------------------------------
+
+PAGE LAYOUT
+
+--------------------------------------------------
+
+Container width sama.
+
+Padding sama.
+
+Margin sama.
+
+Card spacing sama.
+
+Tidak boleh ada halaman yang berbeda layout.
+
+--------------------------------------------------
+
+CARD
+
+--------------------------------------------------
+
+Radius sama.
+
+Shadow sama.
+
+Border sama.
+
+Padding sama.
+
+Header sama.
+
+Footer sama.
+
+Tidak boleh ada card legacy.
+
+--------------------------------------------------
+
+BUTTON
+
+--------------------------------------------------
+
+Primary
+
+Secondary
+
+Outline
+
+Danger
+
+Ghost
+
+Icon Button
+
+Semua memakai AMP Studio.
+
+Tidak boleh ada style berbeda.
+
+--------------------------------------------------
+
+FORM
+
+--------------------------------------------------
+
+Input
+
+Select
+
+Textarea
+
+Checkbox
+
+Radio
+
+Validation
+
+Label
+
+Focus
+
+Error
+
+Semuanya konsisten.
+
+--------------------------------------------------
+
+TABLE
+
+--------------------------------------------------
+
+Header
+
+Hover
+
+Pagination
+
+Sorting
+
+Search
+
+Action
+
+Empty State
+
+Semua konsisten.
+
+--------------------------------------------------
+
+EMPTY STATE
+
+--------------------------------------------------
+
+Semua halaman tanpa data harus memiliki:
+
+Icon
+
+Judul
+
+Deskripsi
+
+CTA
+
+Style yang sama.
+
+--------------------------------------------------
+
+TYPOGRAPHY
+
+--------------------------------------------------
+
+Heading
+
+Subheading
+
+Paragraph
+
+Caption
+
+Badge
+
+Label
+
+Harus memakai hierarchy yang sama.
+
+--------------------------------------------------
+
+COLOR
+
+--------------------------------------------------
+
+Audit seluruh halaman.
+
+Tidak boleh ada:
+
+white on white
+
+text putih di background terang
+
+border hilang
+
+contrast rendah
+
+Semua mengikuti Coffee Palette.
+
+--------------------------------------------------
+
+DARK MODE
+
+--------------------------------------------------
+
+Audit seluruh halaman.
+
+Tidak boleh ada:
+
+background putih
+
+card putih
+
+text hitam
+
+dropdown rusak
+
+modal rusak
+
+table rusak
+
+hover rusak
+
+--------------------------------------------------
+
+RESPONSIVE
+
+--------------------------------------------------
+
+Desktop
+
+Tablet
+
+Mobile
+
+Pastikan:
+
+tidak overflow
+
+tidak pecah
+
+tidak terpotong
+
+==================================================
+PHASE 6
+JAVASCRIPT AUDIT
+==================================================
+
+Cari:
+
+console.log
+
+console.error
+
+unused JS
+
+unused Alpine component
+
+dead script
+
+hapus semuanya.
+
+==================================================
+PHASE 7
+TECHNICAL DEBT AUDIT
+==================================================
+
+Cari:
+
+template tidak dipakai
+
+view tidak dipakai
+
+service tidak dipakai
+
+repository tidak dipakai
+
+URL tidak dipakai
+
+JANGAN dihapus.
+
+Catat sebagai Technical Debt.
+
+==================================================
+PHASE 8
+VISUAL REVIEW
+==================================================
+
+Lakukan visual review sebagai Senior UI/UX Designer.
+
+Bayangkan ini akan dipresentasikan kepada investor.
+
+Jika ada halaman yang terlihat berbeda dari halaman lain,
+standarkan.
+
+Jangan membuat style baru.
+
+Gunakan design system yang sudah ada.
+
+==================================================
+RULES
+==================================================
+
+JANGAN membuat fitur baru.
+
+JANGAN mengubah business logic.
+
+JANGAN mengubah database schema.
+
+JANGAN melakukan refactor besar.
+
+JANGAN mengubah architecture.
+
+Fokus hanya pada:
+
+bug fixing
+
+UI consistency
+
+UX consistency
+
+stability
+
+demo readiness
+
+==================================================
+DELIVERABLE
+==================================================
+
+Berikan laporan:
+
+1.
+Bug ditemukan
+
+2.
+Bug diperbaiki
+
+3.
+Issue yang sengaja ditunda
+
+4.
+Halaman yang distandarkan
+
+5.
+Technical Debt baru (jika ada)
+
+6.
+Dokumentasi yang diperbarui
+
+- CHANGELOG
+- PROJECT_STATE
+- feature-status
+- TECH_DEBT
+
+7.
+Commit Git:
+
+Sprint 4.4.2 - Demo Freeze & UI Consistency

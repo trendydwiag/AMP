@@ -25,8 +25,8 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Informasi Dasar</h2>
+        <div class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] p-6">
+            <h2 class="text-lg font-semibold text-[var(--amp-text-primary)] mb-4">Informasi Dasar</h2>
             <dl class="space-y-3">
                 <div class="flex justify-between"><dt class="text-coffee-500">Domain Utama</dt><dd class="text-coffee-800">{{ partner.primary_domain|default:"-" }}</dd></div>
                 <div class="flex justify-between"><dt class="text-coffee-500">Tagline</dt><dd class="text-coffee-800">{{ partner.tagline|default:"-" }}</dd></div>
@@ -37,8 +37,8 @@
             </dl>
         </div>
 
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Branding</h2>
+        <div class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] p-6">
+            <h2 class="text-lg font-semibold text-[var(--amp-text-primary)] mb-4">Branding</h2>
             <div class="flex items-center space-x-4 mb-4">
                 <div>
                     <div class="text-xs text-coffee-500 mb-1">Primary</div>
@@ -52,8 +52,8 @@
             <p class="text-sm text-coffee-600">{{ partner.description|default:"Tidak ada deskripsi"|truncatewords:30 }}</p>
         </div>
 
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Keanggotaan ({{ memberships|length }})</h2>
+        <div class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] p-6">
+            <h2 class="text-lg font-semibold text-[var(--amp-text-primary)] mb-4">Keanggotaan ({{ memberships|length }})</h2>
             <div class="space-y-2 max-h-48 overflow-y-auto">
                 {% for m in memberships %}
                 <div class="flex items-center justify-between text-sm py-1 border-b border-coffee-100 last:border-0">
@@ -66,8 +66,8 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-coffee-200 p-6">
-            <h2 class="text-lg font-semibold text-coffee-800 mb-4">Domain</h2>
+        <div class="bg-[var(--amp-surface-primary)] rounded-xl border border-[var(--amp-border-default)] p-6">
+            <h2 class="text-lg font-semibold text-[var(--amp-text-primary)] mb-4">Domain</h2>
             <div class="space-y-2">
                 {% for d in domains %}
                 <div class="flex items-center justify-between text-sm py-1 border-b border-coffee-100 last:border-0">

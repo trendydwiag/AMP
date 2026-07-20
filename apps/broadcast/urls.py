@@ -38,6 +38,11 @@ urlpatterns = [
     path('episode/<uuid:pk>/hapus/', views.EpisodeDeleteView.as_view(), name='episode_delete'),
 
     # Announcements
+    path('playlist/', views.PlaylistListView.as_view(), name='playlist_list'),
+    path('playlist/buat/', views.PlaylistCreateView.as_view(), name='playlist_create'),
+    path('playlist/<uuid:pk>/edit/', views.PlaylistEditView.as_view(), name='playlist_edit'),
+    path('playlist/<uuid:pk>/hapus/', views.PlaylistDeleteView.as_view(), name='playlist_delete'),
+
     path('pengumuman/', views.AnnouncementListView.as_view(), name='announcement_list'),
     path('pengumuman/buat/', views.AnnouncementCreateView.as_view(), name='announcement_create'),
     path('pengumuman/<uuid:pk>/edit/', views.AnnouncementEditView.as_view(), name='announcement_edit'),

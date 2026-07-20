@@ -585,6 +585,85 @@ class AnnouncementDeleteView(View):
 
 
 # ---------------------------------------------------------------------------
+# Playlist CRUD
+# ---------------------------------------------------------------------------
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(admin_required, name='dispatch')
+class PlaylistListView(TemplateView):
+    template_name = 'broadcast/playlist_list.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        svc = PlaylistService()
+        ctx['playlists'] = svc.get_active_playlists().select_related('program')
+        return ctx
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(admin_required, name='dispatch')
+class PlaylistCreateView(TemplateView):
+    template_name = 'broadcast/playlist_form.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['form'] = PlaylistForm()
+        ctx['is_edit'] = False
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        form = PlaylistForm(request.POST)
+        if form.is_valid():
+            form.save()
+            from django.contrib import messages
+            from django.shortcuts import redirect
+            messages.success(request, 'Playlist berhasil dibuat.')
+            return redirect('broadcast:playlist_list')
+        ctx = self.get_context_data(**kwargs)
+        ctx['form'] = form
+        return self.render_to_response(ctx)
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(admin_required, name='dispatch')
+class PlaylistEditView(TemplateView):
+    template_name = 'broadcast/playlist_form.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        playlist = get_object_or_404(Playlist, pk=kwargs['pk'])
+        ctx['form'] = PlaylistForm(instance=playlist)
+        ctx['is_edit'] = True
+        ctx['playlist'] = playlist
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        playlist = get_object_or_404(Playlist, pk=kwargs['pk'])
+        form = PlaylistForm(request.POST, instance=playlist)
+        if form.is_valid():
+            form.save()
+            from django.contrib import messages
+            from django.shortcuts import redirect
+            messages.success(request, 'Playlist berhasil diperbarui.')
+            return redirect('broadcast:playlist_list')
+        ctx = self.get_context_data(**kwargs)
+        ctx['form'] = form
+        return self.render_to_response(ctx)
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(admin_required, name='dispatch')
+class PlaylistDeleteView(View):
+    def post(self, request, *args, **kwargs):
+        from django.shortcuts import redirect
+        from django.contrib import messages
+        playlist = get_object_or_404(Playlist, pk=kwargs['pk'])
+        playlist.delete()
+        messages.success(request, 'Playlist berhasil dihapus.')
+        return redirect('broadcast:playlist_list')
+
+
+# ---------------------------------------------------------------------------
 # Calendar
 # ---------------------------------------------------------------------------
 

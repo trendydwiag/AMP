@@ -118,7 +118,8 @@
 | Broadcast Sessions | ✅ | |
 | Episode Management | ✅ | AMP Studio layout ✓ |
 | Guest Star Management | ✅ | |
-| Playlist + Items | ✅ | Drag-reorder via PlalistItemService |
+| Playlist CRUD (admin views) | ✅ | Sprint 4.4.2 — `/broadcast/playlist/` list/create/edit/delete |
+| Playlist + Items (service + API) | ✅ | Drag-reorder via PlaylistService; demo seed data missing (TD-009) |
 | Announcements | ✅ | AMP Studio layout ✓ |
 | Calendar View | ✅ | AMP Studio layout ✓ |
 | CMS Workflow (cms/program/, cms/episode/) | ✅ | Detailed review/publish workflow |

@@ -355,6 +355,44 @@ class AMPStudioPreviewView(View):
 class AMPStudioCalendarView(TemplateView):
     template_name = 'amp_studio/calendar.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            import json
+            from apps.broadcast.services import ScheduleService
+            from apps.broadcast.models import HostMember
+
+            # Map broadcast day_of_week codes → JS weekday numbers (0=Sun)
+            DAY_CODE_TO_JS = {
+                'MON': 1, 'TUE': 2, 'WED': 3, 'THU': 4,
+                'FRI': 5, 'SAT': 6, 'SUN': 0,
+            }
+
+            svc = ScheduleService()
+            schedules = svc.get_active_schedules().select_related('program')
+
+            schedule_data = []
+            for i, s in enumerate(schedules):
+                js_day = DAY_CODE_TO_JS.get(s.day_of_week, 1)
+                host_member = HostMember.objects.filter(
+                    program=s.program, is_lead=True
+                ).select_related('host').first()
+                host_name = host_member.host.display_name if host_member else ''
+
+                schedule_data.append({
+                    'id': i + 1,
+                    'title': s.program.title,
+                    'startHour': s.start_time.hour,
+                    'endHour': s.end_time.hour,
+                    'days': [js_day],
+                    'host': host_name,
+                })
+
+            context['schedule_json'] = json.dumps(schedule_data, ensure_ascii=False)
+        except Exception:
+            context['schedule_json'] = '[]'
+        return context
+
 
 @method_decorator(login_required, name='dispatch')
 class AMPStudioMediaExplorerView(TemplateView):
