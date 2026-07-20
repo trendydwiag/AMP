@@ -1,0 +1,336 @@
+SPRINT 4.5 — DEMO FREEZE VALIDATION
+Priority: CRITICAL
+Mode: QA + Bug Fixing + UX Polish
+DO NOT ADD NEW FEATURES.
+
+==================================================
+READ FIRST
+==================================================
+
+Before doing anything:
+
+1. Read docs/AI_CONTEXT.md
+2. Read docs/PROJECT_STATE.md
+3. Read docs/changelog/CHANGELOG.md
+4. Read docs/architecture/TECH_DEBT.md
+5. Read docs/sprints/NEXT_SPRINT.md
+
+Do NOT assume anything.
+Documentation is the source of truth.
+
+==================================================
+GOAL
+==================================================
+
+The objective is NOT to build features.
+
+The objective is:
+
+Make Kabulhaden CMS feel like a production-ready product for live demo.
+
+Assume tomorrow this application will be demonstrated to investors.
+
+Your task is to eliminate every visible bug.
+
+==================================================
+DO NOT
+==================================================
+
+DO NOT
+
+- refactor architecture
+- rewrite services
+- change business logic
+- rename models
+- add new modules
+- change database schema unless required
+- introduce breaking changes
+
+Only fix bugs and improve UX consistency.
+
+==================================================
+PHASE 1
+FULL APPLICATION AUDIT
+==================================================
+
+Visit EVERY PAGE.
+
+Authenticated pages.
+
+Public pages.
+
+Studio pages.
+
+Settings.
+
+Broadcast.
+
+Podcast.
+
+News.
+
+Community.
+
+Sponsor.
+
+Media.
+
+Analytics.
+
+Streaming.
+
+Website.
+
+For every page verify:
+
+✓ HTTP 200
+✓ No traceback
+✓ No template exception
+✓ No missing include
+✓ No broken image
+✓ No JS exception
+✓ No Alpine warning
+✓ No HTMX error
+✓ No console error
+✓ No empty white screen
+
+==================================================
+PHASE 2
+NAVIGATION AUDIT
+==================================================
+
+Verify ALL navigation.
+
+Header
+
+Sidebar
+
+Breadcrumb
+
+Quick Actions
+
+Dashboard Cards
+
+Buttons
+
+Footer
+
+Dropdown
+
+Profile menu
+
+Everything must navigate correctly.
+
+No
+
+href="#"
+
+javascript:void(0)
+
+dead links
+
+missing URL names
+
+broken reverse()
+
+==================================================
+PHASE 3
+FORM AUDIT
+==================================================
+
+Test every CRUD.
+
+Create
+
+Edit
+
+Delete
+
+Cancel
+
+Back
+
+Search
+
+Filter
+
+Pagination
+
+Validation
+
+Success message
+
+Error message
+
+Required fields
+
+File upload
+
+==================================================
+PHASE 4
+ROLE AUDIT
+==================================================
+
+Login as
+
+SUPERUSER
+
+ADMIN
+
+EDITOR
+
+VIEWER
+
+Verify:
+
+hidden menus
+
+permissions
+
+redirects
+
+403 pages
+
+No unauthorized access.
+
+==================================================
+PHASE 5
+RESPONSIVE AUDIT
+==================================================
+
+Verify
+
+Desktop
+
+Tablet
+
+Mobile
+
+No overflow
+
+No clipped text
+
+No broken sidebar
+
+No overlapping cards
+
+==================================================
+PHASE 6
+VISUAL CONSISTENCY
+==================================================
+
+Verify:
+
+Coffee palette
+
+Buttons
+
+Cards
+
+Badges
+
+Icons
+
+Spacing
+
+Typography
+
+Tables
+
+Forms
+
+Breadcrumb
+
+Page title
+
+Page description
+
+Every page must look like ONE PRODUCT.
+
+==================================================
+PHASE 7
+STREAMING
+==================================================
+
+Verify:
+
+Player
+
+Now Playing
+
+Program
+
+Host
+
+Next Program
+
+Remaining Time
+
+Auto Refresh
+
+No console errors
+
+==================================================
+PHASE 8
+REPORT
+==================================================
+
+Generate:
+
+docs/reports/demo-freeze-report.md
+
+Include:
+
+PASS
+
+WARNING
+
+FAIL
+
+For each issue include:
+
+Severity
+
+Location
+
+Screenshot reference if possible
+
+Fix applied
+
+Remaining risk
+
+==================================================
+FINAL
+==================================================
+
+If a bug can be safely fixed now,
+FIX IT.
+
+If fixing would require architectural changes,
+DO NOT FIX.
+
+Document it.
+
+==================================================
+OUTPUT
+==================================================
+
+When finished provide:
+
+1. Pages tested
+
+2. Bugs fixed
+
+3. Remaining bugs
+
+4. Demo readiness score (0-100)
+
+5. Risk assessment
+
+6. Updated changelog
+
+7. Updated PROJECT_STATE.md
+
+8. Sprint 4.5 report
+
+This sprint is considered COMPLETE only when the application is suitable for a customer-facing live demonstration.

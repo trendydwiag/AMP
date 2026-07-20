@@ -8,3 +8,4 @@
 - [Global Context Processor](global-context-processor.md) — SiteSettings + SocialMediaSettings fully exposed via context_processors; keys: SITE_LOGO_URL, SITE_ADDRESS, SITE_CONTACT_EMAIL/PHONE, SOCIAL_FACEBOOK/INSTAGRAM/TWITTER/YOUTUBE/TIKTOK etc.
 - [AMP Studio Dark Mode](amp-studio-dark-mode.md) — Must toggle both data-theme attr AND .dark class on <html>; Tailwind CDN needs darkMode:'class' + coffee palette in config.
 - [StreamHealth Model Fields](streamhealth-fields.md) — Correct field names for StreamHealth; common wrong names used in templates.
+- [CurrentProgramResolver Timezone](current-program-resolver-tz.md) — Must use localtime(now) not now; schedule times stored in WIB, server is UTC+7.
