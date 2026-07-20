@@ -69,6 +69,19 @@
   color: var(--amp-text-inverse);
   border-color: var(--amp-success);
 }
+.amp-btn-success:hover:not(:disabled) {
+  background: var(--amp-success-dark);
+  border-color: var(--amp-success-dark);
+}
+.amp-btn-warning {
+  background: var(--amp-warning);
+  color: var(--amp-text-inverse);
+  border-color: var(--amp-warning);
+}
+.amp-btn-warning:hover:not(:disabled) {
+  background: var(--amp-warning-dark);
+  border-color: var(--amp-warning-dark);
+}
 
 /* Button Sizes */
 .amp-btn-xs { padding: var(--amp-space-1) var(--amp-space-2); font-size: var(--amp-text-xs); border-radius: var(--amp-radius-sm); }

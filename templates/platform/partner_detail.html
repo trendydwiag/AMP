@@ -21,7 +21,7 @@
                 <p class="text-coffee-600">{{ partner.slug }} | {{ partner.get_tier_display }} | {{ partner.get_status_display }}</p>
             </div>
         </div>
-        <a href="{% url 'platform:partner_edit' partner.pk %}" class="px-4 py-2 bg-coffee-600 text-white rounded-lg hover:bg-coffee-700 transition">Edit Partner</a>
+        <a href="{% url 'platform:partner_edit' partner.pk %}" class="amp-btn amp-btn-primary">Edit Partner</a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

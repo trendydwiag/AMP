@@ -1,3 +1,4 @@
+- [Button System Rules](button-system-rules.md) — Selalu gunakan amp-btn + variant; raw Tailwind custom colors (bg-coffee-*) bisa invisible (putih di atas putih) karena CDN JIT failure.
 - [Radio Streaming Proxy](radio-streaming-proxy.md) — Replit dev proxy buffers streaming; always return direct provider stream_url, never /radio/stream/ as default.
 - [Media Pipeline Engine](sprint-4-2-pipeline.md) — All uploads go through MediaPipelineService; pipeline.py/storage.py/events.py; 9 new fields on MediaFile; mutagen for metadata.
 - [Sprint 4.1 Polish Findings](sprint-4-1.md) — Coming Soon pattern fix, old media_manager card style, empty state standard, known tech debt.
