@@ -571,10 +571,14 @@ class LiveRadioAPIView(View):
                 'cover': np.artwork or '',
                 'listeners': listener_data.current_listeners,
                 'started_at': np.started_at.isoformat() if np.started_at else None,
-                # Direct stream URL — browser connects straight to the source.
-                # The Django proxy (/radio/stream/) is skipped because Replit's
-                # reverse proxy buffers streaming responses, preventing audio delivery.
-                'stream_url': stream_url,
+                # Route audio through the Django proxy (/radio/stream/) so the server
+                # can add the ngrok-skip-browser-warning header. Without this, ngrok
+                # shows an HTML interstitial to any browser that hasn't previously
+                # visited the ngrok URL — blocking playback on all external devices
+                # (phones, other computers). The proxy streams bytes verbatim; the
+                # direct URL is stored in stream_url_direct for debugging only.
+                'stream_url': '/radio/stream/',
+                'stream_url_direct': stream_url,
                 'is_live': is_live,
                 'provider': provider_key.lower(),
             }
@@ -596,7 +600,8 @@ class LiveRadioAPIView(View):
                 'cover': '',
                 'listeners': 0,
                 'started_at': None,
-                'stream_url': listen_url_fallback,
+                'stream_url': '/radio/stream/',
+                'stream_url_direct': listen_url_fallback,
                 'is_live': True,
                 'provider': provider_key.lower(),
             }
