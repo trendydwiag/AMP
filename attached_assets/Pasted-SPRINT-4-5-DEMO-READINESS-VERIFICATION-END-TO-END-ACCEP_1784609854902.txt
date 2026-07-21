@@ -1,0 +1,569 @@
+SPRINT 4.5 — DEMO READINESS VERIFICATION & END-TO-END ACCEPTANCE
+
+PRIORITY: CRITICAL
+MODE: DEMO LOCK
+TARGET DEMO: TODAY 18:00
+
+==================================================
+OBJECTIVE
+==================================================
+
+Kabulhaden CMS / AMP Studio akan digunakan untuk demo client hari ini.
+
+Project saat ini sudah dinyatakan secara manual oleh owner sebagai:
+
+- UI sudah nyaman
+- UI sudah konsisten
+- Dark mode sudah acceptable
+- Navigation sudah acceptable
+- Live radio sudah berjalan
+- Current Program sudah terintegrasi
+- Calendar sudah menggunakan real schedule data
+- Playlist CRUD sudah tersedia
+- Demo readiness sekitar 97/100
+
+JANGAN mengubah UX/UI yang sudah ada kecuali ditemukan BUG nyata.
+
+Sprint ini adalah FINAL VERIFICATION.
+
+Bukan feature development.
+
+Bukan redesign.
+
+Bukan refactoring.
+
+Bukan architecture change.
+
+==================================================
+MANDATORY FIRST STEP
+==================================================
+
+Baca terlebih dahulu:
+
+1. docs/AI_CONTEXT.md
+2. docs/PROJECT_STATE.md
+3. docs/changelog/CHANGELOG.md
+4. docs/sprints/NEXT_SPRINT.md
+5. docs/architecture/TECH_DEBT.md
+6. docs/reports/sprint-4.4.2-report.md
+
+Kemudian inspect kode aktual.
+
+Jika dokumentasi berbeda dengan kode:
+
+TRUST THE CODE.
+
+Jangan membuat asumsi berdasarkan sprint lama.
+
+==================================================
+PHASE 1
+DEMO DATA VERIFICATION
+==================================================
+
+Jalankan atau verifikasi:
+
+python manage.py demo_seed --reset
+
+Pastikan command selesai tanpa error.
+
+Verifikasi database memiliki data demo untuk:
+
+- Partner
+- User
+- Program
+- Host
+- Schedule
+- Broadcast Session jika tersedia
+- Episode
+- Playlist
+- Podcast
+- Podcast Episode
+- News / Article
+- Media
+- Community
+- Sponsor
+- Settings
+
+JANGAN menghapus data production.
+
+Pastikan command hanya dijalankan pada environment development/demo yang aman.
+
+Jika demo_seed gagal:
+
+FIX hanya blocker yang menyebabkan demo gagal.
+
+Jangan melakukan refactor besar.
+
+==================================================
+PHASE 2
+AUTHENTICATION & RBAC VERIFICATION
+==================================================
+
+Verifikasi akun demo:
+
+SUPERUSER
+ADMINISTRATOR
+EDITOR
+VIEWER
+
+Pastikan:
+
+- login berhasil
+- logout berhasil
+- redirect setelah login benar
+- dashboard sesuai role
+- sidebar sesuai permission
+- restricted page menghasilkan 403 atau redirect yang benar
+- tidak ada privilege escalation
+
+Jika akun demo belum tersedia,
+gunakan management command yang sudah ada.
+
+Jangan mengubah sistem RBAC.
+
+==================================================
+PHASE 3
+CRITICAL ROUTE AUDIT
+==================================================
+
+Audit semua halaman yang akan terlihat dalam demo.
+
+Minimal:
+
+/akun/masuk/
+
+/studio/
+
+/studio/streaming/
+
+/studio/analytics/
+
+/studio/program/
+
+/studio/episode/
+
+/studio/podcast/
+
+/studio/news/
+
+/studio/community/
+
+/studio/iklan/
+
+/studio/media/
+
+/studio/settings/
+
+/broadcast/
+
+/broadcast/playlist/
+
+/website/
+
+Dan seluruh route yang terhubung dari sidebar utama.
+
+Pastikan:
+
+- HTTP 200
+- tidak 404
+- tidak 500
+- tidak template error
+- tidak VariableDoesNotExist
+- tidak NoReverseMatch
+- tidak database error
+
+Jika menemukan error nyata:
+
+FIX.
+
+Jika halaman hanya kosong karena memang belum memiliki data:
+
+JANGAN membuat fake data baru secara manual.
+
+Gunakan demo_seed atau empty state yang sudah ada.
+
+==================================================
+PHASE 4
+LIVE RADIO VERIFICATION
+==================================================
+
+Verifikasi:
+
+GET /api/v1/radio/live/
+
+Pastikan response valid.
+
+Minimal field:
+
+status
+station
+title
+artist
+stream_url
+is_live
+provider
+
+Pastikan:
+
+- provider aktif benar
+- stream_url tersedia
+- is_live benar
+- now playing tersedia jika provider mengirimkannya
+- current program tersedia jika schedule aktif
+
+Verifikasi audio player.
+
+Pastikan:
+
+1. Website player dapat play.
+2. Studio player dapat play.
+3. Now Playing tampil.
+4. Artist tampil.
+5. Title tampil.
+6. Current Program tampil.
+7. Host tampil jika tersedia.
+8. Schedule time tampil jika tersedia.
+
+JANGAN mengubah provider.
+
+JANGAN mengganti stream URL.
+
+JANGAN mengubah polling interval.
+
+JANGAN melakukan perubahan arsitektur streaming.
+
+Jika stream eksternal sedang offline karena provider/ngrok,
+catat sebagai external dependency.
+
+Jangan membuat perubahan kode hanya karena external service sedang offline.
+
+==================================================
+PHASE 5
+PROGRAM & SCHEDULE VERIFICATION
+==================================================
+
+Pastikan demo dapat menunjukkan:
+
+Program
+
+→ Host
+
+→ Schedule
+
+→ Current Program
+
+→ Live Radio
+
+→ Next Program
+
+Jika Current Program tidak muncul:
+
+periksa timezone.
+
+Periksa day_of_week.
+
+Periksa schedule active state.
+
+Periksa resolver.
+
+FIX hanya jika ada bug nyata.
+
+==================================================
+PHASE 6
+CRITICAL CRUD VERIFICATION
+==================================================
+
+Test minimal satu flow untuk:
+
+Program
+
+Create
+Read
+Update
+
+Schedule
+
+Create
+Read
+Update
+
+Playlist
+
+Create
+Read
+Update
+
+News
+
+Create
+Read
+Update
+
+Podcast
+
+Create
+Read
+Update
+
+Media
+
+Upload
+Read
+
+JANGAN menguji destructive delete pada production data.
+
+Jika ada CRUD yang error:
+
+FIX blocker tersebut.
+
+==================================================
+PHASE 7
+PUBLIC WEBSITE VERIFICATION
+==================================================
+
+Verifikasi public website.
+
+Minimal:
+
+Homepage
+
+Live Radio
+
+Program
+
+Podcast
+
+News
+
+Article Detail
+
+Pastikan:
+
+- tidak 500
+- tidak broken link
+- live player tampil
+- current program tampil
+- now playing tampil
+- content dari demo seed tampil
+
+==================================================
+PHASE 8
+DARK / LIGHT MODE
+==================================================
+
+Lakukan smoke test.
+
+Minimal:
+
+Dashboard
+
+Streaming
+
+Program
+
+Podcast
+
+News
+
+Media
+
+Settings
+
+Public Homepage
+
+Pastikan tidak ada:
+
+- white-on-white
+- black-on-black
+- invisible text
+- broken dropdown
+- broken modal
+- broken table
+
+JANGAN redesign.
+
+UI saat ini sudah dinyatakan acceptable oleh owner.
+
+==================================================
+PHASE 9
+DEMO BLOCKER SCAN
+==================================================
+
+Cari hanya masalah yang dapat menggagalkan demo:
+
+- HTTP 500
+- HTTP 404 pada menu utama
+- broken login
+- broken logout
+- broken player
+- broken CRUD utama
+- missing template
+- missing URL
+- database exception
+- JavaScript fatal error
+- template VariableDoesNotExist
+- NoReverseMatch
+
+JANGAN menghabiskan waktu memperbaiki:
+
+- minor pixel spacing
+- minor typography
+- refactor
+- technical debt non-critical
+- performance optimization non-critical
+- architecture improvement
+- code cleanup non-critical
+
+==================================================
+PHASE 10
+DEMO SMOKE TEST
+==================================================
+
+Simulasikan perjalanan demo dari awal sampai akhir:
+
+1. Open public website
+2. Play radio
+3. Show Now Playing
+4. Show Current Program
+5. Login
+6. Show Studio Dashboard
+7. Show Program
+8. Show Schedule
+9. Show Calendar
+10. Show Playlist
+11. Show Podcast
+12. Show News
+13. Show Media
+14. Show Community
+15. Show Sponsor
+16. Show Analytics
+17. Show Settings
+18. Return to public website
+
+Pastikan tidak ada dead end.
+
+==================================================
+STRICT DEMO LOCK RULES
+==================================================
+
+DO NOT:
+
+- membuat fitur baru
+- redesign UI
+- mengubah design system
+- mengubah database schema
+- refactor architecture
+- mengganti provider streaming
+- mengganti stream URL
+- mengubah RBAC
+- mengubah business logic yang sudah bekerja
+- menghapus data demo
+- menghapus dokumentasi
+- mengubah UX yang sudah dinyatakan acceptable oleh owner
+
+ONLY:
+
+- verify
+- diagnose
+- fix critical blocker
+- update documentation
+
+==================================================
+FINAL REPORT
+==================================================
+
+Setelah selesai, berikan laporan dengan format:
+
+DEMO READINESS STATUS
+
+Score:
+X / 100
+
+CRITICAL BLOCKERS
+
+List:
+
+1.
+2.
+3.
+
+Jika tidak ada:
+
+NONE
+
+FIXES APPLIED
+
+List seluruh perubahan yang benar-benar dilakukan.
+
+VERIFIED FLOWS
+
+List flow yang berhasil diverifikasi.
+
+EXTERNAL DEPENDENCIES
+
+Contoh:
+
+- Icecast
+- ngrok
+- Broadcastindo
+- External API
+
+Jelaskan jika ada dependency yang dapat mempengaruhi demo.
+
+KNOWN NON-BLOCKERS
+
+List issue yang sengaja tidak diperbaiki karena tidak mempengaruhi demo.
+
+FINAL VERDICT
+
+Pilih salah satu:
+
+READY FOR DEMO
+
+atau
+
+READY FOR DEMO WITH KNOWN LIMITATIONS
+
+atau
+
+NOT READY FOR DEMO
+
+==================================================
+DOCUMENTATION
+==================================================
+
+Jika ada perubahan kode:
+
+Update:
+
+docs/PROJECT_STATE.md
+
+docs/changelog/CHANGELOG.md
+
+docs/architecture/TECH_DEBT.md
+
+Buat:
+
+docs/reports/sprint-4.5-demo-readiness.md
+
+Jangan mengubah nomor sprint lain.
+
+==================================================
+IMPORTANT
+==================================================
+
+Setelah audit selesai:
+
+STOP.
+
+Jangan melanjutkan ke Sprint 4.6.
+
+Jangan mulai Analytics development.
+
+Jangan melakukan refactoring tambahan.
+
+Project harus masuk kondisi DEMO LOCK.
+
+Tujuan utama:
+
+Kabulhaden CMS siap didemokan hari ini pukul 18:00.

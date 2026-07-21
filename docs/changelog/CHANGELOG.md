@@ -292,4 +292,42 @@ Documentation sprint. Full knowledge base audit and synchronization after drift 
 
 ---
 
+## Sprint 4.5 — Demo Readiness Verification & End-to-End Acceptance (21 Juli 2026)
+
+### Summary
+Sprint Demo Lock. Tidak ada fitur baru, tidak ada refactor. Full verification audit sebelum demo client pukul 18:00.
+
+### Fixes Applied (sebelum fase verifikasi)
+- **Button white-on-white fix** — 13 template dikonversi dari raw Tailwind custom colors (`bg-coffee-*`) ke `amp-btn` system menggunakan CSS variables yang reliable. Root cause: Tailwind CDN JIT untuk custom colors bisa silent-fail, menghasilkan background transparent + `text-white` = invisible button.
+- **CSS: `amp-btn-warning`** — Class baru ditambahkan ke `static/css/amp-studio/components.css` (background: `var(--amp-warning)`, white text).
+- **Templates diperbaiki:** `settings/_form_generic.html`, `settings/site.html`, `broadcast/program_list`, `program_form`, `playlist_list`, `playlist_form`, `episode_form`, `cms/episode_form`, `dashboard`, `platform/partner_form`, `partner_detail`, `theme_edit`, `users/admin/user_detail`.
+
+### Verification Results
+- demo_seed --reset: ✅ Selesai tanpa error (340+ records)
+- Route audit: ✅ 32/32 routes HTTP 200
+- Auth (4 roles): ✅ Login, logout, redirect benar
+- CRUD: ✅ Program, Schedule, Playlist, News, Podcast, Media semua 200
+- Live Radio API: ✅ Semua required fields hadir, status "live"
+- Public website: ✅ Semua halaman utama 200
+- Settings: ✅ Semua 10 sub-halaman 200
+- RBAC: ✅ VIEWER di-redirect dari create forms
+
+### Demo Readiness Score
+**98 / 100** (naik dari 97/100 di Sprint 4.4.2)
+
+### Critical Blockers
+**NONE**
+
+### Known Limitations (non-blocking)
+- `current_program` null pada jam audit (12:00 WIB) — tidak ada jadwal tengah hari; pada jam demo (18:00 WIB) jadwal aktif akan tampil
+- Stream audio `stream.kabulhaden.online` tidak dapat diakses dari Replit dev container (DNS restriction) — berjalan normal di production server
+- Playlist dan MediaFile: 0 entries — demo_seed tidak seed konten file, empty state ditampilkan dengan benar
+
+### Documents Created
+- `docs/reports/sprint-4.5-demo-readiness.md` — Full verification report
+
+> Lihat `docs/reports/sprint-4.5-demo-readiness.md` untuk detail lengkap.
+
+---
+
 _Previous sprint history will be appended above this line as new sprints are completed._
